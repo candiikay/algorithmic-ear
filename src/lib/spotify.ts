@@ -79,24 +79,33 @@ export async function getRecommendations(
       throw new Error('No tracks found in search results')
     }
     
-    // Step 2: Get audio features for all tracks
-    const trackIds = allTracks.map(track => track.id).slice(0, 100) // Spotify limit
-    const featuresUrl = `https://api.spotify.com/v1/audio-features?ids=${trackIds.join(',')}`
-    console.log('Fetching audio features for', trackIds.length, 'tracks')
+    // Step 2: Try to get audio features, but don't fail if not available
+    let audioFeatures: any[] = []
     
-    const featuresResponse = await fetch(featuresUrl, {
-      headers: { 
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+    try {
+      const trackIds = allTracks.map(track => track.id).slice(0, 100) // Spotify limit
+      const featuresUrl = `https://api.spotify.com/v1/audio-features?ids=${trackIds.join(',')}`
+      console.log('Fetching audio features for', trackIds.length, 'tracks')
+      
+      const featuresResponse = await fetch(featuresUrl, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+      
+      if (featuresResponse.ok) {
+        const featuresData = await featuresResponse.json()
+        audioFeatures = featuresData.audio_features || []
+        console.log('Successfully fetched audio features for', audioFeatures.length, 'tracks')
+      } else {
+        console.warn(`Audio features failed (${featuresResponse.status}) - using default values`)
+        // Continue without audio features - we'll use defaults
       }
-    })
-    
-    if (!featuresResponse.ok) {
-      throw new Error(`Audio features failed: ${featuresResponse.status}`)
+    } catch (error) {
+      console.warn('Audio features error:', error, '- using default values')
+      // Continue without audio features - we'll use defaults
     }
-    
-    const featuresData = await featuresResponse.json()
-    const audioFeatures = featuresData.audio_features || []
     
     // Step 3: Create track + features pairs
     const tracksWithFeatures = allTracks.map(track => {
@@ -132,23 +141,31 @@ export async function getRecommendations(
     // Step 4: Custom recommendation algorithm
     const recommendations = playableTracks
       .map(track => {
-        // Calculate similarity score based on target features
-        const energyDiff = Math.abs(track.energy - targetEnergy)
-        const valenceDiff = Math.abs(track.valence - targetValence)
-        const danceabilityDiff = Math.abs(track.danceability - targetDanceability)
-        
-        // Weighted similarity score (lower is better)
-        const similarityScore = (energyDiff * 0.4) + (valenceDiff * 0.4) + (danceabilityDiff * 0.2)
-        
-        // Add some randomness to avoid always getting the same results
-        const randomFactor = Math.random() * 0.1
-        
-        return {
-          ...track,
-          _similarityScore: similarityScore + randomFactor
+        // If we have audio features, use them for similarity scoring
+        if (audioFeatures.length > 0) {
+          const energyDiff = Math.abs(track.energy - targetEnergy)
+          const valenceDiff = Math.abs(track.valence - targetValence)
+          const danceabilityDiff = Math.abs(track.danceability - targetDanceability)
+          
+          // Weighted similarity score (lower is better)
+          const similarityScore = (energyDiff * 0.4) + (valenceDiff * 0.4) + (danceabilityDiff * 0.2)
+          
+          return {
+            ...track,
+            _similarityScore: similarityScore
+          }
+        } else {
+          // If no audio features, use popularity and randomness for variety
+          const popularityScore = (100 - (track.popularity || 50)) / 100 // Lower popularity = higher score
+          const randomFactor = Math.random() * 0.5
+          
+          return {
+            ...track,
+            _similarityScore: popularityScore + randomFactor
+          }
         }
       })
-      .sort((a, b) => a._similarityScore - b._similarityScore) // Sort by similarity
+      .sort((a, b) => a._similarityScore - b._similarityScore) // Sort by score
       .slice(0, limit) // Take top recommendations
       .map(({ _similarityScore, ...track }) => track) // Remove internal score
     
