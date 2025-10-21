@@ -16,6 +16,13 @@ function App() {
   const [currentAlgorithm, setCurrentAlgorithm] = useState<keyof typeof ALGORITHM_CONFIGS>('greedyDanceability')
   const [error, setError] = useState<string | null>(null)
 
+  console.log('🎵 App component state:', { 
+    isLoading, 
+    tracksCount: tracks.length, 
+    playlistCount: playlist.length,
+    currentTrack: currentTrack?.name 
+  })
+
   useEffect(() => {
     loadTracks()
   }, [])
@@ -152,6 +159,8 @@ function App() {
       </div>
     )
   }
+
+  console.log('🎵 About to render PlaylistAnalysis with:', { tracksCount: tracks.length, playlistCount: playlist.length })
 
   return (
     <div className="app">
