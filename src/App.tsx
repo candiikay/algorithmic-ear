@@ -24,7 +24,7 @@ function App() {
     try {
       setIsLoading(true)
       setError(null)
-      console.log('🚀 Starting data load on live site...')
+      console.log('🚀 Starting data load on live site... (v2.0)')
       console.log('🌐 Current URL:', window.location.href)
 
       // Try to get real Spotify data
