@@ -8,22 +8,11 @@ interface PlaylistAnalysisProps {
 }
 
 export default function PlaylistAnalysis({ tracks, playlist }: PlaylistAnalysisProps) {
-  console.log('📊 PlaylistAnalysis component rendered')
-  console.log('📊 PlaylistAnalysis received playlist:', playlist.length, 'tracks')
-  console.log('📊 Playlist sample data:', playlist[0])
-  console.log('📊 Playlist energy values:', playlist.map(t => t.energy))
-  console.log('📊 Playlist valence values:', playlist.map(t => t.valence))
-  console.log('📊 Playlist tempo values:', playlist.map(t => t.tempo))
-  
   if (playlist.length === 0) {
-    console.log('📊 Playlist is empty, not rendering analysis')
     return null
   }
 
-  // Calculate playlist statistics
   const stats = calculatePlaylistStats(playlist)
-  console.log('📊 Calculated stats:', stats)
-  
   const moodDistribution = calculateMoodDistribution(playlist)
   const tempoDistribution = calculateTempoDistribution(playlist)
 

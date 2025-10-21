@@ -8,19 +8,23 @@ import { joinTracksWithFeatures, normalizeFeatures } from './lib/transform'
 import { generatePlaylist, generateClusteringPlaylist, generateHybridPlaylist, ALGORITHM_CONFIGS } from './lib/algorithms'
 import './App.css'
 
-function App() {
-  const [isLoading, setIsLoading] = useState(true)
-  const [tracks, setTracks] = useState<Track[]>([])
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(null)
-  const [playlist, setPlaylist] = useState<Track[]>([])
-  const [currentAlgorithm, setCurrentAlgorithm] = useState<keyof typeof ALGORITHM_CONFIGS>('greedyDanceability')
-  const [error, setError] = useState<string | null>(null)
+interface AppState {
+  isLoading: boolean
+  tracks: Track[]
+  currentTrack: Track | null
+  playlist: Track[]
+  currentAlgorithm: keyof typeof ALGORITHM_CONFIGS
+  error: string | null
+}
 
-  console.log('🎵 App component state:', { 
-    isLoading, 
-    tracksCount: tracks.length, 
-    playlistCount: playlist.length,
-    currentTrack: currentTrack?.name 
+function App() {
+  const [state, setState] = useState<AppState>({
+    isLoading: true,
+    tracks: [],
+    currentTrack: null,
+    playlist: [],
+    currentAlgorithm: 'greedyDanceability',
+    error: null
   })
 
   useEffect(() => {
@@ -28,41 +32,21 @@ function App() {
   }, [])
 
   const loadTracks = async () => {
-    try {
-      setIsLoading(true)
-      setError(null)
-      console.log('🚀 Starting data load on live site... (v2.0)')
-      console.log('🌐 Current URL:', window.location.href)
+    setState(prev => ({ ...prev, isLoading: true, error: null }))
 
-      // Try to get real Spotify data
-      console.log('🔑 Fetching token...')
+    try {
       const tokenData = await getToken()
-      console.log('🔑 Got token:', tokenData.access_token ? 'Yes' : 'No')
-      
-      console.log('🎵 Fetching recommendations...')
       const recommendations = await getRecommendations(tokenData.access_token, {
         genres: ['pop', 'electronic', 'indie'],
         limit: 20
       })
-      console.log('🎵 Got recommendations:', recommendations.tracks?.length || 0, 'tracks')
       
-      if (recommendations.tracks && recommendations.tracks.length > 0) {
-        console.log('🎵 First track:', recommendations.tracks[0].name, 'by', recommendations.tracks[0].artists?.[0]?.name)
-      }
-      
-      // The custom recommendation engine already handles audio features internally
-      // No need to fetch them again - just use the tracks directly
-      console.log('🎼 Using tracks from custom recommendation engine (audio features already processed)')
-      
-      // Transform SpotifyTrack to Track type (the custom engine already includes audio features)
       const tracksAsTrackType = recommendations.tracks.map(track => ({
         id: track.id,
         name: track.name,
         artist: track.artists?.[0]?.name || 'Unknown Artist',
         preview: track.preview_url || '',
         popularity: track.popularity || 50,
-        // Audio features are already included by the custom recommendation engine
-        // Use type assertion since we know the custom engine adds these properties
         danceability: (track as any).danceability || 0.5,
         energy: (track as any).energy || 0.5,
         valence: (track as any).valence || 0.5,
@@ -78,40 +62,35 @@ function App() {
       }))
       
       const normalizedTracks = normalizeFeatures(tracksAsTrackType)
-      console.log('📊 Final tracks:', normalizedTracks.length, 'tracks')
       
-      setTracks(normalizedTracks)
+      setState(prev => ({
+        ...prev,
+        tracks: normalizedTracks,
+        currentTrack: normalizedTracks[0] || null,
+        isLoading: false
+      }))
       
       if (normalizedTracks.length > 0) {
-        setCurrentTrack(normalizedTracks[0])
-        // Use the default algorithm for initial playlist generation
         generateNewPlaylist(normalizedTracks, 'greedyDanceability')
-        console.log('✅ Successfully loaded real Spotify data!')
       }
     } catch (err) {
-      console.warn('❌ Spotify API failed, using fallback data:', err)
-      setError('Using sample data (Spotify API unavailable)')
-      
-      // Use fallback data
       const fallbackTracks = normalizeFeatures([...FALLBACK_TRACKS] as Track[])
-      setTracks(fallbackTracks)
+      
+      setState(prev => ({
+        ...prev,
+        tracks: fallbackTracks,
+        currentTrack: fallbackTracks[0] || null,
+        error: 'Using sample data (Spotify API unavailable)',
+        isLoading: false
+      }))
       
       if (fallbackTracks.length > 0) {
-        setCurrentTrack(fallbackTracks[0])
         generateNewPlaylist(fallbackTracks, 'greedyDanceability')
       }
-      console.log('🔄 Using fallback data')
-    } finally {
-      setIsLoading(false)
-      console.log('🏁 Data loading complete')
     }
   }
 
   const generateNewPlaylist = (trackPool: Track[], algorithm: keyof typeof ALGORITHM_CONFIGS) => {
-    console.log('🎯 Generating playlist with algorithm:', algorithm)
-    console.log('🎯 Track pool size:', trackPool.length)
-    console.log('🎯 Sample track data:', trackPool[0])
-    
     let newPlaylist: Track[] = []
     
     if (algorithm === 'clustering') {
@@ -123,33 +102,26 @@ function App() {
       newPlaylist = generatePlaylist(trackPool, config, 8)
     }
     
-    console.log('🎯 Generated playlist:', newPlaylist.length, 'tracks')
-    console.log('🎯 Playlist sample:', newPlaylist[0])
-    console.log('🎯 Playlist energy values:', newPlaylist.map(t => t.energy))
-    console.log('🎯 Playlist valence values:', newPlaylist.map(t => t.valence))
-    console.log('🎯 Playlist tempo values:', newPlaylist.map(t => t.tempo))
-    
-    setPlaylist(newPlaylist)
+    setState(prev => ({ ...prev, playlist: newPlaylist }))
   }
 
   const handleAlgorithmChange = (algorithm: keyof typeof ALGORITHM_CONFIGS) => {
-    setCurrentAlgorithm(algorithm)
-    generateNewPlaylist(tracks, algorithm)
+    setState(prev => ({ ...prev, currentAlgorithm: algorithm }))
+    generateNewPlaylist(state.tracks, algorithm)
   }
 
   const handleTrackSelect = (track: Track) => {
-    setCurrentTrack(track)
+    setState(prev => ({ ...prev, currentTrack: track }))
   }
 
   const handleTrackEnd = () => {
-    // Auto-advance to next track in playlist
-    const currentIndex = playlist.findIndex(t => t.id === currentTrack?.id)
-    if (currentIndex !== -1 && currentIndex < playlist.length - 1) {
-      setCurrentTrack(playlist[currentIndex + 1])
+    const currentIndex = state.playlist.findIndex(t => t.id === state.currentTrack?.id)
+    if (currentIndex !== -1 && currentIndex < state.playlist.length - 1) {
+      setState(prev => ({ ...prev, currentTrack: state.playlist[currentIndex + 1] }))
     }
   }
 
-  if (isLoading) {
+  if (state.isLoading) {
     return (
       <div className="loading-screen">
         <div className="loading-content">
@@ -160,8 +132,6 @@ function App() {
     )
   }
 
-  console.log('🎵 About to render PlaylistAnalysis with:', { tracksCount: tracks.length, playlistCount: playlist.length })
-
   return (
     <div className="app">
       <header className="hero">
@@ -171,7 +141,7 @@ function App() {
           An interactive exploration of how algorithms shape musical taste through 
           Spotify data and machine reasoning.
         </p>
-        {error && <p className="error-message">{error}</p>}
+        {state.error && <p className="error-message">{state.error}</p>}
       </header>
 
       <main className="content">
@@ -194,37 +164,37 @@ function App() {
             <h3>Choose an Algorithm:</h3>
             <div className="algorithm-buttons">
               <button 
-                className={currentAlgorithm === 'greedyDanceability' ? 'active' : ''}
+                className={state.currentAlgorithm === 'greedyDanceability' ? 'active' : ''}
                 onClick={() => handleAlgorithmChange('greedyDanceability')}
               >
                 Greedy: Most Danceable
               </button>
               <button 
-                className={currentAlgorithm === 'greedyEnergy' ? 'active' : ''}
+                className={state.currentAlgorithm === 'greedyEnergy' ? 'active' : ''}
                 onClick={() => handleAlgorithmChange('greedyEnergy')}
               >
                 Greedy: Most Energetic
               </button>
               <button 
-                className={currentAlgorithm === 'searchHappy' ? 'active' : ''}
+                className={state.currentAlgorithm === 'searchHappy' ? 'active' : ''}
                 onClick={() => handleAlgorithmChange('searchHappy')}
               >
                 Search: Happy Mood
               </button>
               <button 
-                className={currentAlgorithm === 'searchChill' ? 'active' : ''}
+                className={state.currentAlgorithm === 'searchChill' ? 'active' : ''}
                 onClick={() => handleAlgorithmChange('searchChill')}
               >
                 Search: Chill Mood
               </button>
               <button 
-                className={currentAlgorithm === 'clustering' ? 'active' : ''}
+                className={state.currentAlgorithm === 'clustering' ? 'active' : ''}
                 onClick={() => handleAlgorithmChange('clustering')}
               >
                 Clustering: Similar Tracks
               </button>
               <button 
-                className={currentAlgorithm === 'hybrid' ? 'active' : ''}
+                className={state.currentAlgorithm === 'hybrid' ? 'active' : ''}
                 onClick={() => handleAlgorithmChange('hybrid')}
               >
                 Hybrid: Mixed Approach
@@ -234,9 +204,9 @@ function App() {
 
           <div className="visualization-container">
             <TasteSpaceVisualization
-              tracks={tracks}
-              currentTrack={currentTrack}
-              playlist={playlist}
+              tracks={state.tracks}
+              currentTrack={state.currentTrack}
+              playlist={state.playlist}
               onTrackSelect={handleTrackSelect}
               width={800}
               height={500}
@@ -245,20 +215,20 @@ function App() {
 
           <div className="audio-container">
             <AudioPlayer
-              track={currentTrack}
+              track={state.currentTrack}
               autoPlay={false}
               onTrackEnd={handleTrackEnd}
             />
           </div>
 
           <div className="playlist-info">
-            <h3>Current Playlist ({playlist.length} tracks)</h3>
+            <h3>Current Playlist ({state.playlist.length} tracks)</h3>
             <div className="playlist-tracks">
-              {playlist.map((track, index) => (
+              {state.playlist.map((track, index) => (
                 <div 
                   key={track.id}
-                  className={`playlist-track ${track.id === currentTrack?.id ? 'current' : ''}`}
-                  onClick={() => setCurrentTrack(track)}
+                  className={`playlist-track ${track.id === state.currentTrack?.id ? 'current' : ''}`}
+                  onClick={() => handleTrackSelect(track)}
                 >
                   <span className="track-number">{index + 1}</span>
                   <span className="track-name">{track.name}</span>
@@ -268,7 +238,7 @@ function App() {
             </div>
           </div>
 
-          <PlaylistAnalysis tracks={tracks} playlist={playlist} />
+          <PlaylistAnalysis tracks={state.tracks} playlist={state.playlist} />
         </section>
 
         <section className="theory-section">
