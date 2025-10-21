@@ -9,7 +9,20 @@
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@vitejs/plugin-react": "^5.0.4",
     "typescript": "~5.9.3",
     "vite": "^7.1.7"
+  },
+  "dependencies": {
+    "@types/d3": "^7.4.3",
+    "@types/p5": "^1.7.6",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "d3": "^7.9.0",
+    "p5": "^2.0.5",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "scrollama": "^3.2.0",
+    "tone": "^15.1.22"
   }
 }

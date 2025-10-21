@@ -1,0 +1,287 @@
+/* App-specific styles */
+.app {
+  /* Additional app styles can go here */
+}
+
+/* Error message */
+.error-message {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+/* Algorithm controls */
+.algorithm-controls {
+  margin: 2rem 0;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.algorithm-controls h3 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.algorithm-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.algorithm-buttons button {
+  padding: 1rem;
+  border: 2px solid #ddd;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.algorithm-buttons button:hover {
+  border-color: #667eea;
+  transform: translateY(-2px);
+}
+
+.algorithm-buttons button.active {
+  background: #667eea;
+  color: white;
+  border-color: #667eea;
+}
+
+/* Visualization container */
+.visualization-container {
+  margin: 2rem 0;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.taste-space-viz {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.taste-space-viz svg {
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+
+.track-details {
+  margin-top: 1rem;
+  text-align: center;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+.track-details h4 {
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.track-details p {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+/* Audio player */
+.audio-container {
+  margin: 2rem 0;
+  padding: 2rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.audio-player {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.track-info h3 {
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-size: 1.3rem;
+}
+
+.track-info p {
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.play-button {
+  background: #667eea;
+  color: white;
+  border: none;
+  padding: 1rem 2rem;
+  border-radius: 50px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 80px;
+}
+
+.play-button:hover {
+  background: #5a6fd8;
+  transform: scale(1.05);
+}
+
+.track-features {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.track-features span {
+  background: #e9ecef;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  color: #495057;
+}
+
+.error {
+  text-align: center;
+  color: #dc3545;
+}
+
+.error p {
+  margin-bottom: 1rem;
+}
+
+/* Playlist info */
+.playlist-info {
+  margin: 2rem 0;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.playlist-info h3 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.playlist-tracks {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.playlist-track {
+  display: grid;
+  grid-template-columns: 40px 1fr auto;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  align-items: center;
+}
+
+.playlist-track:hover {
+  background: #e9ecef;
+  transform: translateX(5px);
+}
+
+.playlist-track.current {
+  background: #667eea;
+  color: white;
+}
+
+.track-number {
+  font-weight: bold;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.track-name {
+  font-weight: 500;
+  color: inherit;
+}
+
+.track-artist {
+  color: inherit;
+  opacity: 0.7;
+  font-size: 0.9rem;
+}
+
+/* Theory section */
+.theory-section {
+  margin: 4rem 0;
+  padding: 3rem;
+  background: #f8f9fa;
+  border-radius: 12px;
+}
+
+.theory-section h2 {
+  margin-bottom: 2rem;
+  color: #333;
+}
+
+.citations {
+  margin-top: 2rem;
+}
+
+.citations h3 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.citations ul {
+  list-style: none;
+  padding: 0;
+}
+
+.citations li {
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: white;
+  border-radius: 8px;
+  border-left: 4px solid #667eea;
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .algorithm-buttons {
+    grid-template-columns: 1fr;
+  }
+  
+  .controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .track-features {
+    justify-content: center;
+  }
+  
+  .playlist-track {
+    grid-template-columns: 30px 1fr;
+    gap: 0.5rem;
+  }
+  
+  .track-artist {
+    grid-column: 1 / -1;
+    margin-top: 0.5rem;
+  }
+}
