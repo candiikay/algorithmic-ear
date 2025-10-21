@@ -38,10 +38,11 @@ export async function getRecommendations(
     const genres = params.genres || ['pop', 'electronic', 'indie-pop']
     const limit = Math.min(params.limit || 20, 100) // Spotify max is 100
     
-    // Build query parameters with multiple seed types (better recommendations)
+    // Build query parameters - remove market for Client Credentials compatibility
     const queryParams = new URLSearchParams({
-      limit: String(limit),
-      market: 'US'
+      limit: String(limit)
+      // Note: market parameter only works with Authorization Code flow (user login)
+      // Client Credentials flow doesn't support market parameter
     })
 
     // Add seed parameters (Spotify requires at least one)
@@ -111,10 +112,10 @@ export async function getRecommendations(
           console.log('Request URL:', url)
           console.log('Query params:', Object.fromEntries(queryParams.entries()))
           
-          // Try fallback with just 'pop' genre and no market
-          if (queryParams.has('seed_genres') && queryParams.has('market')) {
-            console.log('Trying fallback: removing market parameter...')
-            const fallbackUrl = url.replace('&market=US', '')
+          // Try fallback with just 'pop' genre (no market, no target features)
+          if (queryParams.has('seed_genres')) {
+            console.log('Trying fallback: using only pop genre...')
+            const fallbackUrl = 'https://api.spotify.com/v1/recommendations?limit=20&seed_genres=pop'
             const fallbackResponse = await fetch(fallbackUrl, {
               headers: { 
                 'Authorization': `Bearer ${token}`,
