@@ -100,6 +100,10 @@ function App() {
   }
 
   const generateNewPlaylist = (trackPool: Track[], algorithm: keyof typeof ALGORITHM_CONFIGS) => {
+    console.log('🎯 Generating playlist with algorithm:', algorithm)
+    console.log('🎯 Track pool size:', trackPool.length)
+    console.log('🎯 Sample track data:', trackPool[0])
+    
     let newPlaylist: Track[] = []
     
     if (algorithm === 'clustering') {
@@ -110,6 +114,12 @@ function App() {
       const config = { ...ALGORITHM_CONFIGS[algorithm] }
       newPlaylist = generatePlaylist(trackPool, config, 8)
     }
+    
+    console.log('🎯 Generated playlist:', newPlaylist.length, 'tracks')
+    console.log('🎯 Playlist sample:', newPlaylist[0])
+    console.log('🎯 Playlist energy values:', newPlaylist.map(t => t.energy))
+    console.log('🎯 Playlist valence values:', newPlaylist.map(t => t.valence))
+    console.log('🎯 Playlist tempo values:', newPlaylist.map(t => t.tempo))
     
     setPlaylist(newPlaylist)
   }
