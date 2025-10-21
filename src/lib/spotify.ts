@@ -21,6 +21,7 @@ export async function getToken(): Promise<TokenResponse> {
   }
 }
 
+// Custom recommendation engine using search + audio features
 export async function getRecommendations(
   token: string, 
   params: {
@@ -34,139 +35,118 @@ export async function getRecommendations(
   } = {}
 ): Promise<SpotifyRecommendationsResponse> {
   try {
-    // Validate required parameters - use valid Spotify genres
-    const genres = params.genres || ['pop', 'electronic', 'indie-pop']
-    const limit = Math.min(params.limit || 20, 100) // Spotify max is 100
+    console.log('Using custom recommendation engine (Client Credentials compatible)')
     
-    // Build query parameters - remove market for Client Credentials compatibility
-    const queryParams = new URLSearchParams({
-      limit: String(limit)
-      // Note: market parameter only works with Authorization Code flow (user login)
-      // Client Credentials flow doesn't support market parameter
-    })
-
-    // Add seed parameters (Spotify requires at least one)
-    if (params.seedTracks && params.seedTracks.length > 0) {
-      queryParams.append('seed_tracks', params.seedTracks.slice(0, 5).join(','))
-    } else if (params.seedArtists && params.seedArtists.length > 0) {
-      queryParams.append('seed_artists', params.seedArtists.slice(0, 5).join(','))
-    } else {
-      // Use multiple genres for better reliability with Client Credentials
-      // Single genre + market=US often fails with 404 for anonymous tokens
-      const safeGenres = ['pop', 'edm', 'indie']
-      queryParams.append('seed_genres', safeGenres.join(','))
-      
-      // Add target features for better recommendations
-      queryParams.append('target_energy', '0.5')
-      queryParams.append('target_valence', '0.5')
-    }
-
-    // Add target audio features if provided (0-1 range)
-    if (params.danceability !== undefined) {
-      queryParams.append('target_danceability', String(Math.max(0, Math.min(1, params.danceability))))
-    }
-    if (params.energy !== undefined) {
-      queryParams.append('target_energy', String(Math.max(0, Math.min(1, params.energy))))
-    }
-    if (params.valence !== undefined) {
-      queryParams.append('target_valence', String(Math.max(0, Math.min(1, params.valence))))
-    }
-
-    const url = `https://api.spotify.com/v1/recommendations?${queryParams}`
-    console.log('Requesting Spotify recommendations from:', url)
-    console.log('Token length:', token.length)
-    console.log('Token starts with:', token.substring(0, 20) + '...')
+    const limit = Math.min(params.limit || 20, 50) // Reasonable limit for search
+    const targetEnergy = params.energy ?? 0.5
+    const targetValence = params.valence ?? 0.5
+    const targetDanceability = params.danceability ?? 0.5
     
-    // Retry logic with rate limiting (inspired by the repository)
-    let response: Response | undefined
-    let retries = 3
+    // Step 1: Search for tracks by genre
+    const searchQueries = params.genres || ['pop', 'electronic', 'indie']
+    const allTracks: any[] = []
     
-    while (retries > 0) {
+    for (const genre of searchQueries.slice(0, 3)) { // Limit to 3 genres
       try {
-        response = await fetch(url, {
+        const searchUrl = `https://api.spotify.com/v1/search?q=genre:${genre}&type=track&limit=20`
+        console.log(`Searching for ${genre} tracks:`, searchUrl)
+        
+        const searchResponse = await fetch(searchUrl, {
           headers: { 
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
           }
         })
-
-        console.log('Spotify recommendations response status:', response.status)
-
-        if (response.ok) {
-          break // Success, exit retry loop
+        
+        if (searchResponse.ok) {
+          const searchData = await searchResponse.json()
+          const tracks = searchData.tracks?.items || []
+          allTracks.push(...tracks.filter((track: any) => track.preview_url))
+          console.log(`Found ${tracks.length} ${genre} tracks`)
+        } else {
+          console.warn(`Search failed for ${genre}:`, searchResponse.status)
         }
-
-        // Handle rate limiting
-        if (response.status === 429) {
-          const retryAfter = response.headers.get('Retry-After')
-          const delay = retryAfter ? parseInt(retryAfter) * 1000 : 3000
-          console.log(`Rate limited, waiting ${delay}ms before retry...`)
-          await new Promise(resolve => setTimeout(resolve, delay))
-          retries--
-          continue
-        }
-
-        // Handle 404 - likely invalid parameters or Client Credentials issue
-        if (response.status === 404) {
-          console.error('Spotify API 404 - Invalid parameters or Client Credentials issue')
-          console.log('Request URL:', url)
-          console.log('Query params:', Object.fromEntries(queryParams.entries()))
-          
-          // Try fallback with just 'pop' genre (no market, no target features)
-          if (queryParams.has('seed_genres')) {
-            console.log('Trying fallback: using only pop genre...')
-            const fallbackUrl = 'https://api.spotify.com/v1/recommendations?limit=20&seed_genres=pop'
-            const fallbackResponse = await fetch(fallbackUrl, {
-              headers: { 
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-              }
-            })
-            
-            if (fallbackResponse.ok) {
-              console.log('Fallback successful!')
-              response = fallbackResponse
-              break
-            }
-          }
-          
-          throw new Error('Spotify recommendations failed: Invalid parameters (404) - try using seed_artists or seed_tracks instead')
-        }
-
-        // Handle other errors
-        let errorMessage = 'Unknown error'
-        try {
-          const error = await response.json()
-          errorMessage = error.error?.message || error.message || `HTTP ${response.status}`
-          console.error('Spotify API error details:', error)
-        } catch {
-          errorMessage = `HTTP ${response.status}: ${response.statusText}`
-        }
-        throw new Error(`Spotify recommendations failed: ${errorMessage}`)
       } catch (error) {
-        retries--
-        if (retries === 0) throw error
-        console.log(`Request failed, retrying... (${retries} attempts left)`)
-        await new Promise(resolve => setTimeout(resolve, 1000)) // Wait 1 second before retry
+        console.warn(`Search error for ${genre}:`, error)
       }
     }
-
-    if (!response) {
-      throw new Error('Failed to get response from Spotify API after retries')
-    }
-
-    const data = await response.json()
-    console.log('Successfully got recommendations:', data.tracks?.length || 0, 'tracks')
     
-    // Filter out tracks without preview URLs (not playable)
-    if (data.tracks) {
-      data.tracks = data.tracks.filter((track: any) => track.preview_url)
-      console.log('Filtered to playable tracks:', data.tracks.length)
+    if (allTracks.length === 0) {
+      throw new Error('No tracks found in search results')
     }
     
-    return data
+    // Step 2: Get audio features for all tracks
+    const trackIds = allTracks.map(track => track.id).slice(0, 100) // Spotify limit
+    const featuresUrl = `https://api.spotify.com/v1/audio-features?ids=${trackIds.join(',')}`
+    console.log('Fetching audio features for', trackIds.length, 'tracks')
+    
+    const featuresResponse = await fetch(featuresUrl, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+    
+    if (!featuresResponse.ok) {
+      throw new Error(`Audio features failed: ${featuresResponse.status}`)
+    }
+    
+    const featuresData = await featuresResponse.json()
+    const audioFeatures = featuresData.audio_features || []
+    
+    // Step 3: Create track + features pairs
+    const tracksWithFeatures = allTracks.map(track => {
+      const features = audioFeatures.find((f: any) => f && f.id === track.id)
+      return {
+        ...track,
+        ...features,
+        // Ensure all required fields exist
+        danceability: features?.danceability ?? 0.5,
+        energy: features?.energy ?? 0.5,
+        valence: features?.valence ?? 0.5,
+        tempo: features?.tempo ?? 120,
+        acousticness: features?.acousticness ?? 0.5,
+        instrumentalness: features?.instrumentalness ?? 0.5,
+        liveness: features?.liveness ?? 0.5,
+        speechiness: features?.speechiness ?? 0.5,
+        loudness: features?.loudness ?? -10,
+        popularity: track.popularity ?? 50
+      }
+    }).filter(track => track.preview_url) // Only tracks with previews
+    
+    console.log('Tracks with features:', tracksWithFeatures.length)
+    
+    // Step 4: Custom recommendation algorithm
+    const recommendations = tracksWithFeatures
+      .map(track => {
+        // Calculate similarity score based on target features
+        const energyDiff = Math.abs(track.energy - targetEnergy)
+        const valenceDiff = Math.abs(track.valence - targetValence)
+        const danceabilityDiff = Math.abs(track.danceability - targetDanceability)
+        
+        // Weighted similarity score (lower is better)
+        const similarityScore = (energyDiff * 0.4) + (valenceDiff * 0.4) + (danceabilityDiff * 0.2)
+        
+        // Add some randomness to avoid always getting the same results
+        const randomFactor = Math.random() * 0.1
+        
+        return {
+          ...track,
+          _similarityScore: similarityScore + randomFactor
+        }
+      })
+      .sort((a, b) => a._similarityScore - b._similarityScore) // Sort by similarity
+      .slice(0, limit) // Take top recommendations
+      .map(({ _similarityScore, ...track }) => track) // Remove internal score
+    
+    console.log('Generated', recommendations.length, 'custom recommendations')
+    
+    return {
+      tracks: recommendations
+    }
+    
   } catch (error) {
-    console.error('Recommendations fetch error:', error)
+    console.error('Custom recommendations error:', error)
     throw error
   }
 }
