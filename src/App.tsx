@@ -24,28 +24,43 @@ function App() {
     try {
       setIsLoading(true)
       setError(null)
+      console.log('🚀 Starting data load on live site...')
+      console.log('🌐 Current URL:', window.location.href)
 
       // Try to get real Spotify data
+      console.log('🔑 Fetching token...')
       const tokenData = await getToken()
+      console.log('🔑 Got token:', tokenData.access_token ? 'Yes' : 'No')
+      
+      console.log('🎵 Fetching recommendations...')
       const recommendations = await getRecommendations(tokenData.access_token, {
         genres: ['pop', 'electronic', 'indie'],
         limit: 20
       })
+      console.log('🎵 Got recommendations:', recommendations.tracks?.length || 0, 'tracks')
+      
+      if (recommendations.tracks && recommendations.tracks.length > 0) {
+        console.log('🎵 First track:', recommendations.tracks[0].name, 'by', recommendations.tracks[0].artists?.[0]?.name)
+      }
       
       const trackIds = recommendations.tracks.map(t => t.id)
+      console.log('🎼 Fetching audio features for', trackIds.length, 'tracks')
       const audioFeatures = await getAudioFeatures(tokenData.access_token, trackIds)
+      console.log('🎼 Got audio features for', audioFeatures.audio_features?.length || 0, 'tracks')
       
       const joinedTracks = joinTracksWithFeatures(recommendations.tracks, audioFeatures.audio_features)
       const normalizedTracks = normalizeFeatures(joinedTracks)
+      console.log('📊 Final tracks:', normalizedTracks.length, 'tracks')
       
       setTracks(normalizedTracks)
       
       if (normalizedTracks.length > 0) {
         setCurrentTrack(normalizedTracks[0])
         generateNewPlaylist(normalizedTracks, currentAlgorithm)
+        console.log('✅ Successfully loaded real Spotify data!')
       }
     } catch (err) {
-      console.warn('Spotify API failed, using fallback data:', err)
+      console.warn('❌ Spotify API failed, using fallback data:', err)
       setError('Using sample data (Spotify API unavailable)')
       
       // Use fallback data
@@ -56,8 +71,10 @@ function App() {
         setCurrentTrack(fallbackTracks[0])
         generateNewPlaylist(fallbackTracks, currentAlgorithm)
       }
+      console.log('🔄 Using fallback data')
     } finally {
       setIsLoading(false)
+      console.log('🏁 Data loading complete')
     }
   }
 
