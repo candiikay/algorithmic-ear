@@ -43,13 +43,34 @@ function App() {
         console.log('🎵 First track:', recommendations.tracks[0].name, 'by', recommendations.tracks[0].artists?.[0]?.name)
       }
       
-      const trackIds = recommendations.tracks.map(t => t.id)
-      console.log('🎼 Fetching audio features for', trackIds.length, 'tracks')
-      const audioFeatures = await getAudioFeatures(tokenData.access_token, trackIds)
-      console.log('🎼 Got audio features for', audioFeatures.audio_features?.length || 0, 'tracks')
+      // The custom recommendation engine already handles audio features internally
+      // No need to fetch them again - just use the tracks directly
+      console.log('🎼 Using tracks from custom recommendation engine (audio features already processed)')
       
-      const joinedTracks = joinTracksWithFeatures(recommendations.tracks, audioFeatures.audio_features)
-      const normalizedTracks = normalizeFeatures(joinedTracks)
+      // Transform SpotifyTrack to Track type (the custom engine already includes audio features)
+      const tracksAsTrackType = recommendations.tracks.map(track => ({
+        id: track.id,
+        name: track.name,
+        artist: track.artists?.[0]?.name || 'Unknown Artist',
+        preview: track.preview_url || '',
+        popularity: track.popularity || 50,
+        // Audio features are already included by the custom recommendation engine
+        // Use type assertion since we know the custom engine adds these properties
+        danceability: (track as any).danceability || 0.5,
+        energy: (track as any).energy || 0.5,
+        valence: (track as any).valence || 0.5,
+        tempo: (track as any).tempo || 120,
+        acousticness: (track as any).acousticness || 0.5,
+        instrumentalness: (track as any).instrumentalness || 0.5,
+        liveness: (track as any).liveness || 0.5,
+        speechiness: (track as any).speechiness || 0.5,
+        loudness: (track as any).loudness || -10,
+        mode: (track as any).mode || 1,
+        key: (track as any).key || 0,
+        time_signature: (track as any).time_signature || 4
+      }))
+      
+      const normalizedTracks = normalizeFeatures(tracksAsTrackType)
       console.log('📊 Final tracks:', normalizedTracks.length, 'tracks')
       
       setTracks(normalizedTracks)
