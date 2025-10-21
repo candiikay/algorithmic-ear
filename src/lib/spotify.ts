@@ -32,14 +32,27 @@ export async function getRecommendations(
   } = {}
 ): Promise<SpotifyRecommendationsResponse> {
   try {
+    // Validate required parameters
+    const genres = params.genres || ['pop', 'electronic', 'indie']
+    const limit = Math.min(params.limit || 20, 100) // Spotify max is 100
+    
+    // Build query parameters with proper validation
     const queryParams = new URLSearchParams({
-      seed_genres: (params.genres || ['pop', 'electronic', 'indie']).join(','),
-      limit: String(params.limit || 20),
-      market: 'US', // Add market parameter
-      ...(params.danceability !== undefined && { target_danceability: String(params.danceability) }),
-      ...(params.energy !== undefined && { target_energy: String(params.energy) }),
-      ...(params.valence !== undefined && { target_valence: String(params.valence) })
+      seed_genres: genres.join(','),
+      limit: String(limit),
+      market: 'US'
     })
+
+    // Add target audio features if provided (0-1 range)
+    if (params.danceability !== undefined) {
+      queryParams.append('target_danceability', String(Math.max(0, Math.min(1, params.danceability))))
+    }
+    if (params.energy !== undefined) {
+      queryParams.append('target_energy', String(Math.max(0, Math.min(1, params.energy))))
+    }
+    if (params.valence !== undefined) {
+      queryParams.append('target_valence', String(Math.max(0, Math.min(1, params.valence))))
+    }
 
     const url = `https://api.spotify.com/v1/recommendations?${queryParams}`
     console.log('Requesting Spotify recommendations from:', url)
@@ -51,18 +64,23 @@ export async function getRecommendations(
       }
     })
 
+    console.log('Spotify recommendations response status:', response.status)
+
     if (!response.ok) {
       let errorMessage = 'Unknown error'
       try {
         const error = await response.json()
-        errorMessage = error.error?.message || error.message || 'Unknown error'
+        errorMessage = error.error?.message || error.message || `HTTP ${response.status}`
+        console.error('Spotify API error details:', error)
       } catch {
         errorMessage = `HTTP ${response.status}: ${response.statusText}`
       }
       throw new Error(`Spotify recommendations failed: ${errorMessage}`)
     }
 
-    return response.json()
+    const data = await response.json()
+    console.log('Successfully got recommendations:', data.tracks?.length || 0, 'tracks')
+    return data
   } catch (error) {
     console.error('Recommendations fetch error:', error)
     throw error
@@ -74,25 +92,36 @@ export async function getAudioFeatures(
   trackIds: string[]
 ): Promise<SpotifyAudioFeaturesResponse> {
   try {
-    const response = await fetch(`https://api.spotify.com/v1/audio-features?ids=${trackIds.join(',')}`, {
+    // Spotify allows max 100 track IDs per request
+    const maxIds = trackIds.slice(0, 100)
+    const url = `https://api.spotify.com/v1/audio-features?ids=${maxIds.join(',')}`
+    
+    console.log('Requesting audio features for', maxIds.length, 'tracks')
+    
+    const response = await fetch(url, {
       headers: { 
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       }
     })
 
+    console.log('Audio features response status:', response.status)
+
     if (!response.ok) {
       let errorMessage = 'Unknown error'
       try {
         const error = await response.json()
-        errorMessage = error.error?.message || error.message || 'Unknown error'
+        errorMessage = error.error?.message || error.message || `HTTP ${response.status}`
+        console.error('Spotify audio features error details:', error)
       } catch {
         errorMessage = `HTTP ${response.status}: ${response.statusText}`
       }
       throw new Error(`Audio features fetch failed: ${errorMessage}`)
     }
 
-    return response.json()
+    const data = await response.json()
+    console.log('Successfully got audio features for', data.audio_features?.length || 0, 'tracks')
+    return data
   } catch (error) {
     console.error('Audio features fetch error:', error)
     throw error
