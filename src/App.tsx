@@ -77,7 +77,8 @@ function App() {
       
       if (normalizedTracks.length > 0) {
         setCurrentTrack(normalizedTracks[0])
-        generateNewPlaylist(normalizedTracks, currentAlgorithm)
+        // Use the default algorithm for initial playlist generation
+        generateNewPlaylist(normalizedTracks, 'greedyDanceability')
         console.log('✅ Successfully loaded real Spotify data!')
       }
     } catch (err) {
@@ -90,7 +91,7 @@ function App() {
       
       if (fallbackTracks.length > 0) {
         setCurrentTrack(fallbackTracks[0])
-        generateNewPlaylist(fallbackTracks, currentAlgorithm)
+        generateNewPlaylist(fallbackTracks, 'greedyDanceability')
       }
       console.log('🔄 Using fallback data')
     } finally {
