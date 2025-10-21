@@ -260,6 +260,124 @@
   line-height: 1.6;
 }
 
+/* Playlist Analysis */
+.playlist-analysis {
+  margin: 2rem 0;
+  padding: 2rem;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.playlist-analysis h3 {
+  margin-bottom: 2rem;
+  color: #333;
+  text-align: center;
+}
+
+.analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.stat-card {
+  background: #f8f9fa;
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.stat-card h4 {
+  margin-bottom: 1rem;
+  color: #333;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #667eea;
+  margin-bottom: 1rem;
+}
+
+.stat-bar {
+  width: 100%;
+  height: 8px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.stat-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  transition: width 0.3s ease;
+}
+
+.tempo-indicator {
+  font-size: 1.2rem;
+  margin-top: 0.5rem;
+}
+
+.mood-visualization,
+.tempo-visualization {
+  margin: 2rem 0;
+}
+
+.mood-visualization h4,
+.tempo-visualization h4 {
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.mood-bars,
+.tempo-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.mood-bar,
+.tempo-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.mood-label,
+.tempo-label {
+  min-width: 120px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.mood-bar-fill,
+.tempo-bar-fill {
+  flex: 1;
+  height: 20px;
+  background: #e9ecef;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.mood-fill,
+.tempo-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.mood-count,
+.tempo-count {
+  min-width: 30px;
+  text-align: right;
+  font-weight: bold;
+  color: #333;
+}
+
 /* Responsive design */
 @media (max-width: 768px) {
   .algorithm-buttons {
@@ -283,5 +401,21 @@
   .track-artist {
     grid-column: 1 / -1;
     margin-top: 0.5rem;
+  }
+
+  .analysis-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mood-bar,
+  .tempo-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .mood-label,
+  .tempo-label {
+    min-width: auto;
   }
 }

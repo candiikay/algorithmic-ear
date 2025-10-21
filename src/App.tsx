@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import AudioPlayer from './components/AudioPlayer'
 import TasteSpaceVisualization from './components/TasteSpaceVisualization'
+import PlaylistAnalysis from './components/PlaylistAnalysis'
 import type { Track } from './types'
 import { getToken, getRecommendations, getAudioFeatures, FALLBACK_TRACKS } from './lib/spotify'
 import { joinTracksWithFeatures, normalizeFeatures } from './lib/transform'
@@ -208,6 +209,8 @@ function App() {
               ))}
             </div>
           </div>
+
+          <PlaylistAnalysis tracks={tracks} playlist={playlist} />
         </section>
 
         <section className="theory-section">
