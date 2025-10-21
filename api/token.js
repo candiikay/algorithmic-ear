@@ -13,12 +13,12 @@ export default async function handler(req, res) {
 
   console.log(`API called with method: ${req.method}`)
 
-  // Only allow POST requests for token fetching
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
+  // Allow both GET and POST requests for token fetching
+  if (req.method !== 'GET' && req.method !== 'POST') {
+    res.setHeader('Allow', 'GET, POST');
     return res.status(405).json({
       error: 'method_not_allowed',
-      message: `Method ${req.method} Not Allowed`
+      message: `Method ${req.method} Not Allowed. Use GET or POST.`
     });
   }
   try {
