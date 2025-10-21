@@ -25,6 +25,8 @@ export async function getRecommendations(
   token: string, 
   params: {
     genres?: string[]
+    seedTracks?: string[]
+    seedArtists?: string[]
     limit?: number
     danceability?: number
     energy?: number
@@ -36,12 +38,20 @@ export async function getRecommendations(
     const genres = params.genres || ['pop', 'electronic', 'indie']
     const limit = Math.min(params.limit || 20, 100) // Spotify max is 100
     
-    // Build query parameters with proper validation
+    // Build query parameters with multiple seed types (better recommendations)
     const queryParams = new URLSearchParams({
-      seed_genres: genres.join(','),
       limit: String(limit),
       market: 'US'
     })
+
+    // Add seed parameters (Spotify requires at least one)
+    if (params.seedTracks && params.seedTracks.length > 0) {
+      queryParams.append('seed_tracks', params.seedTracks.slice(0, 5).join(','))
+    } else if (params.seedArtists && params.seedArtists.length > 0) {
+      queryParams.append('seed_artists', params.seedArtists.slice(0, 5).join(','))
+    } else {
+      queryParams.append('seed_genres', genres.slice(0, 5).join(','))
+    }
 
     // Add target audio features if provided (0-1 range)
     if (params.danceability !== undefined) {
@@ -57,25 +67,51 @@ export async function getRecommendations(
     const url = `https://api.spotify.com/v1/recommendations?${queryParams}`
     console.log('Requesting Spotify recommendations from:', url)
     
-    const response = await fetch(url, {
-      headers: { 
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      }
-    })
-
-    console.log('Spotify recommendations response status:', response.status)
-
-    if (!response.ok) {
-      let errorMessage = 'Unknown error'
+    // Retry logic with rate limiting (inspired by the repository)
+    let response: Response
+    let retries = 3
+    
+    while (retries > 0) {
       try {
-        const error = await response.json()
-        errorMessage = error.error?.message || error.message || `HTTP ${response.status}`
-        console.error('Spotify API error details:', error)
-      } catch {
-        errorMessage = `HTTP ${response.status}: ${response.statusText}`
+        response = await fetch(url, {
+          headers: { 
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        })
+
+        console.log('Spotify recommendations response status:', response.status)
+
+        if (response.ok) {
+          break // Success, exit retry loop
+        }
+
+        // Handle rate limiting
+        if (response.status === 429) {
+          const retryAfter = response.headers.get('Retry-After')
+          const delay = retryAfter ? parseInt(retryAfter) * 1000 : 3000
+          console.log(`Rate limited, waiting ${delay}ms before retry...`)
+          await new Promise(resolve => setTimeout(resolve, delay))
+          retries--
+          continue
+        }
+
+        // Handle other errors
+        let errorMessage = 'Unknown error'
+        try {
+          const error = await response.json()
+          errorMessage = error.error?.message || error.message || `HTTP ${response.status}`
+          console.error('Spotify API error details:', error)
+        } catch {
+          errorMessage = `HTTP ${response.status}: ${response.statusText}`
+        }
+        throw new Error(`Spotify recommendations failed: ${errorMessage}`)
+      } catch (error) {
+        retries--
+        if (retries === 0) throw error
+        console.log(`Request failed, retrying... (${retries} attempts left)`)
+        await new Promise(resolve => setTimeout(resolve, 1000)) // Wait 1 second before retry
       }
-      throw new Error(`Spotify recommendations failed: ${errorMessage}`)
     }
 
     const data = await response.json()
