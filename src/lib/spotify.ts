@@ -50,10 +50,26 @@ export async function getRecommendations(
     } else if (params.seedArtists && params.seedArtists.length > 0) {
       queryParams.append('seed_artists', params.seedArtists.slice(0, 5).join(','))
     } else {
-      // Use valid Spotify genres - filter out invalid ones
-      const validGenres = genres.filter(g => 
-        ['pop', 'rock', 'electronic', 'indie-pop', 'alternative', 'hip-hop', 'jazz', 'classical', 'country', 'r-n-b', 'blues', 'folk', 'funk', 'soul', 'reggae', 'latin', 'world', 'ambient', 'chill', 'dance', 'edm', 'house', 'techno', 'trance', 'dubstep', 'trap', 'drill', 'lo-fi', 'synthwave', 'vaporwave'].includes(g)
-      )
+      // Use only known valid Spotify genre seeds
+      // These are confirmed to work with Spotify's Recommendations API
+      const validSpotifyGenres = [
+        'acoustic', 'afrobeat', 'alt-rock', 'alternative', 'ambient', 'anime', 'black-metal', 'bluegrass', 'blues', 
+        'bossanova', 'brazil', 'breakbeat', 'british', 'cantopop', 'chicago-house', 'children', 'chill', 'classical', 
+        'club', 'comedy', 'country', 'dance', 'dancehall', 'death-metal', 'deep-house', 'detroit-techno', 'disco', 
+        'drum-and-bass', 'dub', 'dubstep', 'edm', 'electro', 'electronic', 'emo', 'folk', 'forro', 'french', 
+        'funk', 'garage', 'german', 'gospel', 'goth', 'grindcore', 'groove', 'grunge', 'guitar', 'happy', 
+        'hard-rock', 'hardcore', 'hardstyle', 'heavy-metal', 'hip-hop', 'holidays', 'honky-tonk', 'house', 'idm', 
+        'indian', 'indie', 'indie-pop', 'industrial', 'iranian', 'j-dance', 'j-idol', 'j-pop', 'j-rock', 'jazz', 
+        'k-pop', 'kids', 'latin', 'latino', 'malay', 'mandopop', 'metal', 'metal-misc', 'metalcore', 'minimal-techno', 
+        'movies', 'mpb', 'new-age', 'new-release', 'opera', 'pagode', 'party', 'philippines-opm', 'piano', 'pop', 
+        'pop-film', 'post-dubstep', 'power-pop', 'progressive-house', 'psych-rock', 'punk', 'punk-rock', 'r-n-b', 
+        'rainy-day', 'reggae', 'reggaeton', 'road-trip', 'rock', 'rock-n-roll', 'rockabilly', 'romance', 'sad', 
+        'salsa', 'samba', 'sertanejo', 'show-tunes', 'singer-songwriter', 'ska', 'sleep', 'songwriter', 'soul', 
+        'soundtracks', 'spanish', 'study', 'summer', 'swedish', 'synth-pop', 'tango', 'techno', 'trance', 'trip-hop', 
+        'turkish', 'work-out', 'world-music'
+      ]
+      
+      const validGenres = genres.filter(g => validSpotifyGenres.includes(g))
       if (validGenres.length > 0) {
         queryParams.append('seed_genres', validGenres.slice(0, 5).join(','))
       } else {
