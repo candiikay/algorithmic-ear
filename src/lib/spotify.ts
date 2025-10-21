@@ -2,12 +2,23 @@
 import type { TokenResponse, SpotifyRecommendationsResponse, SpotifyAudioFeaturesResponse } from '../types'
 
 export async function getToken(): Promise<TokenResponse> {
-  const response = await fetch('/api/token')
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(`Token fetch failed: ${error.message || 'Unknown error'}`)
+  try {
+    const response = await fetch('/api/token')
+    if (!response.ok) {
+      let errorMessage = 'Unknown error'
+      try {
+        const error = await response.json()
+        errorMessage = error.message || error.error || 'Unknown error'
+      } catch {
+        errorMessage = `HTTP ${response.status}: ${response.statusText}`
+      }
+      throw new Error(`Token fetch failed: ${errorMessage}`)
+    }
+    return response.json()
+  } catch (error) {
+    console.error('Token fetch error:', error)
+    throw error
   }
-  return response.json()
 }
 
 export async function getRecommendations(
@@ -20,46 +31,68 @@ export async function getRecommendations(
     valence?: number
   } = {}
 ): Promise<SpotifyRecommendationsResponse> {
-  const queryParams = new URLSearchParams({
-    seed_genres: (params.genres || ['pop', 'electronic', 'indie']).join(','),
-    limit: String(params.limit || 20),
-    ...(params.danceability !== undefined && { target_danceability: String(params.danceability) }),
-    ...(params.energy !== undefined && { target_energy: String(params.energy) }),
-    ...(params.valence !== undefined && { target_valence: String(params.valence) })
-  })
+  try {
+    const queryParams = new URLSearchParams({
+      seed_genres: (params.genres || ['pop', 'electronic', 'indie']).join(','),
+      limit: String(params.limit || 20),
+      ...(params.danceability !== undefined && { target_danceability: String(params.danceability) }),
+      ...(params.energy !== undefined && { target_energy: String(params.energy) }),
+      ...(params.valence !== undefined && { target_valence: String(params.valence) })
+    })
 
-  const response = await fetch(`https://api.spotify.com/v1/recommendations?${queryParams}`, {
-    headers: { 
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
+    const response = await fetch(`https://api.spotify.com/v1/recommendations?${queryParams}`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      let errorMessage = 'Unknown error'
+      try {
+        const error = await response.json()
+        errorMessage = error.error?.message || error.message || 'Unknown error'
+      } catch {
+        errorMessage = `HTTP ${response.status}: ${response.statusText}`
+      }
+      throw new Error(`Spotify recommendations failed: ${errorMessage}`)
     }
-  })
 
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(`Spotify recommendations failed: ${error.error?.message || 'Unknown error'}`)
+    return response.json()
+  } catch (error) {
+    console.error('Recommendations fetch error:', error)
+    throw error
   }
-
-  return response.json()
 }
 
 export async function getAudioFeatures(
   token: string, 
   trackIds: string[]
 ): Promise<SpotifyAudioFeaturesResponse> {
-  const response = await fetch(`https://api.spotify.com/v1/audio-features?ids=${trackIds.join(',')}`, {
-    headers: { 
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
+  try {
+    const response = await fetch(`https://api.spotify.com/v1/audio-features?ids=${trackIds.join(',')}`, {
+      headers: { 
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      let errorMessage = 'Unknown error'
+      try {
+        const error = await response.json()
+        errorMessage = error.error?.message || error.message || 'Unknown error'
+      } catch {
+        errorMessage = `HTTP ${response.status}: ${response.statusText}`
+      }
+      throw new Error(`Audio features fetch failed: ${errorMessage}`)
     }
-  })
 
-  if (!response.ok) {
-    const error = await response.json()
-    throw new Error(`Audio features fetch failed: ${error.error?.message || 'Unknown error'}`)
+    return response.json()
+  } catch (error) {
+    console.error('Audio features fetch error:', error)
+    throw error
   }
-
-  return response.json()
 }
 
 // Fallback data for when Spotify API is unavailable
