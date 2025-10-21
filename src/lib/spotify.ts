@@ -61,8 +61,9 @@ export async function getRecommendations(
         if (searchResponse.ok) {
           const searchData = await searchResponse.json()
           const tracks = searchData.tracks?.items || []
-          allTracks.push(...tracks.filter((track: any) => track.preview_url))
           console.log(`Found ${tracks.length} ${genre} tracks`)
+          console.log(`Preview URLs available:`, tracks.filter((t: any) => t.preview_url).length)
+          allTracks.push(...tracks) // Don't filter yet - we'll filter later
         } else {
           console.warn(`Search failed for ${genre}:`, searchResponse.status)
         }
@@ -70,6 +71,9 @@ export async function getRecommendations(
         console.warn(`Search error for ${genre}:`, error)
       }
     }
+    
+    console.log('Total combined tracks:', allTracks.length)
+    console.log('Sample track:', allTracks[0]?.name, 'by', allTracks[0]?.artists?.[0]?.name)
     
     if (allTracks.length === 0) {
       throw new Error('No tracks found in search results')
@@ -100,7 +104,7 @@ export async function getRecommendations(
       return {
         ...track,
         ...features,
-        // Ensure all required fields exist
+        // Ensure all required fields exist with safe defaults
         danceability: features?.danceability ?? 0.5,
         energy: features?.energy ?? 0.5,
         valence: features?.valence ?? 0.5,
@@ -112,12 +116,21 @@ export async function getRecommendations(
         loudness: features?.loudness ?? -10,
         popularity: track.popularity ?? 50
       }
-    }).filter(track => track.preview_url) // Only tracks with previews
+    })
     
     console.log('Tracks with features:', tracksWithFeatures.length)
     
+    // Filter for playable tracks, but be lenient
+    let playableTracks = tracksWithFeatures.filter(track => track.preview_url)
+    if (playableTracks.length === 0) {
+      console.warn('No preview URLs found - using unfiltered tracks')
+      playableTracks = tracksWithFeatures
+    }
+    
+    console.log('Playable tracks:', playableTracks.length)
+    
     // Step 4: Custom recommendation algorithm
-    const recommendations = tracksWithFeatures
+    const recommendations = playableTracks
       .map(track => {
         // Calculate similarity score based on target features
         const energyDiff = Math.abs(track.energy - targetEnergy)
