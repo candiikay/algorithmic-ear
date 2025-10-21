@@ -14,7 +14,11 @@ export default async function handler(req, res) {
     const clientId = process.env.SPOTIFY_CLIENT_ID
     const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
     
+    console.log('Client ID exists:', !!clientId)
+    console.log('Client Secret exists:', !!clientSecret)
+    
     if (!clientId || !clientSecret) {
+      console.error('Missing credentials:', { clientId: !!clientId, clientSecret: !!clientSecret })
       return res.status(500).json({ 
         error: 'Missing Spotify credentials',
         message: 'Please set SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET environment variables'
@@ -23,6 +27,7 @@ export default async function handler(req, res) {
 
     const auth = Buffer.from(`${clientId}:${clientSecret}`).toString('base64')
 
+    console.log('Making request to Spotify...')
     const response = await fetch('https://accounts.spotify.com/api/token', {
       method: 'POST',
       headers: {
@@ -34,15 +39,20 @@ export default async function handler(req, res) {
       })
     })
 
-    const data = await response.json()
+    console.log('Spotify response status:', response.status)
     
     if (!response.ok) {
+      const errorText = await response.text()
+      console.error('Spotify API error:', errorText)
       return res.status(response.status).json({
         error: 'Spotify API error',
-        message: data.error_description || 'Failed to get access token'
+        message: errorText || 'Failed to get access token'
       })
     }
 
+    const data = await response.json()
+    console.log('Successfully got token')
+    
     // Cache briefly to reduce rate hits
     res.setHeader('Cache-Control', 's-maxage=300, stale-while-revalidate=600')
     res.status(200).json({ 
