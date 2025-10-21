@@ -34,8 +34,8 @@ export async function getRecommendations(
   } = {}
 ): Promise<SpotifyRecommendationsResponse> {
   try {
-    // Validate required parameters
-    const genres = params.genres || ['pop', 'electronic', 'indie']
+    // Validate required parameters - use valid Spotify genres
+    const genres = params.genres || ['pop', 'electronic', 'indie-pop']
     const limit = Math.min(params.limit || 20, 100) // Spotify max is 100
     
     // Build query parameters with multiple seed types (better recommendations)
@@ -50,7 +50,16 @@ export async function getRecommendations(
     } else if (params.seedArtists && params.seedArtists.length > 0) {
       queryParams.append('seed_artists', params.seedArtists.slice(0, 5).join(','))
     } else {
-      queryParams.append('seed_genres', genres.slice(0, 5).join(','))
+      // Use valid Spotify genres - filter out invalid ones
+      const validGenres = genres.filter(g => 
+        ['pop', 'rock', 'electronic', 'indie-pop', 'alternative', 'hip-hop', 'jazz', 'classical', 'country', 'r-n-b', 'blues', 'folk', 'funk', 'soul', 'reggae', 'latin', 'world', 'ambient', 'chill', 'dance', 'edm', 'house', 'techno', 'trance', 'dubstep', 'trap', 'drill', 'lo-fi', 'synthwave', 'vaporwave'].includes(g)
+      )
+      if (validGenres.length > 0) {
+        queryParams.append('seed_genres', validGenres.slice(0, 5).join(','))
+      } else {
+        // Fallback to a known working genre
+        queryParams.append('seed_genres', 'pop')
+      }
     }
 
     // Add target audio features if provided (0-1 range)
@@ -68,7 +77,7 @@ export async function getRecommendations(
     console.log('Requesting Spotify recommendations from:', url)
     
     // Retry logic with rate limiting (inspired by the repository)
-    let response: Response
+    let response: Response | undefined
     let retries = 3
     
     while (retries > 0) {
@@ -96,6 +105,14 @@ export async function getRecommendations(
           continue
         }
 
+        // Handle 404 - likely invalid parameters
+        if (response.status === 404) {
+          console.error('Spotify API 404 - Invalid parameters or endpoint')
+          console.log('Request URL:', url)
+          console.log('Query params:', Object.fromEntries(queryParams.entries()))
+          throw new Error('Spotify recommendations failed: Invalid parameters (404)')
+        }
+
         // Handle other errors
         let errorMessage = 'Unknown error'
         try {
@@ -112,6 +129,10 @@ export async function getRecommendations(
         console.log(`Request failed, retrying... (${retries} attempts left)`)
         await new Promise(resolve => setTimeout(resolve, 1000)) // Wait 1 second before retry
       }
+    }
+
+    if (!response) {
+      throw new Error('Failed to get response from Spotify API after retries')
     }
 
     const data = await response.json()
