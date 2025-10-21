@@ -35,12 +35,16 @@ export async function getRecommendations(
     const queryParams = new URLSearchParams({
       seed_genres: (params.genres || ['pop', 'electronic', 'indie']).join(','),
       limit: String(params.limit || 20),
+      market: 'US', // Add market parameter
       ...(params.danceability !== undefined && { target_danceability: String(params.danceability) }),
       ...(params.energy !== undefined && { target_energy: String(params.energy) }),
       ...(params.valence !== undefined && { target_valence: String(params.valence) })
     })
 
-    const response = await fetch(`https://api.spotify.com/v1/recommendations?${queryParams}`, {
+    const url = `https://api.spotify.com/v1/recommendations?${queryParams}`
+    console.log('Requesting Spotify recommendations from:', url)
+    
+    const response = await fetch(url, {
       headers: { 
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
