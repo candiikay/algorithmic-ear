@@ -50,11 +50,12 @@ export async function getRecommendations(
     } else if (params.seedArtists && params.seedArtists.length > 0) {
       queryParams.append('seed_artists', params.seedArtists.slice(0, 5).join(','))
     } else {
-      // Use a simple, known working genre combination
-      // Start with just 'pop' to test if the API is working
-      queryParams.append('seed_genres', 'pop')
+      // Use multiple genres for better reliability with Client Credentials
+      // Single genre + market=US often fails with 404 for anonymous tokens
+      const safeGenres = ['pop', 'edm', 'indie']
+      queryParams.append('seed_genres', safeGenres.join(','))
       
-      // Add some target features to make the request more specific
+      // Add target features for better recommendations
       queryParams.append('target_energy', '0.5')
       queryParams.append('target_valence', '0.5')
     }
@@ -104,12 +105,31 @@ export async function getRecommendations(
           continue
         }
 
-        // Handle 404 - likely invalid parameters
+        // Handle 404 - likely invalid parameters or Client Credentials issue
         if (response.status === 404) {
-          console.error('Spotify API 404 - Invalid parameters or endpoint')
+          console.error('Spotify API 404 - Invalid parameters or Client Credentials issue')
           console.log('Request URL:', url)
           console.log('Query params:', Object.fromEntries(queryParams.entries()))
-          throw new Error('Spotify recommendations failed: Invalid parameters (404)')
+          
+          // Try fallback with just 'pop' genre and no market
+          if (queryParams.has('seed_genres') && queryParams.has('market')) {
+            console.log('Trying fallback: removing market parameter...')
+            const fallbackUrl = url.replace('&market=US', '')
+            const fallbackResponse = await fetch(fallbackUrl, {
+              headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+              }
+            })
+            
+            if (fallbackResponse.ok) {
+              console.log('Fallback successful!')
+              response = fallbackResponse
+              break
+            }
+          }
+          
+          throw new Error('Spotify recommendations failed: Invalid parameters (404) - try using seed_artists or seed_tracks instead')
         }
 
         // Handle other errors
@@ -136,6 +156,13 @@ export async function getRecommendations(
 
     const data = await response.json()
     console.log('Successfully got recommendations:', data.tracks?.length || 0, 'tracks')
+    
+    // Filter out tracks without preview URLs (not playable)
+    if (data.tracks) {
+      data.tracks = data.tracks.filter((track: any) => track.preview_url)
+      console.log('Filtered to playable tracks:', data.tracks.length)
+    }
+    
     return data
   } catch (error) {
     console.error('Recommendations fetch error:', error)
