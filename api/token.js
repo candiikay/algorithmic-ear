@@ -1,21 +1,28 @@
 // /api/token.js
 export default async function handler(req, res) {
+  console.log('API called with method:', req.method)
+  console.log('Headers:', req.headers)
+  
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
 
   if (req.method === 'OPTIONS') {
+    console.log('Handling OPTIONS request')
     res.status(200).end()
     return
   }
 
   try {
+    console.log('Starting token fetch process...')
     const clientId = process.env.SPOTIFY_CLIENT_ID
     const clientSecret = process.env.SPOTIFY_CLIENT_SECRET
     
     console.log('Client ID exists:', !!clientId)
     console.log('Client Secret exists:', !!clientSecret)
+    console.log('Client ID length:', clientId ? clientId.length : 0)
+    console.log('Client Secret length:', clientSecret ? clientSecret.length : 0)
     
     if (!clientId || !clientSecret) {
       console.error('Missing credentials:', { clientId: !!clientId, clientSecret: !!clientSecret })
