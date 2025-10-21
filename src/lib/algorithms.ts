@@ -1,5 +1,6 @@
 // Algorithm implementations for playlist generation
 import type { Track, AlgorithmConfig } from '../types'
+import { kMeansClustering, findSimilarTracks, findClusterTracks, cosineSimilarity } from './clustering'
 
 export function greedyNext(
   current: Track, 
@@ -91,6 +92,98 @@ export function generatePlaylist(
   return playlist
 }
 
+// Advanced clustering-based algorithm inspired by the repository
+export function generateClusteringPlaylist(
+  tracks: Track[], 
+  length: number = 10,
+  clusterCount: number = 5
+): Track[] {
+  if (tracks.length === 0) return []
+  
+  // Create clusters
+  const clusters = kMeansClustering(tracks, clusterCount)
+  
+  const playlist: Track[] = []
+  const availableTracks = [...tracks]
+  
+  // Start with a random track
+  const startIndex = Math.floor(Math.random() * availableTracks.length)
+  let current = availableTracks.splice(startIndex, 1)[0]
+  playlist.push(current)
+
+  for (let i = 1; i < length && availableTracks.length > 0; i++) {
+    // Find similar tracks using cosine similarity
+    const similarTracks = findSimilarTracks(current, availableTracks, 5)
+    
+    if (similarTracks.length > 0) {
+      // Pick the most similar track
+      const next = similarTracks[0].track
+      const nextIndex = availableTracks.findIndex(t => t.id === next.id)
+      if (nextIndex !== -1) {
+        current = availableTracks.splice(nextIndex, 1)[0]
+        playlist.push(current)
+      }
+    } else {
+      // Fallback: pick random
+      const randomIndex = Math.floor(Math.random() * availableTracks.length)
+      current = availableTracks.splice(randomIndex, 1)[0]
+      playlist.push(current)
+    }
+  }
+
+  return playlist
+}
+
+// Hybrid algorithm combining multiple approaches
+export function generateHybridPlaylist(
+  tracks: Track[], 
+  length: number = 10
+): Track[] {
+  if (tracks.length === 0) return []
+  
+  const playlist: Track[] = []
+  const availableTracks = [...tracks]
+  
+  // Start with a random track
+  const startIndex = Math.floor(Math.random() * availableTracks.length)
+  let current = availableTracks.splice(startIndex, 1)[0]
+  playlist.push(current)
+
+  for (let i = 1; i < length && availableTracks.length > 0; i++) {
+    let next: Track | null = null
+    
+    // Alternate between different strategies
+    if (i % 3 === 1) {
+      // Use similarity-based approach
+      const similarTracks = findSimilarTracks(current, availableTracks, 3)
+      if (similarTracks.length > 0) {
+        next = similarTracks[0].track
+      }
+    } else if (i % 3 === 2) {
+      // Use greedy approach for energy
+      next = greedyNext(current, availableTracks, (t) => t.energy)
+    } else {
+      // Use search approach for valence
+      next = nearestByVector(current, availableTracks, { valence: 0.6 }, ['valence'])
+    }
+
+    if (next) {
+      const nextIndex = availableTracks.findIndex(t => t.id === next!.id)
+      if (nextIndex !== -1) {
+        current = availableTracks.splice(nextIndex, 1)[0]
+        playlist.push(current)
+      }
+    } else {
+      // Fallback: pick random
+      const randomIndex = Math.floor(Math.random() * availableTracks.length)
+      current = availableTracks.splice(randomIndex, 1)[0]
+      playlist.push(current)
+    }
+  }
+
+  return playlist
+}
+
 // Predefined algorithm configurations
 export const ALGORITHM_CONFIGS = {
   greedyDanceability: {
@@ -119,5 +212,11 @@ export const ALGORITHM_CONFIGS = {
     mode: 'search' as const,
     target: { energy: 0.4, valence: 0.6 },
     keys: ['energy', 'valence'] as Array<keyof Pick<Track, 'energy' | 'valence' | 'danceability'>>
+  },
+  clustering: {
+    mode: 'clustering' as const
+  },
+  hybrid: {
+    mode: 'hybrid' as const
   }
 } as const

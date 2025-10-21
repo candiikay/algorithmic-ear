@@ -4,7 +4,7 @@ import TasteSpaceVisualization from './components/TasteSpaceVisualization'
 import type { Track } from './types'
 import { getToken, getRecommendations, getAudioFeatures, FALLBACK_TRACKS } from './lib/spotify'
 import { joinTracksWithFeatures, normalizeFeatures } from './lib/transform'
-import { generatePlaylist, ALGORITHM_CONFIGS } from './lib/algorithms'
+import { generatePlaylist, generateClusteringPlaylist, generateHybridPlaylist, ALGORITHM_CONFIGS } from './lib/algorithms'
 import './App.css'
 
 function App() {
@@ -61,8 +61,17 @@ function App() {
   }
 
   const generateNewPlaylist = (trackPool: Track[], algorithm: keyof typeof ALGORITHM_CONFIGS) => {
-    const config = { ...ALGORITHM_CONFIGS[algorithm] }
-    const newPlaylist = generatePlaylist(trackPool, config, 8)
+    let newPlaylist: Track[] = []
+    
+    if (algorithm === 'clustering') {
+      newPlaylist = generateClusteringPlaylist(trackPool, 8, 5)
+    } else if (algorithm === 'hybrid') {
+      newPlaylist = generateHybridPlaylist(trackPool, 8)
+    } else {
+      const config = { ...ALGORITHM_CONFIGS[algorithm] }
+      newPlaylist = generatePlaylist(trackPool, config, 8)
+    }
+    
     setPlaylist(newPlaylist)
   }
 
@@ -148,6 +157,18 @@ function App() {
                 onClick={() => handleAlgorithmChange('searchChill')}
               >
                 Search: Chill Mood
+              </button>
+              <button 
+                className={currentAlgorithm === 'clustering' ? 'active' : ''}
+                onClick={() => handleAlgorithmChange('clustering')}
+              >
+                Clustering: Similar Tracks
+              </button>
+              <button 
+                className={currentAlgorithm === 'hybrid' ? 'active' : ''}
+                onClick={() => handleAlgorithmChange('hybrid')}
+              >
+                Hybrid: Mixed Approach
               </button>
             </div>
           </div>
