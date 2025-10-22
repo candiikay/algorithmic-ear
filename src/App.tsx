@@ -51,9 +51,15 @@ function App() {
     error: null
   })
 
+  // Prevent infinite re-renders
+  const [hasInitialized, setHasInitialized] = useState(false)
+
   useEffect(() => {
-    loadTracks()
-  }, [])
+    if (!hasInitialized) {
+      setHasInitialized(true)
+      loadTracks()
+    }
+  }, [hasInitialized])
 
   const loadTracks = async () => {
     console.log('🚀 Starting data load (v3.0 - Custom Engine)')
@@ -166,6 +172,11 @@ function App() {
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0])
 
   console.log('🎵 App rendering main content with', state.tracks.length, 'tracks and', state.playlist.length, 'playlist items')
+  
+  // Simple test to see if content renders
+  if (state.tracks.length === 0) {
+    return <div style={{padding: '20px', color: 'white', background: 'red'}}>NO TRACKS LOADED - This should not happen!</div>
+  }
   
   return (
     <div className="app">
