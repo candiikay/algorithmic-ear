@@ -161,7 +161,8 @@ export async function getRecommendations(
         console.log('⚠️ Spotify recommendations failed, using similarity-based approach')
       }
     } catch (error) {
-      console.log('⚠️ Spotify recommendations error, using similarity-based approach')
+      console.log('⚠️ Spotify recommendations error:', error)
+      console.log('Using similarity-based approach')
     }
     
     // Fallback: Use similarity-based recommendations with REAL audio features
@@ -225,6 +226,7 @@ export async function getAudioFeatures(
     const data = await response.json()
     return data
   } catch (error) {
+    console.error('❌ Error in getAudioFeatures:', error)
     throw error
   }
 }
