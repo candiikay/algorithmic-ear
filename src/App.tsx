@@ -40,6 +40,8 @@ const ScrollSection = ({ children, className = "" }: { children: React.ReactNode
 }
 
 function App() {
+  console.log('🎧 App component rendering...')
+  
   const [state, setState] = useState<AppState>({
     isLoading: true,
     tracks: [],
@@ -55,6 +57,7 @@ function App() {
 
   const loadTracks = async () => {
     console.log('🚀 Starting data load (v3.0 - Custom Engine)')
+    console.log('App is loading...')
     setState(prev => ({ ...prev, isLoading: true, error: null }))
 
     try {
