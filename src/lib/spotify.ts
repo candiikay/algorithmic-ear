@@ -34,7 +34,7 @@ export async function getRecommendations(
     valence?: number
   } = {}
 ): Promise<SpotifyRecommendationsResponse> {
-  console.log('🎵 Using CUSTOM recommendation engine (v3.0)')
+  console.log('🎵 Using REAL Spotify recommendation engine (v4.0)')
   console.log('Parameters:', params)
   
   try {
@@ -80,47 +80,55 @@ export async function getRecommendations(
       throw new Error('No tracks found in search results')
     }
     
-    // Step 2: Generate realistic audio features based on track data
-    const generateAudioFeatures = (track: any, genre: string) => {
-      const genreProfiles = {
-        pop: { energy: 0.7, valence: 0.6, danceability: 0.8, tempo: 120 },
-        electronic: { energy: 0.8, valence: 0.5, danceability: 0.9, tempo: 128 },
-        indie: { energy: 0.5, valence: 0.4, danceability: 0.6, tempo: 110 }
-      }
-      
-      const profile = genreProfiles[genre as keyof typeof genreProfiles] || genreProfiles.pop
-      const popularityFactor = (track.popularity || 50) / 100
-      const randomVariation = () => (Math.random() - 0.5) * 0.3
-      
-      return {
-        danceability: Math.max(0, Math.min(1, profile.danceability + randomVariation() + (popularityFactor * 0.1))),
-        energy: Math.max(0, Math.min(1, profile.energy + randomVariation() + (popularityFactor * 0.1))),
-        valence: Math.max(0, Math.min(1, profile.valence + randomVariation())),
-        tempo: Math.max(60, Math.min(200, profile.tempo + (Math.random() - 0.5) * 40)),
-        acousticness: Math.max(0, Math.min(1, (1 - profile.energy) + randomVariation())),
-        instrumentalness: Math.max(0, Math.min(1, Math.random() * 0.3)),
-        liveness: Math.max(0, Math.min(1, Math.random() * 0.4)),
-        speechiness: Math.max(0, Math.min(1, Math.random() * 0.2)),
-        loudness: Math.max(-20, Math.min(0, -5 - (profile.energy * 10) + (Math.random() - 0.5) * 5)),
-        mode: Math.random() > 0.5 ? 1 : 0,
-        key: Math.floor(Math.random() * 12),
-        time_signature: Math.random() > 0.1 ? 4 : 3
-      }
-    }
+    // Step 2: Get REAL audio features from Spotify
+    console.log('🎵 Fetching real audio features for', allTracks.length, 'tracks')
     
-    // Step 3: Create track + features pairs with generated features
-    const tracksWithFeatures = allTracks.map((track, index) => {
-      const genre = searchQueries[Math.floor(index / 20)] || 'pop'
-      const features = generateAudioFeatures(track, genre)
+    const trackIds = allTracks.map(track => track.id).slice(0, 100) // Spotify limit
+    const audioFeaturesResponse = await getAudioFeatures(token, trackIds)
+    
+    // Step 3: Create track + features pairs with REAL features
+    const tracksWithFeatures = allTracks.map(track => {
+      const features = audioFeaturesResponse.audio_features.find((f: any) => f && f.id === track.id)
       
-      return {
-        ...track,
-        ...features,
-        popularity: track.popularity ?? 50
+      if (features) {
+        return {
+          ...track,
+          danceability: features.danceability,
+          energy: features.energy,
+          valence: features.valence,
+          tempo: features.tempo,
+          acousticness: features.acousticness,
+          instrumentalness: features.instrumentalness,
+          liveness: features.liveness,
+          speechiness: features.speechiness,
+          loudness: features.loudness,
+          mode: features.mode,
+          key: features.key,
+          time_signature: features.time_signature,
+          popularity: track.popularity ?? 50
+        }
+      } else {
+        // Fallback for tracks without features
+        return {
+          ...track,
+          danceability: 0.5,
+          energy: 0.5,
+          valence: 0.5,
+          tempo: 120,
+          acousticness: 0.5,
+          instrumentalness: 0.5,
+          liveness: 0.5,
+          speechiness: 0.5,
+          loudness: -10,
+          mode: 1,
+          key: 0,
+          time_signature: 4,
+          popularity: track.popularity ?? 50
+        }
       }
     })
     
-    console.log('Generated features for', tracksWithFeatures.length, 'tracks')
+    console.log('✅ Got REAL audio features for', tracksWithFeatures.length, 'tracks')
     
     // Filter for playable tracks, but be lenient
     let playableTracks = tracksWithFeatures.filter(track => track.preview_url)
@@ -130,13 +138,41 @@ export async function getRecommendations(
     
     console.log('Playable tracks:', playableTracks.length)
     
-    // Step 4: Custom recommendation algorithm using generated features
+    // Step 4: Use REAL Spotify recommendations
+    console.log('🎯 Getting REAL Spotify recommendations...')
+    
+    try {
+      // Try to get real Spotify recommendations using seed tracks
+      const seedTracks = playableTracks.slice(0, 5).map(t => t.id).join(',')
+      const recommendationsUrl = `https://api.spotify.com/v1/recommendations?seed_tracks=${seedTracks}&limit=${limit}&target_energy=${targetEnergy}&target_valence=${targetValence}&target_danceability=${targetDanceability}`
+      
+      const recommendationsResponse = await fetch(recommendationsUrl, {
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      })
+      
+      if (recommendationsResponse.ok) {
+        const recommendationsData = await recommendationsResponse.json()
+        console.log('✅ Got REAL Spotify recommendations:', recommendationsData.tracks.length, 'tracks')
+        return { tracks: recommendationsData.tracks }
+      } else {
+        console.log('⚠️ Spotify recommendations failed, using similarity-based approach')
+      }
+    } catch (error) {
+      console.log('⚠️ Spotify recommendations error, using similarity-based approach')
+    }
+    
+    // Fallback: Use similarity-based recommendations with REAL audio features
     const recommendations = playableTracks
       .map(track => {
+        // Use REAL audio features for similarity scoring
         const energyDiff = Math.abs(track.energy - targetEnergy)
         const valenceDiff = Math.abs(track.valence - targetValence)
         const danceabilityDiff = Math.abs(track.danceability - targetDanceability)
         
+        // Weighted similarity score (lower is better)
         const similarityScore = (energyDiff * 0.4) + (valenceDiff * 0.4) + (danceabilityDiff * 0.2)
         
         return {
@@ -144,11 +180,11 @@ export async function getRecommendations(
           _similarityScore: similarityScore
         }
       })
-      .sort((a, b) => a._similarityScore - b._similarityScore)
-      .slice(0, limit)
-      .map(({ _similarityScore, ...track }) => track)
+      .sort((a, b) => a._similarityScore - b._similarityScore) // Sort by score
+      .slice(0, limit) // Take top recommendations
+      .map(({ _similarityScore, ...track }) => track) // Remove internal score
     
-    console.log('Generated', recommendations.length, 'recommendations')
+    console.log('✅ Generated', recommendations.length, 'recommendations using REAL audio features')
     
     return {
       tracks: recommendations

@@ -45,18 +45,18 @@ function App() {
   }, [hasInitialized])
 
   const loadTracks = async () => {
-    console.log('🚀 Starting data load (v3.0 - Custom Engine)')
+    console.log('🚀 Starting data load (v4.0 - Real Spotify Engine)')
     console.log('App is loading...')
     setState(prev => ({ ...prev, isLoading: true, error: null }))
 
     try {
       const tokenData = await getToken()
-      console.log('🔑 Got token, calling CUSTOM getRecommendations...')
+      console.log('🔑 Got token, calling REAL Spotify getRecommendations...')
       const recommendations = await getRecommendations(tokenData.access_token, {
         genres: ['pop', 'electronic', 'indie'],
         limit: 20
       })
-      console.log('🎵 Got recommendations from CUSTOM engine:', recommendations.tracks.length, 'tracks')
+      console.log('🎵 Got recommendations from REAL Spotify engine:', recommendations.tracks.length, 'tracks')
       
       const tracksAsTrackType = recommendations.tracks.map(track => ({
         id: track.id,
