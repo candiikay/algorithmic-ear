@@ -34,6 +34,9 @@ export async function getRecommendations(
     valence?: number
   } = {}
 ): Promise<SpotifyRecommendationsResponse> {
+  console.log('🎵 Using CUSTOM recommendation engine (v2.0)')
+  console.log('Parameters:', params)
+  
   try {
     const limit = Math.min(params.limit || 20, 50)
     const targetEnergy = params.energy ?? 0.5

@@ -54,14 +54,17 @@ function App() {
   }, [])
 
   const loadTracks = async () => {
+    console.log('🚀 Starting data load (v3.0 - Custom Engine)')
     setState(prev => ({ ...prev, isLoading: true, error: null }))
 
     try {
       const tokenData = await getToken()
+      console.log('🔑 Got token, calling CUSTOM getRecommendations...')
       const recommendations = await getRecommendations(tokenData.access_token, {
         genres: ['pop', 'electronic', 'indie'],
         limit: 20
       })
+      console.log('🎵 Got recommendations from CUSTOM engine:', recommendations.tracks.length, 'tracks')
       
       const tracksAsTrackType = recommendations.tracks.map(track => ({
         id: track.id,
