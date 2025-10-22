@@ -104,14 +104,30 @@ function App() {
         time_signature: (track as any).time_signature || 4
       }))
       
-      const normalizedTracks = normalizeFeatures(tracksAsTrackType)
-      
-      setState(prev => ({
-        ...prev,
-        tracks: normalizedTracks,
-        currentTrack: normalizedTracks[0] || null,
-        isLoading: false
-      }))
+      console.log('🎯 About to normalize features for', tracksAsTrackType.length, 'tracks')
+      let normalizedTracks: Track[] = []
+      try {
+        normalizedTracks = normalizeFeatures(tracksAsTrackType)
+        console.log('✅ Features normalized successfully, got', normalizedTracks.length, 'tracks')
+        
+        console.log('🎯 About to update state with tracks')
+        console.log('🎯 Sample normalized track:', normalizedTracks[0])
+        setState(prev => {
+          console.log('🎯 Previous state:', prev)
+          const newState = {
+            ...prev,
+            tracks: normalizedTracks,
+            currentTrack: normalizedTracks[0] || null,
+            isLoading: false
+          }
+          console.log('🎯 New state:', newState)
+          return newState
+        })
+        console.log('✅ State updated successfully')
+      } catch (error) {
+        console.error('❌ Error normalizing features or updating state:', error)
+        throw error
+      }
       
       if (normalizedTracks.length > 0) {
         console.log('🎯 About to generate playlist with', normalizedTracks.length, 'tracks')
