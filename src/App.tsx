@@ -310,9 +310,9 @@ function App() {
             viewport={{ once: true, margin: "-100px" }}
           >
             <TasteSpaceVisualization
-              tracks={state.tracks}
+              tracks={state.tracks || []}
               currentTrack={state.currentTrack}
-              playlist={state.playlist}
+              playlist={state.playlist || []}
               onTrackSelect={handleTrackSelect}
               width={800}
               height={500}
@@ -340,24 +340,30 @@ function App() {
             transition={{ duration: 0.6, delay: 1.2, ease: "easeOut" }}
             viewport={{ once: true, margin: "-100px" }}
           >
-            <h3>Current Playlist ({state.playlist.length} tracks)</h3>
+            <h3>Current Playlist ({state.playlist?.length || 0} tracks)</h3>
             <div className="playlist-tracks">
-              {state.playlist.map((track, index) => (
-                <motion.div 
-                  key={track.id}
-                  className={`playlist-track ${track.id === state.currentTrack?.id ? 'current' : ''}`}
-                  onClick={() => handleTrackSelect(track)}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4, delay: 1.4 + index * 0.05, ease: "easeOut" }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  whileHover={{ x: 10, scale: 1.02 }}
-                >
-                  <span className="track-number">{index + 1}</span>
-                  <span className="track-name">{track.name}</span>
-                  <span className="track-artist">{track.artist}</span>
-                </motion.div>
-              ))}
+              {Array.isArray(state.playlist) && state.playlist.length > 0 ? (
+                state.playlist.map((track, index) => (
+                  <motion.div 
+                    key={track.id || `track-${index}`}
+                    className={`playlist-track ${track.id === state.currentTrack?.id ? 'current' : ''}`}
+                    onClick={() => handleTrackSelect(track)}
+                    initial={{ opacity: 0, x: -20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 1.4 + index * 0.05, ease: "easeOut" }}
+                    viewport={{ once: true, margin: "-100px" }}
+                    whileHover={{ x: 10, scale: 1.02 }}
+                  >
+                    <span className="track-number">{index + 1}</span>
+                    <span className="track-name">{track.name || 'Unknown Track'}</span>
+                    <span className="track-artist">{track.artist || 'Unknown Artist'}</span>
+                  </motion.div>
+                ))
+              ) : (
+                <p style={{ textAlign: 'center', color: '#666', padding: '2rem' }}>
+                  Generating playlist...
+                </p>
+              )}
             </div>
           </motion.div>
 
@@ -367,7 +373,7 @@ function App() {
             transition={{ duration: 0.8, delay: 1.6, ease: "easeOut" }}
             viewport={{ once: true, margin: "-100px" }}
           >
-            <PlaylistAnalysis tracks={state.tracks} playlist={state.playlist} />
+            <PlaylistAnalysis tracks={state.tracks || []} playlist={state.playlist || []} />
           </motion.div>
         </ScrollSection>
 
