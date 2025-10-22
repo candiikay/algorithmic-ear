@@ -53,6 +53,15 @@ function App() {
 
   // Prevent infinite re-renders
   const [hasInitialized, setHasInitialized] = useState(false)
+  
+  // Debug: Log state changes
+  console.log('🎯 Current state:', {
+    isLoading: state.isLoading,
+    tracksCount: state.tracks.length,
+    playlistCount: state.playlist.length,
+    currentTrack: state.currentTrack?.name || 'none',
+    error: state.error
+  })
 
   useEffect(() => {
     if (!hasInitialized) {
@@ -105,7 +114,13 @@ function App() {
       }))
       
       if (normalizedTracks.length > 0) {
-        generateNewPlaylist(normalizedTracks, 'greedyDanceability')
+        console.log('🎯 About to generate playlist with', normalizedTracks.length, 'tracks')
+        try {
+          generateNewPlaylist(normalizedTracks, 'greedyDanceability')
+          console.log('✅ Playlist generated successfully')
+        } catch (error) {
+          console.error('❌ Error generating playlist:', error)
+        }
       }
     } catch (err) {
       const fallbackTracks = normalizeFeatures([...FALLBACK_TRACKS] as Track[])
@@ -125,18 +140,30 @@ function App() {
   }
 
   const generateNewPlaylist = (trackPool: Track[], algorithm: keyof typeof ALGORITHM_CONFIGS) => {
-    let newPlaylist: Track[] = []
+    console.log('🎯 generateNewPlaylist called with:', { trackPoolLength: trackPool.length, algorithm })
     
-    if (algorithm === 'clustering') {
-      newPlaylist = generateClusteringPlaylist(trackPool, 8, 5)
-    } else if (algorithm === 'hybrid') {
-      newPlaylist = generateHybridPlaylist(trackPool, 8)
-    } else {
-      const config = { ...ALGORITHM_CONFIGS[algorithm] }
-      newPlaylist = generatePlaylist(trackPool, config, 8)
+    try {
+      let newPlaylist: Track[] = []
+      
+      if (algorithm === 'clustering') {
+        console.log('🎯 Using clustering algorithm')
+        newPlaylist = generateClusteringPlaylist(trackPool, 8, 5)
+      } else if (algorithm === 'hybrid') {
+        console.log('🎯 Using hybrid algorithm')
+        newPlaylist = generateHybridPlaylist(trackPool, 8)
+      } else {
+        console.log('🎯 Using greedy algorithm:', algorithm)
+        const config = { ...ALGORITHM_CONFIGS[algorithm] }
+        newPlaylist = generatePlaylist(trackPool, config, 8)
+      }
+      
+      console.log('🎯 Generated playlist with', newPlaylist.length, 'tracks')
+      setState(prev => ({ ...prev, playlist: newPlaylist }))
+      console.log('✅ Playlist state updated')
+    } catch (error) {
+      console.error('❌ Error in generateNewPlaylist:', error)
+      throw error
     }
-    
-    setState(prev => ({ ...prev, playlist: newPlaylist }))
   }
 
   const handleAlgorithmChange = (algorithm: keyof typeof ALGORITHM_CONFIGS) => {
