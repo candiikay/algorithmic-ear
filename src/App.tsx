@@ -155,6 +155,7 @@ function App() {
         <div className="loading-content">
           <h1>🎧 The Algorithmic Ear</h1>
           <p>Loading how machines listen...</p>
+          <p>Debug: {state.tracks.length} tracks loaded</p>
         </div>
       </div>
     )
@@ -164,6 +165,8 @@ function App() {
   const y = useTransform(scrollYProgress, [0, 1], [0, -50])
   const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0])
 
+  console.log('🎵 App rendering main content with', state.tracks.length, 'tracks and', state.playlist.length, 'playlist items')
+  
   return (
     <div className="app">
       <motion.header 
