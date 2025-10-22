@@ -34,7 +34,7 @@ export async function getRecommendations(
     valence?: number
   } = {}
 ): Promise<SpotifyRecommendationsResponse> {
-  console.log('🎵 Using CUSTOM recommendation engine (v2.0)')
+  console.log('🎵 Using CUSTOM recommendation engine (v3.0)')
   console.log('Parameters:', params)
   
   try {
@@ -47,9 +47,12 @@ export async function getRecommendations(
     const searchQueries = params.genres || ['pop', 'electronic', 'indie']
     const allTracks: any[] = []
     
-    for (const genre of searchQueries.slice(0, 3)) { // Limit to 3 genres
+    console.log('🔍 Searching for tracks with genres:', searchQueries)
+    
+    for (const genre of searchQueries.slice(0, 3)) {
       try {
         const searchUrl = `https://api.spotify.com/v1/search?q=genre:${genre}&type=track&limit=20`
+        console.log(`Searching ${genre}:`, searchUrl)
         
         const searchResponse = await fetch(searchUrl, {
           headers: { 
@@ -61,21 +64,24 @@ export async function getRecommendations(
         if (searchResponse.ok) {
           const searchData = await searchResponse.json()
           const tracks = searchData.tracks?.items || []
+          console.log(`Found ${tracks.length} ${genre} tracks`)
           allTracks.push(...tracks)
+        } else {
+          console.warn(`Search failed for ${genre}:`, searchResponse.status)
         }
       } catch (error) {
-        // Continue with other genres if one fails
+        console.warn(`Search error for ${genre}:`, error)
       }
     }
+    
+    console.log('Total tracks found:', allTracks.length)
     
     if (allTracks.length === 0) {
       throw new Error('No tracks found in search results')
     }
     
     // Step 2: Generate realistic audio features based on track data
-    // Since Client Credentials tokens can't access audio features, we'll generate them
     const generateAudioFeatures = (track: any, genre: string) => {
-      // Base features vary by genre
       const genreProfiles = {
         pop: { energy: 0.7, valence: 0.6, danceability: 0.8, tempo: 120 },
         electronic: { energy: 0.8, valence: 0.5, danceability: 0.9, tempo: 128 },
@@ -83,8 +89,6 @@ export async function getRecommendations(
       }
       
       const profile = genreProfiles[genre as keyof typeof genreProfiles] || genreProfiles.pop
-      
-      // Add some randomness and popularity influence
       const popularityFactor = (track.popularity || 50) / 100
       const randomVariation = () => (Math.random() - 0.5) * 0.3
       
@@ -106,7 +110,6 @@ export async function getRecommendations(
     
     // Step 3: Create track + features pairs with generated features
     const tracksWithFeatures = allTracks.map((track, index) => {
-      // Determine genre based on search order
       const genre = searchQueries[Math.floor(index / 20)] || 'pop'
       const features = generateAudioFeatures(track, genre)
       
@@ -117,21 +120,23 @@ export async function getRecommendations(
       }
     })
     
+    console.log('Generated features for', tracksWithFeatures.length, 'tracks')
+    
     // Filter for playable tracks, but be lenient
     let playableTracks = tracksWithFeatures.filter(track => track.preview_url)
     if (playableTracks.length === 0) {
       playableTracks = tracksWithFeatures
     }
     
+    console.log('Playable tracks:', playableTracks.length)
+    
     // Step 4: Custom recommendation algorithm using generated features
     const recommendations = playableTracks
       .map(track => {
-        // Use generated audio features for similarity scoring
         const energyDiff = Math.abs(track.energy - targetEnergy)
         const valenceDiff = Math.abs(track.valence - targetValence)
         const danceabilityDiff = Math.abs(track.danceability - targetDanceability)
         
-        // Weighted similarity score (lower is better)
         const similarityScore = (energyDiff * 0.4) + (valenceDiff * 0.4) + (danceabilityDiff * 0.2)
         
         return {
@@ -139,15 +144,18 @@ export async function getRecommendations(
           _similarityScore: similarityScore
         }
       })
-      .sort((a, b) => a._similarityScore - b._similarityScore) // Sort by score
-      .slice(0, limit) // Take top recommendations
-      .map(({ _similarityScore, ...track }) => track) // Remove internal score
+      .sort((a, b) => a._similarityScore - b._similarityScore)
+      .slice(0, limit)
+      .map(({ _similarityScore, ...track }) => track)
+    
+    console.log('Generated', recommendations.length, 'recommendations')
     
     return {
       tracks: recommendations
     }
     
   } catch (error) {
+    console.error('Custom recommendations error:', error)
     throw error
   }
 }
