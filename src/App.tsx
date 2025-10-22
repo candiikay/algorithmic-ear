@@ -190,30 +190,45 @@ function App() {
   try {
     return (
       <div className="app">
+        {/* Debug overlay to confirm render */}
+        <div style={{ 
+          position: 'fixed', 
+          top: 20, 
+          left: 20, 
+          color: 'lime', 
+          backgroundColor: 'black',
+          padding: '10px',
+          zIndex: 9999,
+          fontSize: '14px',
+          border: '2px solid lime'
+        }}>
+          ✅ RENDERED: {state.tracks.length} tracks, {state.playlist.length} playlist
+        </div>
+        
         <motion.header 
           className="hero"
           style={{ y, opacity }}
         >
         <motion.h1
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 1, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
+          transition={{ duration: 0.1 }}
         >
           The Algorithmic Ear
         </motion.h1>
         <motion.p 
           className="subtitle"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 1, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
+          transition={{ duration: 0.1 }}
         >
           How Machines Listen (and Decide What Sounds Good)
         </motion.p>
         <motion.p 
           className="description"
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 1, y: 0 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.4, ease: "easeOut" }}
+          transition={{ duration: 0.1 }}
         >
           An interactive exploration of how algorithms shape musical taste through 
           Spotify data and machine reasoning.
@@ -304,33 +319,43 @@ function App() {
 
           <motion.div 
             className="visualization-container"
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 1, scale: 1 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.8, delay: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.1 }}
             viewport={{ once: true, margin: "-100px" }}
           >
-            <TasteSpaceVisualization
+            {/* Temporarily disabled for debugging */}
+            {/* <TasteSpaceVisualization
               tracks={state.tracks || []}
               currentTrack={state.currentTrack}
               playlist={state.playlist || []}
               onTrackSelect={handleTrackSelect}
               width={800}
               height={500}
-            />
+            /> */}
+            <div style={{ padding: '2rem', textAlign: 'center', background: '#f0f0f0', borderRadius: '8px' }}>
+              <h3>🎵 Visualization (Temporarily Disabled)</h3>
+              <p>Found {state.tracks.length} tracks, {state.playlist.length} in playlist</p>
+            </div>
           </motion.div>
 
           <motion.div 
             className="audio-container"
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 1, y: 0 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.0, ease: "easeOut" }}
+            transition={{ duration: 0.1 }}
             viewport={{ once: true, margin: "-100px" }}
           >
-            <AudioPlayer
+            {/* Temporarily disabled for debugging */}
+            {/* <AudioPlayer
               track={state.currentTrack}
               autoPlay={false}
               onTrackEnd={handleTrackEnd}
-            />
+            /> */}
+            <div style={{ padding: '2rem', textAlign: 'center', background: '#1a1a2e', color: 'white', borderRadius: '8px' }}>
+              <h3>🎧 Audio Player (Temporarily Disabled)</h3>
+              <p>Current track: {state.currentTrack?.name || 'None'}</p>
+            </div>
           </motion.div>
 
           <motion.div 
