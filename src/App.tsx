@@ -177,13 +177,23 @@ function App() {
   if (state.tracks.length === 0) {
     return <div style={{padding: '20px', color: 'white', background: 'red'}}>NO TRACKS LOADED - This should not happen!</div>
   }
+
+  // Debug: Show current state
+  console.log('🎯 Current state:', {
+    isLoading: state.isLoading,
+    tracksCount: state.tracks.length,
+    playlistCount: state.playlist.length,
+    currentTrack: state.currentTrack?.name || 'none',
+    error: state.error
+  })
   
-  return (
-    <div className="app">
-      <motion.header 
-        className="hero"
-        style={{ y, opacity }}
-      >
+  try {
+    return (
+      <div className="app">
+        <motion.header 
+          className="hero"
+          style={{ y, opacity }}
+        >
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -417,7 +427,17 @@ function App() {
         </ScrollSection>
       </main>
     </div>
-  )
+    )
+  } catch (error) {
+    console.error('🚨 Error rendering app:', error)
+    return (
+      <div style={{padding: '20px', color: 'white', background: 'red'}}>
+        <h1>Rendering Error</h1>
+        <p>Error: {error instanceof Error ? error.message : 'Unknown error'}</p>
+        <p>State: {JSON.stringify(state, null, 2)}</p>
+      </div>
+    )
+  }
 }
 
 export default App
