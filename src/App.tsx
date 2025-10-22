@@ -1,14 +1,8 @@
 import React, { useState, useEffect } from 'react'
-import { motion, useScroll, useTransform, useInView } from 'framer-motion'
-import { useInView as useIntersectionObserver } from 'react-intersection-observer'
-import AudioPlayer from './components/AudioPlayer'
-import TasteSpaceVisualization from './components/TasteSpaceVisualization'
-import PlaylistAnalysis from './components/PlaylistAnalysis'
 import type { Track } from './types'
-import { getToken, getRecommendations, getAudioFeatures, FALLBACK_TRACKS } from './lib/spotify'
-import { joinTracksWithFeatures, normalizeFeatures } from './lib/transform'
-import { generatePlaylist, generateClusteringPlaylist, generateHybridPlaylist, ALGORITHM_CONFIGS } from './lib/algorithms'
-import './App.css'
+import { getToken, getRecommendations, FALLBACK_TRACKS } from './lib/spotify'
+import { normalizeFeatures } from './lib/transform'
+import { generatePlaylist, ALGORITHM_CONFIGS } from './lib/algorithms'
 
 interface AppState {
   isLoading: boolean
@@ -17,26 +11,6 @@ interface AppState {
   playlist: Track[]
   currentAlgorithm: keyof typeof ALGORITHM_CONFIGS
   error: string | null
-}
-
-// Scroll-driven section component
-const ScrollSection = ({ children, className = "" }: { children: React.ReactNode, className?: string }) => {
-  const { ref, inView } = useIntersectionObserver({
-    threshold: 0.1,
-    triggerOnce: true
-  })
-
-  return (
-    <motion.section 
-      ref={ref}
-      className={`scroll-section ${className}`}
-      initial={{ opacity: 0, y: 50 }}
-      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
-      transition={{ duration: 0.8, ease: "easeOut" }}
-    >
-      {children}
-    </motion.section>
-  )
 }
 
 function App() {
@@ -163,10 +137,12 @@ function App() {
       
       if (algorithm === 'clustering') {
         console.log('🎯 Using clustering algorithm')
-        newPlaylist = generateClusteringPlaylist(trackPool, 8, 5)
+        // newPlaylist = generateClusteringPlaylist(trackPool, 8, 5)
+        newPlaylist = trackPool.slice(0, 8) // Simple fallback
       } else if (algorithm === 'hybrid') {
         console.log('🎯 Using hybrid algorithm')
-        newPlaylist = generateHybridPlaylist(trackPool, 8)
+        // newPlaylist = generateHybridPlaylist(trackPool, 8)
+        newPlaylist = trackPool.slice(0, 8) // Simple fallback
       } else {
         console.log('🎯 Using greedy algorithm:', algorithm)
         const config = { ...ALGORITHM_CONFIGS[algorithm] }
@@ -191,327 +167,136 @@ function App() {
     setState(prev => ({ ...prev, currentTrack: track }))
   }
 
-  const handleTrackEnd = () => {
-    const currentIndex = state.playlist.findIndex(t => t.id === state.currentTrack?.id)
-    if (currentIndex !== -1 && currentIndex < state.playlist.length - 1) {
-      setState(prev => ({ ...prev, currentTrack: state.playlist[currentIndex + 1] }))
-    }
-  }
-
   if (state.isLoading) {
     return (
-      <div className="loading-screen">
-        <div className="loading-content">
-          <h1>🎧 The Algorithmic Ear</h1>
-          <p>Loading how machines listen...</p>
-          <p>Debug: {state.tracks.length} tracks loaded</p>
-        </div>
+      <div style={{ 
+        height: '100vh', 
+        display: 'flex', 
+        flexDirection: 'column', 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
+        color: 'white',
+        fontFamily: 'Arial, sans-serif'
+      }}>
+        <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎧 The Algorithmic Ear</h1>
+        <p style={{ fontSize: '1.2rem', opacity: 0.9 }}>Loading how machines listen...</p>
+        <p style={{ fontSize: '1rem', opacity: 0.7, marginTop: '1rem' }}>
+          Debug: {state.tracks.length} tracks loaded
+        </p>
       </div>
     )
   }
 
-  const { scrollYProgress } = useScroll()
-  const y = useTransform(scrollYProgress, [0, 1], [0, -50])
-  const opacity = useTransform(scrollYProgress, [0, 0.2], [1, 0])
+  // SUPER SIMPLE VERSION - NO COMPLEX COMPONENTS
+  return (
+    <div style={{ 
+      padding: '20px', 
+      fontFamily: 'Arial, sans-serif',
+      backgroundColor: '#1a1a2e',
+      color: 'white',
+      minHeight: '100vh'
+    }}>
+      <h1 style={{ fontSize: '3rem', marginBottom: '2rem', textAlign: 'center' }}>
+        🎧 The Algorithmic Ear
+      </h1>
+      
+      <div style={{ 
+        backgroundColor: 'rgba(255,255,255,0.1)', 
+        padding: '20px', 
+        borderRadius: '10px',
+        marginBottom: '2rem'
+      }}>
+        <h2>📊 Data Status</h2>
+        <p>✅ Tracks loaded: {state.tracks.length}</p>
+        <p>✅ Playlist generated: {state.playlist.length}</p>
+        <p>✅ Current track: {state.currentTrack?.name || 'None'}</p>
+        <p>✅ Algorithm: {state.currentAlgorithm}</p>
+        {state.error && <p style={{ color: '#ff6b6b' }}>⚠️ {state.error}</p>}
+      </div>
 
-  console.log('🎵 App rendering main content with', state.tracks.length, 'tracks and', state.playlist.length, 'playlist items')
-  
-  // Simple test to see if content renders
-  if (state.tracks.length === 0) {
-    return <div style={{padding: '20px', color: 'white', background: 'red'}}>NO TRACKS LOADED - This should not happen!</div>
-  }
+      <div style={{ 
+        backgroundColor: 'rgba(255,255,255,0.1)', 
+        padding: '20px', 
+        borderRadius: '10px',
+        marginBottom: '2rem'
+      }}>
+        <h2>🎛️ Algorithm Controls</h2>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
+          {Object.entries(ALGORITHM_CONFIGS).map(([key, config]) => (
+            <button
+              key={key}
+              onClick={() => handleAlgorithmChange(key as keyof typeof ALGORITHM_CONFIGS)}
+              style={{
+                padding: '10px 20px',
+                backgroundColor: state.currentAlgorithm === key ? '#667eea' : 'rgba(255,255,255,0.1)',
+                color: 'white',
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: '5px',
+                cursor: 'pointer',
+                fontSize: '14px'
+              }}
+            >
+              {key === 'greedyDanceability' && 'Greedy: Most Danceable'}
+              {key === 'greedyEnergy' && 'Greedy: Most Energetic'}
+              {key === 'searchHappy' && 'Search: Happy Mood'}
+              {key === 'searchChill' && 'Search: Chill Mood'}
+              {key === 'clustering' && 'Clustering: Similar Tracks'}
+              {key === 'hybrid' && 'Hybrid: Mixed Approach'}
+            </button>
+          ))}
+        </div>
+      </div>
 
-  // Debug: Show current state
-  console.log('🎯 Current state:', {
-    isLoading: state.isLoading,
-    tracksCount: state.tracks.length,
-    playlistCount: state.playlist.length,
-    currentTrack: state.currentTrack?.name || 'none',
-    error: state.error
-  })
-  
-  try {
-    return (
-      <div className="app">
-        {/* Debug overlay to confirm render */}
+      {state.tracks.length > 0 && (
         <div style={{ 
-          position: 'fixed', 
-          top: 20, 
-          left: 20, 
-          color: 'lime', 
-          backgroundColor: 'black',
-          padding: '10px',
-          zIndex: 9999,
-          fontSize: '14px',
-          border: '2px solid lime'
+          backgroundColor: 'rgba(255,255,255,0.1)', 
+          padding: '20px', 
+          borderRadius: '10px',
+          marginBottom: '2rem'
         }}>
-          ✅ RENDERED: {state.tracks.length} tracks, {state.playlist.length} playlist
+          <h2>🎵 Sample Tracks</h2>
+          {state.tracks.slice(0, 5).map((track, index) => (
+            <div key={track.id} style={{ 
+              padding: '10px', 
+              margin: '5px 0', 
+              backgroundColor: 'rgba(255,255,255,0.05)',
+              borderRadius: '5px',
+              cursor: 'pointer'
+            }} onClick={() => handleTrackSelect(track)}>
+              <strong>{index + 1}.</strong> {track.name} - {track.artist}
+              <br />
+              <small>Energy: {(track.energy * 100).toFixed(0)}% | Valence: {(track.valence * 100).toFixed(0)}%</small>
+            </div>
+          ))}
         </div>
-        
-        <motion.header 
-          className="hero"
-          style={{ y, opacity }}
-        >
-        <motion.h1
-          initial={{ opacity: 1, y: 0 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.1 }}
-        >
-          The Algorithmic Ear
-        </motion.h1>
-        <motion.p 
-          className="subtitle"
-          initial={{ opacity: 1, y: 0 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.1 }}
-        >
-          How Machines Listen (and Decide What Sounds Good)
-        </motion.p>
-        <motion.p 
-          className="description"
-          initial={{ opacity: 1, y: 0 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.1 }}
-        >
-          An interactive exploration of how algorithms shape musical taste through 
-          Spotify data and machine reasoning.
-        </motion.p>
-        {state.error && (
-          <motion.p 
-            className="error-message"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-          >
-            {state.error}
-          </motion.p>
-        )}
-      </motion.header>
+      )}
 
-      <main className="content">
-        <ScrollSection>
-          <motion.h2
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            If algorithms can shape what we hear, what happens when we teach them to listen?
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            This project merges design, code, and cultural critique to show how 
-            computational systems "listen" and make aesthetic judgments.
-          </motion.p>
-        </ScrollSection>
-
-        <ScrollSection className="demo-section">
-          <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            Interactive Demo
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            Experience how different algorithms create playlists. Each algorithm 
-            "listens" differently, optimizing for different musical features.
-          </motion.p>
-
-          <motion.div 
-            className="algorithm-controls"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            <h3>Choose an Algorithm:</h3>
-            <div className="algorithm-buttons">
-              {Object.entries(ALGORITHM_CONFIGS).map(([key, config], index) => (
-                <motion.button
-                  key={key}
-                  className={state.currentAlgorithm === key ? 'active' : ''}
-                  onClick={() => handleAlgorithmChange(key as keyof typeof ALGORITHM_CONFIGS)}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, delay: 0.6 + index * 0.1, ease: "easeOut" }}
-                  viewport={{ once: true, margin: "-100px" }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {key === 'greedyDanceability' && 'Greedy: Most Danceable'}
-                  {key === 'greedyEnergy' && 'Greedy: Most Energetic'}
-                  {key === 'searchHappy' && 'Search: Happy Mood'}
-                  {key === 'searchChill' && 'Search: Chill Mood'}
-                  {key === 'clustering' && 'Clustering: Similar Tracks'}
-                  {key === 'hybrid' && 'Hybrid: Mixed Approach'}
-                </motion.button>
-              ))}
+      {state.playlist.length > 0 && (
+        <div style={{ 
+          backgroundColor: 'rgba(255,255,255,0.1)', 
+          padding: '20px', 
+          borderRadius: '10px'
+        }}>
+          <h2>🎯 Generated Playlist</h2>
+          {state.playlist.map((track, index) => (
+            <div key={track.id} style={{ 
+              padding: '10px', 
+              margin: '5px 0', 
+              backgroundColor: 'rgba(102, 126, 234, 0.2)',
+              borderRadius: '5px',
+              border: track.id === state.currentTrack?.id ? '2px solid #667eea' : '1px solid rgba(255,255,255,0.1)',
+              cursor: 'pointer'
+            }} onClick={() => handleTrackSelect(track)}>
+              <strong>{index + 1}.</strong> {track.name} - {track.artist}
+              <br />
+              <small>Energy: {(track.energy * 100).toFixed(0)}% | Valence: {(track.valence * 100).toFixed(0)}%</small>
             </div>
-          </motion.div>
-
-          <motion.div 
-            className="visualization-container"
-            initial={{ opacity: 1, scale: 1 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.1 }}
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            {/* Temporarily disabled for debugging */}
-            {/* <TasteSpaceVisualization
-              tracks={state.tracks || []}
-              currentTrack={state.currentTrack}
-              playlist={state.playlist || []}
-              onTrackSelect={handleTrackSelect}
-              width={800}
-              height={500}
-            /> */}
-            <div style={{ padding: '2rem', textAlign: 'center', background: '#f0f0f0', borderRadius: '8px' }}>
-              <h3>🎵 Visualization (Temporarily Disabled)</h3>
-              <p>Found {state.tracks.length} tracks, {state.playlist.length} in playlist</p>
-            </div>
-          </motion.div>
-
-          <motion.div 
-            className="audio-container"
-            initial={{ opacity: 1, y: 0 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.1 }}
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            {/* Temporarily disabled for debugging */}
-            {/* <AudioPlayer
-              track={state.currentTrack}
-              autoPlay={false}
-              onTrackEnd={handleTrackEnd}
-            /> */}
-            <div style={{ padding: '2rem', textAlign: 'center', background: '#1a1a2e', color: 'white', borderRadius: '8px' }}>
-              <h3>🎧 Audio Player (Temporarily Disabled)</h3>
-              <p>Current track: {state.currentTrack?.name || 'None'}</p>
-            </div>
-          </motion.div>
-
-          <motion.div 
-            className="playlist-info"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 1.2, ease: "easeOut" }}
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            <h3>Current Playlist ({state.playlist?.length || 0} tracks)</h3>
-            <div className="playlist-tracks">
-              {Array.isArray(state.playlist) && state.playlist.length > 0 ? (
-                state.playlist.map((track, index) => (
-                  <motion.div 
-                    key={track.id || `track-${index}`}
-                    className={`playlist-track ${track.id === state.currentTrack?.id ? 'current' : ''}`}
-                    onClick={() => handleTrackSelect(track)}
-                    initial={{ opacity: 0, x: -20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, delay: 1.4 + index * 0.05, ease: "easeOut" }}
-                    viewport={{ once: true, margin: "-100px" }}
-                    whileHover={{ x: 10, scale: 1.02 }}
-                  >
-                    <span className="track-number">{index + 1}</span>
-                    <span className="track-name">{track.name || 'Unknown Track'}</span>
-                    <span className="track-artist">{track.artist || 'Unknown Artist'}</span>
-                  </motion.div>
-                ))
-              ) : (
-                <p style={{ textAlign: 'center', color: '#666', padding: '2rem' }}>
-                  Generating playlist...
-                </p>
-              )}
-            </div>
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 1.6, ease: "easeOut" }}
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            <PlaylistAnalysis tracks={state.tracks || []} playlist={state.playlist || []} />
-          </motion.div>
-        </ScrollSection>
-
-        <ScrollSection className="theory-section">
-          <motion.h2
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: "easeOut" }}
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            Theory & Citations
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            This project draws from critical algorithm studies and music information retrieval 
-            to examine how computational systems encode cultural assumptions about taste and preference.
-          </motion.p>
-          <motion.div 
-            className="citations"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4, ease: "easeOut" }}
-            viewport={{ once: true, margin: "-100px" }}
-          >
-            <h3>Key References:</h3>
-            <ul>
-              <motion.li
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: 0.6, ease: "easeOut" }}
-                viewport={{ once: true, margin: "-100px" }}
-              >
-                Seaver, N. (2017). Algorithms as culture: Some tactics for the ethnography of algorithmic systems. <em>Big Data & Society, 4</em>(2), 1-12.
-              </motion.li>
-              <motion.li
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: 0.7, ease: "easeOut" }}
-                viewport={{ once: true, margin: "-100px" }}
-              >
-                Goffey, A. (2008). Algorithm. In M. Fuller (Ed.), <em>Software Studies: A Lexicon</em> (pp. 15-20). MIT Press.
-              </motion.li>
-              <motion.li
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: 0.8, ease: "easeOut" }}
-                viewport={{ once: true, margin: "-100px" }}
-              >
-                Louridas, P. (2020). <em>Algorithms</em>. MIT Press Essential Knowledge Series.
-              </motion.li>
-            </ul>
-          </motion.div>
-        </ScrollSection>
-      </main>
+          ))}
+        </div>
+      )}
     </div>
-    )
-  } catch (error) {
-    console.error('🚨 Error rendering app:', error)
-    return (
-      <div style={{padding: '20px', color: 'white', background: 'red'}}>
-        <h1>Rendering Error</h1>
-        <p>Error: {error instanceof Error ? error.message : 'Unknown error'}</p>
-        <p>State: {JSON.stringify(state, null, 2)}</p>
-      </div>
-    )
-  }
+  )
 }
 
 export default App
