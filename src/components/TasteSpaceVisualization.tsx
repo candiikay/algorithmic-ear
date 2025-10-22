@@ -23,10 +23,17 @@ export default function TasteSpaceVisualization({
   const [hoveredTrack, setHoveredTrack] = useState<Track | null>(null)
 
   useEffect(() => {
-    if (!svgRef.current || tracks.length === 0) return
+    if (!svgRef.current || tracks.length === 0) {
+      console.log('TasteSpaceVisualization: No tracks or SVG ref', { tracksLength: tracks.length, hasSvgRef: !!svgRef.current })
+      return
+    }
 
-    const svg = d3.select(svgRef.current)
-    svg.selectAll('*').remove()
+    console.log('TasteSpaceVisualization: Rendering with', tracks.length, 'tracks')
+    console.log('Sample track data:', tracks[0])
+
+    try {
+      const svg = d3.select(svgRef.current)
+      svg.selectAll('*').remove()
 
     const margin = { top: 20, right: 20, bottom: 40, left: 40 }
     const innerWidth = width - margin.left - margin.right
@@ -53,12 +60,16 @@ export default function TasteSpaceVisualization({
 
     // Create visualization points
     const points: VisualizationPoint[] = tracks.map(track => ({
-      x: track.energy,
-      y: track.valence,
+      x: isNaN(track.energy) ? 0.5 : track.energy,
+      y: isNaN(track.valence) ? 0.5 : track.valence,
       track,
       color: getColorForValence(track.valence),
       size: sizeScale(track.popularity)
     }))
+
+    console.log('Visualization points:', points.slice(0, 3))
+    console.log('Energy range:', d3.extent(tracks, d => d.energy))
+    console.log('Valence range:', d3.extent(tracks, d => d.valence))
 
     // Draw grid
     g.append('g')
@@ -115,13 +126,19 @@ export default function TasteSpaceVisualization({
     }
 
     // Draw points
-    g.selectAll('.track-point')
+    const circles = g.selectAll('.track-point')
       .data(points)
       .enter()
       .append('circle')
       .attr('class', 'track-point')
-      .attr('cx', d => xScale(d.x))
-      .attr('cy', d => yScale(d.y))
+      .attr('cx', d => {
+        console.log('Drawing circle at x:', d.x, 'scaled to:', xScale(d.x))
+        return xScale(d.x)
+      })
+      .attr('cy', d => {
+        console.log('Drawing circle at y:', d.y, 'scaled to:', yScale(d.y))
+        return yScale(d.y)
+      })
       .attr('r', d => d.size)
       .attr('fill', d => d.color)
       .attr('stroke', d => d.track.id === currentTrack?.id ? '#333' : 'white')
@@ -137,6 +154,8 @@ export default function TasteSpaceVisualization({
       .on('mouseout', () => {
         setHoveredTrack(null)
       })
+
+    console.log('Drew', circles.size(), 'circles')
 
     // Tooltip
     if (hoveredTrack) {
@@ -165,6 +184,10 @@ export default function TasteSpaceVisualization({
         .attr('fill', 'white')
         .style('font-size', '10px')
         .text(`E:${(hoveredTrack.energy * 100).toFixed(0)}% V:${(hoveredTrack.valence * 100).toFixed(0)}%`)
+    }
+
+    } catch (error) {
+      console.error('Error rendering TasteSpaceVisualization:', error)
     }
 
   }, [tracks, currentTrack, playlist, width, height, onTrackSelect])
