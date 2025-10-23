@@ -2,61 +2,39 @@ import React, { useState, useEffect } from 'react'
 import type { Track } from './types'
 import { getToken, getRecommendations, FALLBACK_TRACKS } from './lib/spotify'
 import { normalizeFeatures } from './lib/transform'
-import { generatePlaylist, ALGORITHM_CONFIGS } from './lib/algorithms'
 
 interface AppState {
   isLoading: boolean
   tracks: Track[]
-  currentTrack: Track | null
-  playlist: Track[]
-  currentAlgorithm: keyof typeof ALGORITHM_CONFIGS
+  selectedSong: Track | null
+  selectedFeature: 'danceability' | 'energy' | 'valence' | 'tempo' | 'acousticness'
+  greedyPlaylist: Track[]
   error: string | null
 }
 
 function App() {
-  console.log('🎧 App component rendering...')
-  
   const [state, setState] = useState<AppState>({
     isLoading: true,
     tracks: [],
-    currentTrack: null,
-    playlist: [],
-    currentAlgorithm: 'greedyDanceability',
+    selectedSong: null,
+    selectedFeature: 'danceability',
+    greedyPlaylist: [],
     error: null
   })
 
-  // Prevent infinite re-renders
-  const [hasInitialized, setHasInitialized] = useState(false)
-  
-  // Debug: Log state changes
-  console.log('🎯 Current state:', {
-    isLoading: state.isLoading,
-    tracksCount: state.tracks.length,
-    playlistCount: state.playlist.length,
-    currentTrack: state.currentTrack?.name || 'none',
-    error: state.error
-  })
-
   useEffect(() => {
-    if (!hasInitialized) {
-      setHasInitialized(true)
-      loadTracks()
-    }
-  }, [hasInitialized])
+    loadTracks()
+  }, [])
 
   const loadTracks = async () => {
-    console.log('🚀 Starting data load (v4.0 - Real Spotify Engine)')
-    console.log('App is loading...')
     setState(prev => ({ ...prev, isLoading: true, error: null }))
 
     try {
       const tokenData = await getToken()
-      console.log('🔑 Got token, calling REAL Spotify getRecommendations...')
       const recommendations = await getRecommendations(tokenData.access_token, {
         genres: ['pop', 'electronic', 'indie'],
-        limit: 20
+        limit: 50
       })
-      console.log('🎵 Got recommendations from REAL Spotify engine:', recommendations.tracks.length, 'tracks')
       
       const tracksAsTrackType = recommendations.tracks.map(track => ({
         id: track.id,
@@ -78,93 +56,75 @@ function App() {
         time_signature: (track as any).time_signature || 4
       }))
       
-      console.log('🎯 About to normalize features for', tracksAsTrackType.length, 'tracks')
-      let normalizedTracks: Track[] = []
-      try {
-        normalizedTracks = normalizeFeatures(tracksAsTrackType)
-        console.log('✅ Features normalized successfully, got', normalizedTracks.length, 'tracks')
-        
-        console.log('🎯 About to update state with tracks')
-        console.log('🎯 Sample normalized track:', normalizedTracks[0])
-        setState(prev => {
-          console.log('🎯 Previous state:', prev)
-          const newState = {
-            ...prev,
-            tracks: normalizedTracks,
-            currentTrack: normalizedTracks[0] || null,
-            isLoading: false
-          }
-          console.log('🎯 New state:', newState)
-          return newState
-        })
-        console.log('✅ State updated successfully')
-      } catch (error) {
-        console.error('❌ Error normalizing features or updating state:', error)
-        throw error
-      }
+      const normalizedTracks = normalizeFeatures(tracksAsTrackType)
       
-      if (normalizedTracks.length > 0) {
-        console.log('🎯 About to generate playlist with', normalizedTracks.length, 'tracks')
-        try {
-          generateNewPlaylist(normalizedTracks, 'greedyDanceability')
-          console.log('✅ Playlist generated successfully')
-        } catch (error) {
-          console.error('❌ Error generating playlist:', error)
-        }
-      }
+      setState(prev => ({
+        ...prev,
+        tracks: normalizedTracks,
+        selectedSong: normalizedTracks[0] || null,
+        isLoading: false
+      }))
     } catch (err) {
       const fallbackTracks = normalizeFeatures([...FALLBACK_TRACKS] as Track[])
       
       setState(prev => ({
         ...prev,
         tracks: fallbackTracks,
-        currentTrack: fallbackTracks[0] || null,
+        selectedSong: fallbackTracks[0] || null,
         error: 'Using sample data (Spotify API unavailable)',
         isLoading: false
       }))
-      
-      if (fallbackTracks.length > 0) {
-        generateNewPlaylist(fallbackTracks, 'greedyDanceability')
-      }
     }
   }
 
-  const generateNewPlaylist = (trackPool: Track[], algorithm: keyof typeof ALGORITHM_CONFIGS) => {
-    console.log('🎯 generateNewPlaylist called with:', { trackPoolLength: trackPool.length, algorithm })
+  // The core greedy algorithm
+  const greedyNextSong = (seed: Track, candidates: Track[], feature: keyof Track): Track | null => {
+    let closest: Track | null = null
+    let minDiff = Infinity
     
-    try {
-      let newPlaylist: Track[] = []
+    for (const track of candidates) {
+      if (track.id === seed.id) continue // Skip the seed song
       
-      if (algorithm === 'clustering') {
-        console.log('🎯 Using clustering algorithm')
-        // newPlaylist = generateClusteringPlaylist(trackPool, 8, 5)
-        newPlaylist = trackPool.slice(0, 8) // Simple fallback
-      } else if (algorithm === 'hybrid') {
-        console.log('🎯 Using hybrid algorithm')
-        // newPlaylist = generateHybridPlaylist(trackPool, 8)
-        newPlaylist = trackPool.slice(0, 8) // Simple fallback
-      } else {
-        console.log('🎯 Using greedy algorithm:', algorithm)
-        const config = { ...ALGORITHM_CONFIGS[algorithm] }
-        newPlaylist = generatePlaylist(trackPool, config, 8)
+      const diff = Math.abs((track[feature] as number) - (seed[feature] as number))
+      if (diff < minDiff) {
+        closest = track
+        minDiff = diff
       }
-      
-      console.log('🎯 Generated playlist with', newPlaylist.length, 'tracks')
-      setState(prev => ({ ...prev, playlist: newPlaylist }))
-      console.log('✅ Playlist state updated')
-    } catch (error) {
-      console.error('❌ Error in generateNewPlaylist:', error)
-      throw error
     }
+    
+    return closest
   }
 
-  const handleAlgorithmChange = (algorithm: keyof typeof ALGORITHM_CONFIGS) => {
-    setState(prev => ({ ...prev, currentAlgorithm: algorithm }))
-    generateNewPlaylist(state.tracks, algorithm)
+  const generateGreedyPlaylist = () => {
+    if (!state.selectedSong) return
+
+    const playlist: Track[] = [state.selectedSong]
+    const usedIds = new Set([state.selectedSong.id])
+    let currentSong = state.selectedSong
+
+    // Generate 9 more songs (10 total)
+    for (let i = 0; i < 9; i++) {
+      const availableTracks = state.tracks.filter(track => !usedIds.has(track.id))
+      const nextSong = greedyNextSong(currentSong, availableTracks, state.selectedFeature)
+      
+      if (nextSong) {
+        playlist.push(nextSong)
+        usedIds.add(nextSong.id)
+        currentSong = nextSong
+      } else {
+        break // No more songs available
+      }
+    }
+
+    setState(prev => ({ ...prev, greedyPlaylist: playlist }))
   }
 
-  const handleTrackSelect = (track: Track) => {
-    setState(prev => ({ ...prev, currentTrack: track }))
+  const handleSongSelect = (song: Track) => {
+    setState(prev => ({ ...prev, selectedSong: song, greedyPlaylist: [] }))
+  }
+
+  const handleFeatureChange = (feature: keyof Track) => {
+    setState(prev => ({ ...prev, selectedFeature: feature as any, greedyPlaylist: [] }))
   }
 
   if (state.isLoading) {
@@ -179,16 +139,12 @@ function App() {
         color: 'white',
         fontFamily: 'Arial, sans-serif'
       }}>
-        <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎧 The Algorithmic Ear</h1>
-        <p style={{ fontSize: '1.2rem', opacity: 0.9 }}>Loading how machines listen...</p>
-        <p style={{ fontSize: '1rem', opacity: 0.7, marginTop: '1rem' }}>
-          Debug: {state.tracks.length} tracks loaded
-        </p>
+        <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎧 Greedy Listening</h1>
+        <p style={{ fontSize: '1.2rem', opacity: 0.9 }}>Loading how algorithms decide what sounds similar...</p>
       </div>
     )
   }
 
-  // SUPER SIMPLE VERSION - NO COMPLEX COMPONENTS
   return (
     <div style={{ 
       padding: '20px', 
@@ -197,104 +153,188 @@ function App() {
       color: 'white',
       minHeight: '100vh'
     }}>
-      <h1 style={{ fontSize: '3rem', marginBottom: '2rem', textAlign: 'center' }}>
-        🎧 The Algorithmic Ear
-      </h1>
-      
-      <div style={{ 
-        backgroundColor: 'rgba(255,255,255,0.1)', 
-        padding: '20px', 
-        borderRadius: '10px',
-        marginBottom: '2rem'
-      }}>
-        <h2>📊 Data Status</h2>
-        <p>✅ Tracks loaded: {state.tracks.length}</p>
-        <p>✅ Playlist generated: {state.playlist.length}</p>
-        <p>✅ Current track: {state.currentTrack?.name || 'None'}</p>
-        <p>✅ Algorithm: {state.currentAlgorithm}</p>
-        {state.error && <p style={{ color: '#ff6b6b' }}>⚠️ {state.error}</p>}
-      </div>
+      <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
+        <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>
+          🎧 Greedy Listening
+        </h1>
+        <p style={{ fontSize: '1.2rem', opacity: 0.8, maxWidth: '600px', margin: '0 auto' }}>
+          What happens when we let a greedy algorithm decide what we listen to next?
+          <br />
+          <em>Simulating Spotify's recommendation logic with one simple rule.</em>
+        </p>
+        {state.error && (
+          <p style={{ color: '#ff6b6b', marginTop: '1rem' }}>
+            ⚠️ {state.error}
+          </p>
+        )}
+      </header>
 
       <div style={{ 
-        backgroundColor: 'rgba(255,255,255,0.1)', 
-        padding: '20px', 
-        borderRadius: '10px',
-        marginBottom: '2rem'
+        display: 'grid', 
+        gridTemplateColumns: '1fr 1fr', 
+        gap: '2rem',
+        marginBottom: '3rem'
       }}>
-        <h2>🎛️ Algorithm Controls</h2>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '10px' }}>
-          {Object.entries(ALGORITHM_CONFIGS).map(([key, config]) => (
-            <button
-              key={key}
-              onClick={() => handleAlgorithmChange(key as keyof typeof ALGORITHM_CONFIGS)}
-              style={{
-                padding: '10px 20px',
-                backgroundColor: state.currentAlgorithm === key ? '#667eea' : 'rgba(255,255,255,0.1)',
-                color: 'white',
-                border: '1px solid rgba(255,255,255,0.2)',
+        {/* Song Selection */}
+        <div style={{ 
+          backgroundColor: 'rgba(255,255,255,0.1)', 
+          padding: '20px', 
+          borderRadius: '10px'
+        }}>
+          <h2 style={{ marginBottom: '1rem' }}>1. Choose Your Starting Song</h2>
+          <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
+            {state.tracks.slice(0, 20).map((track, index) => (
+              <div 
+                key={track.id}
+                onClick={() => handleSongSelect(track)}
+                style={{ 
+                  padding: '10px', 
+                  margin: '5px 0', 
+                  backgroundColor: track.id === state.selectedSong?.id ? 'rgba(102, 126, 234, 0.3)' : 'rgba(255,255,255,0.05)',
+                  borderRadius: '5px',
+                  cursor: 'pointer',
+                  border: track.id === state.selectedSong?.id ? '2px solid #667eea' : '1px solid rgba(255,255,255,0.1)'
+                }}
+              >
+                <strong>{index + 1}.</strong> {track.name} - {track.artist}
+                <br />
+                <small style={{ opacity: 0.7 }}>
+                  Danceability: {(track.danceability * 100).toFixed(0)}% | 
+                  Energy: {(track.energy * 100).toFixed(0)}% | 
+                  Valence: {(track.valence * 100).toFixed(0)}%
+                </small>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Feature Selection */}
+        <div style={{ 
+          backgroundColor: 'rgba(255,255,255,0.1)', 
+          padding: '20px', 
+          borderRadius: '10px'
+        }}>
+          <h2 style={{ marginBottom: '1rem' }}>2. Choose What Makes Songs "Similar"</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            {[
+              { key: 'danceability', label: 'Danceability', desc: 'How suitable a track is for dancing' },
+              { key: 'energy', label: 'Energy', desc: 'Perceptual measure of intensity and power' },
+              { key: 'valence', label: 'Valence', desc: 'Musical positivity (happy vs sad)' },
+              { key: 'tempo', label: 'Tempo', desc: 'Overall estimated tempo in BPM' },
+              { key: 'acousticness', label: 'Acousticness', desc: 'Confidence measure of acoustic recording' }
+            ].map(feature => (
+              <label key={feature.key} style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                padding: '10px',
+                backgroundColor: state.selectedFeature === feature.key ? 'rgba(102, 126, 234, 0.2)' : 'rgba(255,255,255,0.05)',
                 borderRadius: '5px',
                 cursor: 'pointer',
-                fontSize: '14px'
-              }}
-            >
-              {key === 'greedyDanceability' && 'Greedy: Most Danceable'}
-              {key === 'greedyEnergy' && 'Greedy: Most Energetic'}
-              {key === 'searchHappy' && 'Search: Happy Mood'}
-              {key === 'searchChill' && 'Search: Chill Mood'}
-              {key === 'clustering' && 'Clustering: Similar Tracks'}
-              {key === 'hybrid' && 'Hybrid: Mixed Approach'}
-            </button>
-          ))}
+                border: state.selectedFeature === feature.key ? '2px solid #667eea' : '1px solid rgba(255,255,255,0.1)'
+              }}>
+                <input
+                  type="radio"
+                  name="feature"
+                  value={feature.key}
+                  checked={state.selectedFeature === feature.key}
+                  onChange={() => handleFeatureChange(feature.key as any)}
+                  style={{ marginRight: '10px' }}
+                />
+                <div>
+                  <strong>{feature.label}</strong>
+                  <br />
+                  <small style={{ opacity: 0.7 }}>{feature.desc}</small>
+                </div>
+              </label>
+            ))}
+          </div>
         </div>
       </div>
 
-      {state.tracks.length > 0 && (
+      {/* Generate Button */}
+      <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+        <button
+          onClick={generateGreedyPlaylist}
+          disabled={!state.selectedSong}
+          style={{
+            padding: '15px 30px',
+            fontSize: '1.2rem',
+            backgroundColor: state.selectedSong ? '#667eea' : '#666',
+            color: 'white',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: state.selectedSong ? 'pointer' : 'not-allowed',
+            fontWeight: 'bold'
+          }}
+        >
+          🎯 Generate Greedy Playlist
+        </button>
+      </div>
+
+      {/* Greedy Playlist Results */}
+      {state.greedyPlaylist.length > 0 && (
         <div style={{ 
           backgroundColor: 'rgba(255,255,255,0.1)', 
           padding: '20px', 
           borderRadius: '10px',
           marginBottom: '2rem'
         }}>
-          <h2>🎵 Sample Tracks</h2>
-          {state.tracks.slice(0, 5).map((track, index) => (
-            <div key={track.id} style={{ 
-              padding: '10px', 
-              margin: '5px 0', 
-              backgroundColor: 'rgba(255,255,255,0.05)',
-              borderRadius: '5px',
-              cursor: 'pointer'
-            }} onClick={() => handleTrackSelect(track)}>
-              <strong>{index + 1}.</strong> {track.name} - {track.artist}
-              <br />
-              <small>Energy: {(track.energy * 100).toFixed(0)}% | Valence: {(track.valence * 100).toFixed(0)}%</small>
-            </div>
-          ))}
+          <h2 style={{ marginBottom: '1rem' }}>
+            🎵 Greedy Algorithm Playlist ({state.greedyPlaylist.length} songs)
+          </h2>
+          <p style={{ marginBottom: '1rem', opacity: 0.8 }}>
+            <strong>Algorithm:</strong> Always pick the song with the closest {state.selectedFeature} value to the previous song.
+          </p>
+          
+          <div style={{ display: 'grid', gap: '10px' }}>
+            {state.greedyPlaylist.map((track, index) => (
+              <div key={track.id} style={{ 
+                padding: '15px', 
+                backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                borderRadius: '8px',
+                border: '1px solid rgba(102, 126, 234, 0.3)'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <strong>{index + 1}.</strong> {track.name} - {track.artist}
+                    <br />
+                    <small style={{ opacity: 0.7 }}>
+                      {state.selectedFeature}: {((track[state.selectedFeature] as number) * 100).toFixed(0)}%
+                    </small>
+                  </div>
+                  <div style={{ textAlign: 'right', fontSize: '0.9rem', opacity: 0.7 }}>
+                    {index > 0 && (
+                      <div>
+                        Diff: {Math.abs((track[state.selectedFeature] as number) - (state.greedyPlaylist[index - 1][state.selectedFeature] as number)).toFixed(3)}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
-      {state.playlist.length > 0 && (
-        <div style={{ 
-          backgroundColor: 'rgba(255,255,255,0.1)', 
-          padding: '20px', 
-          borderRadius: '10px'
-        }}>
-          <h2>🎯 Generated Playlist</h2>
-          {state.playlist.map((track, index) => (
-            <div key={track.id} style={{ 
-              padding: '10px', 
-              margin: '5px 0', 
-              backgroundColor: 'rgba(102, 126, 234, 0.2)',
-              borderRadius: '5px',
-              border: track.id === state.currentTrack?.id ? '2px solid #667eea' : '1px solid rgba(255,255,255,0.1)',
-              cursor: 'pointer'
-            }} onClick={() => handleTrackSelect(track)}>
-              <strong>{index + 1}.</strong> {track.name} - {track.artist}
-              <br />
-              <small>Energy: {(track.energy * 100).toFixed(0)}% | Valence: {(track.valence * 100).toFixed(0)}%</small>
-            </div>
-          ))}
+      {/* Reflection Section */}
+      <div style={{ 
+        backgroundColor: 'rgba(255,255,255,0.1)', 
+        padding: '20px', 
+        borderRadius: '10px'
+      }}>
+        <h2 style={{ marginBottom: '1rem' }}>🤔 What This Shows</h2>
+        <div style={{ lineHeight: '1.6' }}>
+          <p>
+            <strong>Algorithmic Convergence:</strong> Notice how the {state.selectedFeature} values get closer and closer together as the playlist progresses. This is the greedy algorithm optimizing for similarity.
+          </p>
+          <p>
+            <strong>Cultural Flattening:</strong> By always choosing the "most similar" song, the algorithm creates a narrow, predictable listening experience. Real discovery requires surprise and diversity.
+          </p>
+          <p>
+            <strong>Optimization vs. Discovery:</strong> This demonstrates how algorithmic systems prioritize engagement and similarity over cultural exploration and serendipity.
+          </p>
         </div>
-      )}
+      </div>
     </div>
   )
 }
