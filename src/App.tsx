@@ -320,8 +320,8 @@ function App() {
             
             .metrics-grid {
               grid-template-columns: repeat(3, 1fr) !important;
-              gap: 1rem !important;
-              padding: 1.5rem !important;
+              gap: 0.5rem !important;
+              padding: 0.75rem !important;
             }
           }
         `}</style>
@@ -760,10 +760,10 @@ function App() {
                   <div className="metrics-grid" style={{ 
                     display: 'grid', 
                     gridTemplateColumns: 'repeat(5, 1fr)', 
-                    gap: '1.5rem', 
-                    fontSize: '0.875rem',
+                    gap: '0.75rem', 
+                    fontSize: '0.75rem',
                     background: 'rgba(255, 255, 255, 0.02)',
-                    padding: '2rem',
+                    padding: '1rem',
                     borderRadius: '12px',
                     backdropFilter: 'blur(10px)',
                     WebkitBackdropFilter: 'blur(10px)',
@@ -772,91 +772,91 @@ function App() {
                   }}>
                     <div style={{ 
                       textAlign: 'center',
-                      padding: '0.75rem 0.5rem'
+                      padding: '0.5rem 0.25rem'
                     }}>
                       <div style={{ 
-                        fontSize: '0.75rem', 
+                        fontSize: '0.65rem', 
                         color: '#888888', 
-                        marginBottom: '0.5rem', 
+                        marginBottom: '0.25rem', 
                         textTransform: 'uppercase', 
-                        letterSpacing: '0.5px',
+                        letterSpacing: '0.3px',
                         fontWeight: '400'
                       }}>Dance</div>
                       <div style={{ 
                         fontWeight: '500', 
-                        fontSize: '0.9rem',
+                        fontSize: '0.8rem',
                         color: '#ffffff'
                       }}>{(selectedSong.danceability * 100).toFixed(0)}%</div>
                     </div>
                     <div style={{ 
                       textAlign: 'center',
-                      padding: '0.75rem 0.5rem'
+                      padding: '0.5rem 0.25rem'
                     }}>
                       <div style={{ 
-                        fontSize: '0.75rem', 
+                        fontSize: '0.65rem', 
                         color: '#888888', 
-                        marginBottom: '0.5rem', 
+                        marginBottom: '0.25rem', 
                         textTransform: 'uppercase', 
-                        letterSpacing: '0.5px',
+                        letterSpacing: '0.3px',
                         fontWeight: '400'
                       }}>Energy</div>
                       <div style={{ 
                         fontWeight: '500', 
-                        fontSize: '0.9rem',
+                        fontSize: '0.8rem',
                         color: '#ffffff'
                       }}>{(selectedSong.energy * 100).toFixed(0)}%</div>
                     </div>
                     <div style={{ 
                       textAlign: 'center',
-                      padding: '0.75rem 0.5rem'
+                      padding: '0.5rem 0.25rem'
                     }}>
                       <div style={{ 
-                        fontSize: '0.75rem', 
+                        fontSize: '0.65rem', 
                         color: '#888888', 
-                        marginBottom: '0.5rem', 
+                        marginBottom: '0.25rem', 
                         textTransform: 'uppercase', 
-                        letterSpacing: '0.5px',
+                        letterSpacing: '0.3px',
                         fontWeight: '400'
                       }}>Valence</div>
                       <div style={{ 
                         fontWeight: '500', 
-                        fontSize: '0.9rem',
+                        fontSize: '0.8rem',
                         color: '#ffffff'
                       }}>{(selectedSong.valence * 100).toFixed(0)}%</div>
                     </div>
                     <div style={{ 
                       textAlign: 'center',
-                      padding: '0.75rem 0.5rem'
+                      padding: '0.5rem 0.25rem'
                     }}>
                       <div style={{ 
-                        fontSize: '0.75rem', 
+                        fontSize: '0.65rem', 
                         color: '#888888', 
-                        marginBottom: '0.5rem', 
+                        marginBottom: '0.25rem', 
                         textTransform: 'uppercase', 
-                        letterSpacing: '0.5px',
+                        letterSpacing: '0.3px',
                         fontWeight: '400'
                       }}>Tempo</div>
                       <div style={{ 
                         fontWeight: '500', 
-                        fontSize: '0.9rem',
+                        fontSize: '0.8rem',
                         color: '#ffffff'
                       }}>{Math.round(selectedSong.tempo)}</div>
                     </div>
                     <div style={{ 
                       textAlign: 'center',
-                      padding: '0.75rem 0.5rem'
+                      padding: '0.5rem 0.25rem'
                     }}>
                       <div style={{ 
-                        fontSize: '0.75rem', 
+                        fontSize: '0.65rem', 
                         color: '#888888', 
-                        marginBottom: '0.5rem', 
+                        marginBottom: '0.25rem', 
                         textTransform: 'uppercase', 
-                        letterSpacing: '0.5px',
+                        letterSpacing: '0.3px',
                         fontWeight: '400'
                       }}>Acoustic</div>
                       <div style={{ 
                         fontWeight: '500', 
-                        fontSize: '0.9rem',
+                        fontSize: '0.8rem',
                         color: '#ffffff'
                       }}>{(selectedSong.acousticness * 100).toFixed(0)}%</div>
                     </div>
@@ -948,10 +948,10 @@ function App() {
                       <div className="metrics-grid" style={{ 
                         display: 'grid', 
                         gridTemplateColumns: 'repeat(5, 1fr)', 
-                        gap: '1.5rem', 
-                        fontSize: '0.875rem',
+                        gap: '0.75rem', 
+                        fontSize: '0.75rem',
                         background: 'rgba(255, 255, 255, 0.02)',
-                        padding: '2rem',
+                        padding: '1rem',
                         borderRadius: '12px',
                         backdropFilter: 'blur(10px)',
                         WebkitBackdropFilter: 'blur(10px)',
@@ -960,91 +960,91 @@ function App() {
                       }}>
                         <div style={{ 
                           textAlign: 'center',
-                          padding: '0.75rem 0.5rem'
+                          padding: '0.5rem 0.25rem'
                         }}>
                           <div style={{ 
-                            fontSize: '0.75rem', 
+                            fontSize: '0.65rem', 
                             color: '#888888', 
-                            marginBottom: '0.5rem', 
+                            marginBottom: '0.25rem', 
                             textTransform: 'uppercase', 
-                            letterSpacing: '0.5px',
+                            letterSpacing: '0.3px',
                             fontWeight: '400'
                           }}>Dance</div>
                           <div style={{ 
                             fontWeight: '500', 
-                            fontSize: '0.9rem',
+                            fontSize: '0.8rem',
                             color: '#ffffff'
                           }}>{(nextSong.danceability * 100).toFixed(0)}%</div>
                         </div>
                         <div style={{ 
                           textAlign: 'center',
-                          padding: '0.75rem 0.5rem'
+                          padding: '0.5rem 0.25rem'
                         }}>
                           <div style={{ 
-                            fontSize: '0.75rem', 
+                            fontSize: '0.65rem', 
                             color: '#888888', 
-                            marginBottom: '0.5rem', 
+                            marginBottom: '0.25rem', 
                             textTransform: 'uppercase', 
-                            letterSpacing: '0.5px',
+                            letterSpacing: '0.3px',
                             fontWeight: '400'
                           }}>Energy</div>
                           <div style={{ 
                             fontWeight: '500', 
-                            fontSize: '0.9rem',
+                            fontSize: '0.8rem',
                             color: '#ffffff'
                           }}>{(nextSong.energy * 100).toFixed(0)}%</div>
                         </div>
                         <div style={{ 
                           textAlign: 'center',
-                          padding: '0.75rem 0.5rem'
+                          padding: '0.5rem 0.25rem'
                         }}>
                           <div style={{ 
-                            fontSize: '0.75rem', 
+                            fontSize: '0.65rem', 
                             color: '#888888', 
-                            marginBottom: '0.5rem', 
+                            marginBottom: '0.25rem', 
                             textTransform: 'uppercase', 
-                            letterSpacing: '0.5px',
+                            letterSpacing: '0.3px',
                             fontWeight: '400'
                           }}>Valence</div>
                           <div style={{ 
                             fontWeight: '500', 
-                            fontSize: '0.9rem',
+                            fontSize: '0.8rem',
                             color: '#ffffff'
                           }}>{(nextSong.valence * 100).toFixed(0)}%</div>
                         </div>
                         <div style={{ 
                           textAlign: 'center',
-                          padding: '0.75rem 0.5rem'
+                          padding: '0.5rem 0.25rem'
                         }}>
                           <div style={{ 
-                            fontSize: '0.75rem', 
+                            fontSize: '0.65rem', 
                             color: '#888888', 
-                            marginBottom: '0.5rem', 
+                            marginBottom: '0.25rem', 
                             textTransform: 'uppercase', 
-                            letterSpacing: '0.5px',
+                            letterSpacing: '0.3px',
                             fontWeight: '400'
                           }}>Tempo</div>
                           <div style={{ 
                             fontWeight: '500', 
-                            fontSize: '0.9rem',
+                            fontSize: '0.8rem',
                             color: '#ffffff'
                           }}>{Math.round(nextSong.tempo)}</div>
                         </div>
                         <div style={{ 
                           textAlign: 'center',
-                          padding: '0.75rem 0.5rem'
+                          padding: '0.5rem 0.25rem'
                         }}>
                           <div style={{ 
-                            fontSize: '0.75rem', 
+                            fontSize: '0.65rem', 
                             color: '#888888', 
-                            marginBottom: '0.5rem', 
+                            marginBottom: '0.25rem', 
                             textTransform: 'uppercase', 
-                            letterSpacing: '0.5px',
+                            letterSpacing: '0.3px',
                             fontWeight: '400'
                           }}>Acoustic</div>
                           <div style={{ 
                             fontWeight: '500', 
-                            fontSize: '0.9rem',
+                            fontSize: '0.8rem',
                             color: '#ffffff'
                           }}>{(nextSong.acousticness * 100).toFixed(0)}%</div>
                         </div>
