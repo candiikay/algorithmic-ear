@@ -321,7 +321,7 @@ function App() {
             .metrics-grid {
               grid-template-columns: repeat(3, 1fr) !important;
               gap: 0.5rem !important;
-              padding: 0.75rem !important;
+              padding: 0.75rem 1rem !important;
             }
           }
         `}</style>
@@ -763,7 +763,7 @@ function App() {
                     gap: '0.75rem', 
                     fontSize: '0.75rem',
                     background: 'rgba(255, 255, 255, 0.02)',
-                    padding: '1rem',
+                    padding: '1rem 1.25rem',
                     borderRadius: '12px',
                     backdropFilter: 'blur(10px)',
                     WebkitBackdropFilter: 'blur(10px)',
@@ -772,7 +772,7 @@ function App() {
                   }}>
                     <div style={{ 
                       textAlign: 'center',
-                      padding: '0.5rem 0.25rem'
+                      padding: '0.5rem 0.4rem'
                     }}>
                       <div style={{ 
                         fontSize: '0.65rem', 
@@ -790,7 +790,7 @@ function App() {
                     </div>
                     <div style={{ 
                       textAlign: 'center',
-                      padding: '0.5rem 0.25rem'
+                      padding: '0.5rem 0.4rem'
                     }}>
                       <div style={{ 
                         fontSize: '0.65rem', 
@@ -808,7 +808,7 @@ function App() {
                     </div>
                     <div style={{ 
                       textAlign: 'center',
-                      padding: '0.5rem 0.25rem'
+                      padding: '0.5rem 0.4rem'
                     }}>
                       <div style={{ 
                         fontSize: '0.65rem', 
@@ -826,7 +826,7 @@ function App() {
                     </div>
                     <div style={{ 
                       textAlign: 'center',
-                      padding: '0.5rem 0.25rem'
+                      padding: '0.5rem 0.4rem'
                     }}>
                       <div style={{ 
                         fontSize: '0.65rem', 
@@ -844,7 +844,7 @@ function App() {
                     </div>
                     <div style={{ 
                       textAlign: 'center',
-                      padding: '0.5rem 0.25rem'
+                      padding: '0.5rem 0.4rem'
                     }}>
                       <div style={{ 
                         fontSize: '0.65rem', 
@@ -951,7 +951,7 @@ function App() {
                         gap: '0.75rem', 
                         fontSize: '0.75rem',
                         background: 'rgba(255, 255, 255, 0.02)',
-                        padding: '1rem',
+                        padding: '1rem 1.25rem',
                         borderRadius: '12px',
                         backdropFilter: 'blur(10px)',
                         WebkitBackdropFilter: 'blur(10px)',
@@ -960,7 +960,7 @@ function App() {
                       }}>
                         <div style={{ 
                           textAlign: 'center',
-                          padding: '0.5rem 0.25rem'
+                          padding: '0.5rem 0.4rem'
                         }}>
                           <div style={{ 
                             fontSize: '0.65rem', 
@@ -978,7 +978,7 @@ function App() {
                         </div>
                         <div style={{ 
                           textAlign: 'center',
-                          padding: '0.5rem 0.25rem'
+                          padding: '0.5rem 0.4rem'
                         }}>
                           <div style={{ 
                             fontSize: '0.65rem', 
@@ -996,7 +996,7 @@ function App() {
                         </div>
                         <div style={{ 
                           textAlign: 'center',
-                          padding: '0.5rem 0.25rem'
+                          padding: '0.5rem 0.4rem'
                         }}>
                           <div style={{ 
                             fontSize: '0.65rem', 
@@ -1014,7 +1014,7 @@ function App() {
                         </div>
                         <div style={{ 
                           textAlign: 'center',
-                          padding: '0.5rem 0.25rem'
+                          padding: '0.5rem 0.4rem'
                         }}>
                           <div style={{ 
                             fontSize: '0.65rem', 
@@ -1032,7 +1032,7 @@ function App() {
                         </div>
                         <div style={{ 
                           textAlign: 'center',
-                          padding: '0.5rem 0.25rem'
+                          padding: '0.5rem 0.4rem'
                         }}>
                           <div style={{ 
                             fontSize: '0.65rem', 
