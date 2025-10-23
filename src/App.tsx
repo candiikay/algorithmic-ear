@@ -173,65 +173,246 @@ function App() {
         alignItems: 'center',
         justifyContent: 'center',
         minHeight: '100vh',
-        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%)',
         color: 'white',
         fontSize: '1.5rem',
-        padding: '2rem'
+        padding: '2rem',
+        position: 'relative',
+        overflow: 'hidden'
       }}>
-        <div style={{ marginBottom: '2rem', textAlign: 'center' }}>
-          🎧 {loadingMessage}
-        </div>
+        {/* Animated background elements */}
+        <div style={{
+          position: 'absolute',
+          top: '-50%',
+          left: '-50%',
+          width: '200%',
+          height: '200%',
+          background: 'radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)',
+          animation: 'float 6s ease-in-out infinite'
+        }} />
         
         <div style={{
+          position: 'absolute',
+          top: '20%',
+          right: '-20%',
           width: '300px',
-          height: '8px',
-          backgroundColor: 'rgba(255,255,255,0.2)',
-          borderRadius: '4px',
-          overflow: 'hidden',
-          marginBottom: '1rem'
+          height: '300px',
+          background: 'radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%)',
+          borderRadius: '50%',
+          animation: 'float 8s ease-in-out infinite reverse'
+        }} />
+        
+        {/* Glass loading panel */}
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          borderRadius: '24px',
+          padding: '3rem',
+          textAlign: 'center',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+          maxWidth: '400px',
+          width: '100%'
         }}>
+          <div style={{ 
+            marginBottom: '2rem', 
+            fontSize: '1.8rem',
+            fontWeight: '600',
+            background: 'linear-gradient(45deg, #fff, #f0f0f0)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            🎧 {loadingMessage}
+          </div>
+          
           <div style={{
-            width: `${loadingProgress}%`,
-            height: '100%',
-            backgroundColor: '#4ecdc4',
-            transition: 'width 0.3s ease',
-            borderRadius: '4px'
-          }} />
+            width: '100%',
+            height: '8px',
+            backgroundColor: 'rgba(255,255,255,0.2)',
+            borderRadius: '20px',
+            overflow: 'hidden',
+            marginBottom: '1.5rem',
+            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
+          }}>
+            <div style={{
+              width: `${loadingProgress}%`,
+              height: '100%',
+              background: 'linear-gradient(90deg, #4ecdc4, #44a08d)',
+              transition: 'width 0.5s cubic-bezier(0.4, 0, 0.2, 1)',
+              borderRadius: '20px',
+              boxShadow: '0 2px 8px rgba(78, 205, 196, 0.3)'
+            }} />
+          </div>
+          
+          <div style={{ 
+            fontSize: '1rem', 
+            opacity: 0.8,
+            fontWeight: '500'
+          }}>
+            {loadingProgress}% complete
+          </div>
         </div>
         
-        <div style={{ fontSize: '1rem', opacity: 0.8 }}>
-          {loadingProgress}% complete
-        </div>
+        <style>{`
+          @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+          }
+          
+          * {
+            box-sizing: border-box;
+          }
+          
+          body {
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            overflow-x: hidden;
+          }
+          
+          /* Smooth scrolling */
+          html {
+            scroll-behavior: smooth;
+          }
+          
+          /* Custom scrollbar */
+          ::-webkit-scrollbar {
+            width: 8px;
+          }
+          
+          ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+          }
+          
+          ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 4px;
+          }
+          
+          ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #764ba2, #f093fb);
+          }
+        `}</style>
       </div>
     )
   }
 
   return (
     <div style={{
-      background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #f5576c 75%, #4facfe 100%)',
       color: 'white',
       minHeight: '100vh',
       padding: '2rem',
-      fontFamily: 'Arial, sans-serif'
+      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+      position: 'relative',
+      overflow: 'hidden'
     }}>
-      <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
-        <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎧 Greedy Listening (v6.0)</h1>
-        <p style={{ fontSize: '1.2rem', opacity: 0.8 }}>
-          Pick a song with a slider, then see what the algorithm suggests next
-        </p>
+      {/* Animated background elements */}
+      <div style={{
+        position: 'absolute',
+        top: '-50%',
+        left: '-50%',
+        width: '200%',
+        height: '200%',
+        background: 'radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 70%)',
+        animation: 'float 20s ease-in-out infinite'
+      }} />
+      
+      <div style={{
+        position: 'absolute',
+        top: '10%',
+        right: '-10%',
+        width: '400px',
+        height: '400px',
+        background: 'radial-gradient(circle, rgba(255,255,255,0.03) 0%, transparent 70%)',
+        borderRadius: '50%',
+        animation: 'float 25s ease-in-out infinite reverse'
+      }} />
+      
+      <div style={{
+        position: 'absolute',
+        bottom: '-20%',
+        left: '-20%',
+        width: '300px',
+        height: '300px',
+        background: 'radial-gradient(circle, rgba(255,255,255,0.04) 0%, transparent 70%)',
+        borderRadius: '50%',
+        animation: 'float 15s ease-in-out infinite'
+      }} />
+
+      <header style={{ 
+        textAlign: 'center', 
+        marginBottom: '3rem',
+        position: 'relative',
+        zIndex: 1
+      }}>
+        <div style={{
+          background: 'rgba(255, 255, 255, 0.1)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.2)',
+          borderRadius: '32px',
+          padding: '2.5rem',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+          maxWidth: '600px',
+          margin: '0 auto'
+        }}>
+          <h1 style={{ 
+            fontSize: '3.5rem', 
+            marginBottom: '1rem',
+            background: 'linear-gradient(45deg, #fff, #f0f0f0, #e0e0e0)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text',
+            fontWeight: '700',
+            letterSpacing: '-0.02em'
+          }}>
+            🎧 Greedy Listening
+          </h1>
+          <p style={{ 
+            fontSize: '1.3rem', 
+            opacity: 0.9,
+            fontWeight: '400',
+            lineHeight: '1.5'
+          }}>
+            Pick a song with a slider, then see what the algorithm suggests next
+          </p>
+        </div>
       </header>
 
-      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
         {/* Step 1: Choose Feature */}
-        <div style={{ marginBottom: '2rem' }}>
-          <h2 style={{ marginBottom: '1rem', fontSize: '1.5rem' }}>1. Choose a Feature</h2>
-          <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+        <div style={{ 
+          marginBottom: '3rem',
+          background: 'rgba(255, 255, 255, 0.08)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
+          borderRadius: '24px',
+          padding: '2rem',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+        }}>
+          <h2 style={{ 
+            marginBottom: '1.5rem', 
+            fontSize: '1.8rem',
+            fontWeight: '600',
+            background: 'linear-gradient(45deg, #fff, #f0f0f0)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}>
+            1. Choose a Feature
+          </h2>
+          <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
             {[
-              { key: 'danceability', label: '💃 Danceability', color: '#ff6b6b' },
-              { key: 'energy', label: '⚡ Energy', color: '#4ecdc4' },
-              { key: 'valence', label: '😊 Valence', color: '#45b7d1' },
-              { key: 'tempo', label: '🎵 Tempo', color: '#96ceb4' },
-              { key: 'acousticness', label: '🎸 Acousticness', color: '#feca57' }
+              { key: 'danceability', label: '💃 Danceability', color: '#ff6b6b', gradient: 'linear-gradient(135deg, #ff6b6b, #ff8e8e)' },
+              { key: 'energy', label: '⚡ Energy', color: '#4ecdc4', gradient: 'linear-gradient(135deg, #4ecdc4, #44a08d)' },
+              { key: 'valence', label: '😊 Valence', color: '#45b7d1', gradient: 'linear-gradient(135deg, #45b7d1, #96c93d)' },
+              { key: 'tempo', label: '🎵 Tempo', color: '#96ceb4', gradient: 'linear-gradient(135deg, #96ceb4, #feca57)' },
+              { key: 'acousticness', label: '🎸 Acousticness', color: '#feca57', gradient: 'linear-gradient(135deg, #feca57, #ff9ff3)' }
             ].map(metric => (
               <button
                 key={metric.key}
@@ -240,15 +421,37 @@ function App() {
                   setSliderValue(0)
                 }}
                 style={{
-                  padding: '12px 20px',
-                  borderRadius: '25px',
-                  border: `2px solid ${selectedFeature === metric.key ? metric.color : 'rgba(255,255,255,0.2)'}`,
-                  backgroundColor: selectedFeature === metric.key ? metric.color : 'rgba(255,255,255,0.1)',
-                  color: selectedFeature === metric.key ? 'white' : 'rgba(255,255,255,0.8)',
+                  padding: '16px 24px',
+                  borderRadius: '20px',
+                  border: selectedFeature === metric.key ? '2px solid rgba(255,255,255,0.4)' : '2px solid rgba(255,255,255,0.1)',
+                  background: selectedFeature === metric.key 
+                    ? metric.gradient 
+                    : 'rgba(255, 255, 255, 0.05)',
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                  color: selectedFeature === metric.key ? 'white' : 'rgba(255,255,255,0.9)',
                   fontSize: '16px',
                   cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  fontWeight: selectedFeature === metric.key ? 'bold' : 'normal'
+                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                  fontWeight: selectedFeature === metric.key ? '600' : '400',
+                  boxShadow: selectedFeature === metric.key 
+                    ? '0 8px 25px rgba(0,0,0,0.15), 0 0 0 1px rgba(255,255,255,0.1)' 
+                    : '0 4px 15px rgba(0,0,0,0.1)',
+                  transform: selectedFeature === metric.key ? 'translateY(-2px)' : 'translateY(0)',
+                  minWidth: '140px',
+                  textAlign: 'center'
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedFeature !== metric.key) {
+                    e.currentTarget.style.transform = 'translateY(-1px)'
+                    e.currentTarget.style.boxShadow = '0 6px 20px rgba(0,0,0,0.15)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedFeature !== metric.key) {
+                    e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.1)'
+                  }
                 }}
               >
                 {metric.label}
@@ -259,14 +462,32 @@ function App() {
 
         {/* Step 2: Slider */}
         {selectedFeature && sortedTracks.length > 0 && (
-          <div style={{ marginBottom: '2rem' }}>
-            <h2 style={{ marginBottom: '1rem', fontSize: '1.5rem' }}>
+          <div style={{ 
+            marginBottom: '3rem',
+            background: 'rgba(255, 255, 255, 0.08)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            borderRadius: '24px',
+            padding: '2rem',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+          }}>
+            <h2 style={{ 
+              marginBottom: '1.5rem', 
+              fontSize: '1.8rem',
+              fontWeight: '600',
+              background: 'linear-gradient(45deg, #fff, #f0f0f0)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>
               2. Slide to Pick a Song by {selectedFeature}
             </h2>
             
             <div style={{
               width: '100%',
-              margin: '20px 0'
+              margin: '30px 0',
+              position: 'relative'
             }}>
               <input
                 type="range"
@@ -276,13 +497,61 @@ function App() {
                 onChange={(e) => handleSliderChange(parseInt(e.target.value))}
                 style={{
                   width: '100%',
+                  height: '8px',
                   cursor: 'pointer',
-                  accentColor: '#667eea'
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  borderRadius: '20px',
+                  outline: 'none',
+                  appearance: 'none',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none'
                 }}
               />
+              <style>{`
+                input[type="range"]::-webkit-slider-thumb {
+                  appearance: none;
+                  width: 24px;
+                  height: 24px;
+                  border-radius: 50%;
+                  background: linear-gradient(135deg, #667eea, #764ba2);
+                  cursor: pointer;
+                  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+                  border: 2px solid rgba(255, 255, 255, 0.3);
+                  transition: all 0.2s ease;
+                }
+                input[type="range"]::-webkit-slider-thumb:hover {
+                  transform: scale(1.1);
+                  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.6);
+                }
+                input[type="range"]::-moz-range-thumb {
+                  width: 24px;
+                  height: 24px;
+                  border-radius: 50%;
+                  background: linear-gradient(135deg, #667eea, #764ba2);
+                  cursor: pointer;
+                  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+                  border: 2px solid rgba(255, 255, 255, 0.3);
+                  transition: all 0.2s ease;
+                }
+                input[type="range"]::-moz-range-thumb:hover {
+                  transform: scale(1.1);
+                  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.6);
+                }
+              `}</style>
             </div>
             
-            <div style={{ textAlign: 'center', fontSize: '0.9rem', opacity: 0.7 }}>
+            <div style={{ 
+              textAlign: 'center', 
+              fontSize: '1rem', 
+              opacity: 0.8,
+              fontWeight: '500',
+              background: 'rgba(255, 255, 255, 0.05)',
+              padding: '12px 20px',
+              borderRadius: '16px',
+              backdropFilter: 'blur(10px)',
+              WebkitBackdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.1)'
+            }}>
               {sortedTracks.length} songs available • Position {Math.min(sliderValue, sortedTracks.length - 1) + 1}
             </div>
           </div>
@@ -291,75 +560,204 @@ function App() {
         {/* Step 3: Results */}
         {selectedSong && (
           <div style={{
-            backgroundColor: 'rgba(255,255,255,0.1)',
-            padding: '30px',
-            borderRadius: '15px',
-            textAlign: 'center'
+            background: 'rgba(255, 255, 255, 0.08)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            borderRadius: '32px',
+            padding: '3rem',
+            textAlign: 'center',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+            position: 'relative',
+            overflow: 'hidden'
           }}>
-            <h2 style={{ marginBottom: '2rem', fontSize: '1.8rem' }}>🎯 Your Selection</h2>
+            {/* Background gradient overlay */}
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+              borderRadius: '32px',
+              zIndex: 0
+            }} />
             
-            <div style={{ 
-              display: 'grid', 
-              gridTemplateColumns: nextSong ? '1fr auto 1fr' : '1fr', 
-              gap: '2rem',
-              alignItems: 'center',
-              marginBottom: '2rem'
-            }}>
-              {/* Selected Song */}
-              <div style={{
-                backgroundColor: 'rgba(102, 126, 234, 0.2)',
-                padding: '25px',
-                borderRadius: '15px',
-                border: '3px solid #667eea'
+            <div style={{ position: 'relative', zIndex: 1 }}>
+              <h2 style={{ 
+                marginBottom: '2.5rem', 
+                fontSize: '2.2rem',
+                fontWeight: '700',
+                background: 'linear-gradient(45deg, #fff, #f0f0f0)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text'
               }}>
-                <h3 style={{ marginBottom: '1rem', color: '#667eea', fontSize: '1.3rem' }}>Your Song</h3>
-                <div style={{ fontSize: '1.3rem', marginBottom: '1rem' }}>
-                  <strong>{selectedSong.name}</strong><br />
-                  <em style={{ opacity: 0.8 }}>{selectedSong.artist}</em>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px', fontSize: '0.9rem' }}>
-                  <div>💃 {(selectedSong.danceability * 100).toFixed(0)}%</div>
-                  <div>⚡ {(selectedSong.energy * 100).toFixed(0)}%</div>
-                  <div>😊 {(selectedSong.valence * 100).toFixed(0)}%</div>
-                  <div>🎵 {Math.round(selectedSong.tempo)} BPM</div>
-                  <div>🎸 {(selectedSong.acousticness * 100).toFixed(0)}%</div>
-                </div>
-              </div>
-
-              {/* Arrow */}
-              {nextSong && (
-                <>
-                  <div style={{ fontSize: '2.5rem' }}>→</div>
-                  
-                  {/* Next Song */}
+                🎯 Your Selection
+              </h2>
+              
+              <div style={{ 
+                display: 'grid', 
+                gridTemplateColumns: nextSong ? '1fr auto 1fr' : '1fr', 
+                gap: '3rem',
+                alignItems: 'center',
+                marginBottom: '2.5rem'
+              }}>
+                {/* Selected Song */}
+                <div style={{
+                  background: 'rgba(102, 126, 234, 0.15)',
+                  backdropFilter: 'blur(15px)',
+                  WebkitBackdropFilter: 'blur(15px)',
+                  padding: '2rem',
+                  borderRadius: '24px',
+                  border: '2px solid rgba(102, 126, 234, 0.3)',
+                  boxShadow: '0 8px 25px rgba(102, 126, 234, 0.2)',
+                  position: 'relative',
+                  overflow: 'hidden'
+                }}>
                   <div style={{
-                    backgroundColor: 'rgba(255, 107, 107, 0.2)',
-                    padding: '25px',
-                    borderRadius: '15px',
-                    border: '3px solid #ff6b6b'
-                  }}>
-                    <h3 style={{ marginBottom: '1rem', color: '#ff6b6b', fontSize: '1.3rem' }}>Next Song</h3>
-                    <div style={{ fontSize: '1.3rem', marginBottom: '1rem' }}>
-                      <strong>{nextSong.name}</strong><br />
-                      <em style={{ opacity: 0.8 }}>{nextSong.artist}</em>
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+                    borderRadius: '24px',
+                    zIndex: 0
+                  }} />
+                  
+                  <div style={{ position: 'relative', zIndex: 1 }}>
+                    <h3 style={{ 
+                      marginBottom: '1.5rem', 
+                      color: '#667eea', 
+                      fontSize: '1.5rem',
+                      fontWeight: '600',
+                      background: 'linear-gradient(45deg, #667eea, #764ba2)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text'
+                    }}>
+                      Your Song
+                    </h3>
+                    <div style={{ fontSize: '1.4rem', marginBottom: '1.5rem', lineHeight: '1.4' }}>
+                      <div style={{ fontWeight: '600', marginBottom: '0.5rem' }}>{selectedSong.name}</div>
+                      <div style={{ opacity: 0.8, fontSize: '1.1rem' }}>{selectedSong.artist}</div>
                     </div>
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px', fontSize: '0.9rem' }}>
-                      <div>💃 {(nextSong.danceability * 100).toFixed(0)}%</div>
-                      <div>⚡ {(nextSong.energy * 100).toFixed(0)}%</div>
-                      <div>😊 {(nextSong.valence * 100).toFixed(0)}%</div>
-                      <div>🎵 {Math.round(nextSong.tempo)} BPM</div>
-                      <div>🎸 {(nextSong.acousticness * 100).toFixed(0)}%</div>
+                    <div style={{ 
+                      display: 'grid', 
+                      gridTemplateColumns: 'repeat(5, 1fr)', 
+                      gap: '12px', 
+                      fontSize: '0.95rem',
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      padding: '1rem',
+                      borderRadius: '16px',
+                      backdropFilter: 'blur(10px)',
+                      WebkitBackdropFilter: 'blur(10px)'
+                    }}>
+                      <div style={{ textAlign: 'center' }}>💃<br />{(selectedSong.danceability * 100).toFixed(0)}%</div>
+                      <div style={{ textAlign: 'center' }}>⚡<br />{(selectedSong.energy * 100).toFixed(0)}%</div>
+                      <div style={{ textAlign: 'center' }}>😊<br />{(selectedSong.valence * 100).toFixed(0)}%</div>
+                      <div style={{ textAlign: 'center' }}>🎵<br />{Math.round(selectedSong.tempo)} BPM</div>
+                      <div style={{ textAlign: 'center' }}>🎸<br />{(selectedSong.acousticness * 100).toFixed(0)}%</div>
                     </div>
                   </div>
-                </>
+                </div>
+
+                {/* Arrow */}
+                {nextSong && (
+                  <>
+                    <div style={{ 
+                      fontSize: '3rem',
+                      background: 'linear-gradient(45deg, #667eea, #764ba2)',
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                      backgroundClip: 'text',
+                      fontWeight: 'bold',
+                      filter: 'drop-shadow(0 4px 8px rgba(102, 126, 234, 0.3))'
+                    }}>
+                      →
+                    </div>
+                    
+                    {/* Next Song */}
+                    <div style={{
+                      background: 'rgba(255, 107, 107, 0.15)',
+                      backdropFilter: 'blur(15px)',
+                      WebkitBackdropFilter: 'blur(15px)',
+                      padding: '2rem',
+                      borderRadius: '24px',
+                      border: '2px solid rgba(255, 107, 107, 0.3)',
+                      boxShadow: '0 8px 25px rgba(255, 107, 107, 0.2)',
+                      position: 'relative',
+                      overflow: 'hidden'
+                    }}>
+                      <div style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        background: 'linear-gradient(135deg, rgba(255, 107, 107, 0.1) 0%, rgba(255, 142, 142, 0.1) 100%)',
+                        borderRadius: '24px',
+                        zIndex: 0
+                      }} />
+                      
+                      <div style={{ position: 'relative', zIndex: 1 }}>
+                        <h3 style={{ 
+                          marginBottom: '1.5rem', 
+                          color: '#ff6b6b', 
+                          fontSize: '1.5rem',
+                          fontWeight: '600',
+                          background: 'linear-gradient(45deg, #ff6b6b, #ff8e8e)',
+                          WebkitBackgroundClip: 'text',
+                          WebkitTextFillColor: 'transparent',
+                          backgroundClip: 'text'
+                        }}>
+                          Next Song
+                        </h3>
+                        <div style={{ fontSize: '1.4rem', marginBottom: '1.5rem', lineHeight: '1.4' }}>
+                          <div style={{ fontWeight: '600', marginBottom: '0.5rem' }}>{nextSong.name}</div>
+                          <div style={{ opacity: 0.8, fontSize: '1.1rem' }}>{nextSong.artist}</div>
+                        </div>
+                        <div style={{ 
+                          display: 'grid', 
+                          gridTemplateColumns: 'repeat(5, 1fr)', 
+                          gap: '12px', 
+                          fontSize: '0.95rem',
+                          background: 'rgba(255, 255, 255, 0.05)',
+                          padding: '1rem',
+                          borderRadius: '16px',
+                          backdropFilter: 'blur(10px)',
+                          WebkitBackdropFilter: 'blur(10px)'
+                        }}>
+                          <div style={{ textAlign: 'center' }}>💃<br />{(nextSong.danceability * 100).toFixed(0)}%</div>
+                          <div style={{ textAlign: 'center' }}>⚡<br />{(nextSong.energy * 100).toFixed(0)}%</div>
+                          <div style={{ textAlign: 'center' }}>😊<br />{(nextSong.valence * 100).toFixed(0)}%</div>
+                          <div style={{ textAlign: 'center' }}>🎵<br />{Math.round(nextSong.tempo)} BPM</div>
+                          <div style={{ textAlign: 'center' }}>🎸<br />{(nextSong.acousticness * 100).toFixed(0)}%</div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {nextSong && (
+                <div style={{ 
+                  fontSize: '1.2rem', 
+                  opacity: 0.9,
+                  fontWeight: '500',
+                  background: 'rgba(255, 255, 255, 0.05)',
+                  padding: '1rem 2rem',
+                  borderRadius: '20px',
+                  backdropFilter: 'blur(10px)',
+                  WebkitBackdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 255, 255, 0.1)',
+                  display: 'inline-block'
+                }}>
+                  The greedy algorithm found the next song with the closest {selectedFeature} value!
+                </div>
               )}
             </div>
-
-            {nextSong && (
-              <div style={{ fontSize: '1.1rem', opacity: 0.8 }}>
-                The greedy algorithm found the next song with the closest {selectedFeature} value!
-              </div>
-            )}
           </div>
         )}
 
@@ -367,13 +765,30 @@ function App() {
         {!selectedFeature && (
           <div style={{
             textAlign: 'center',
-            padding: '40px',
-            backgroundColor: 'rgba(255,255,255,0.05)',
-            borderRadius: '15px',
-            fontSize: '1.1rem',
-            opacity: 0.8
+            padding: '3rem',
+            background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.05) 100%)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.15)',
+            borderRadius: '24px',
+            fontSize: '1.3rem',
+            fontWeight: '500',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
           }}>
-            👆 Choose a feature above to start picking songs with the slider!
+            <div style={{
+              background: 'linear-gradient(45deg, #fff, #f0f0f0)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              fontSize: '1.5rem',
+              fontWeight: '600',
+              marginBottom: '1rem'
+            }}>
+              👆 Choose a feature above to start picking songs with the slider!
+            </div>
+            <div style={{ opacity: 0.8, fontSize: '1.1rem' }}>
+              Select any musical feature to explore the algorithm's recommendations
+            </div>
           </div>
         )}
 
@@ -381,14 +796,29 @@ function App() {
         {error && (
           <div style={{
             marginTop: '2rem',
-            padding: '20px',
-            borderRadius: '10px',
-            backgroundColor: 'rgba(255, 107, 107, 0.15)',
-            border: '1px solid rgba(255, 107, 107, 0.4)',
+            padding: '2rem',
+            borderRadius: '20px',
+            background: 'rgba(255, 107, 107, 0.15)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '2px solid rgba(255, 107, 107, 0.3)',
             color: '#ff9f9f',
-            textAlign: 'center'
+            textAlign: 'center',
+            boxShadow: '0 8px 25px rgba(255, 107, 107, 0.2)',
+            fontSize: '1.1rem',
+            fontWeight: '500'
           }}>
-            ⚠️ {error}
+            <div style={{
+              background: 'linear-gradient(45deg, #ff6b6b, #ff8e8e)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text',
+              fontSize: '1.3rem',
+              fontWeight: '600',
+              marginBottom: '0.5rem'
+            }}>
+              ⚠️ {error}
+            </div>
           </div>
         )}
       </div>
