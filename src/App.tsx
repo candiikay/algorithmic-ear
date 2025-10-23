@@ -321,7 +321,7 @@ function App() {
             .metrics-grid {
               grid-template-columns: repeat(3, 1fr) !important;
               gap: 0.5rem !important;
-              padding: 0.75rem 1rem 0.75rem 0.5rem !important;
+              padding: 0.75rem 1rem 0.75rem 0.25rem !important;
             }
           }
         `}</style>
@@ -763,7 +763,7 @@ function App() {
                     gap: '0.75rem', 
                     fontSize: '0.75rem',
                     background: 'rgba(255, 255, 255, 0.02)',
-                    padding: '1rem 1.5rem 1rem 0.5rem',
+                    padding: '1rem 1.5rem 1rem 0.25rem',
                     borderRadius: '12px',
                     backdropFilter: 'blur(10px)',
                     WebkitBackdropFilter: 'blur(10px)',
@@ -951,7 +951,7 @@ function App() {
                         gap: '0.75rem', 
                         fontSize: '0.75rem',
                         background: 'rgba(255, 255, 255, 0.02)',
-                        padding: '1rem 1.5rem 1rem 0.5rem',
+                        padding: '1rem 1.5rem 1rem 0.25rem',
                         borderRadius: '12px',
                         backdropFilter: 'blur(10px)',
                         WebkitBackdropFilter: 'blur(10px)',
