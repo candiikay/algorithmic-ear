@@ -83,21 +83,45 @@ export async function getRecommendations(
     // Step 2: Try to get REAL audio features, but handle 403 gracefully
     console.log('🎵 Attempting to fetch real audio features for', allTracks.length, 'tracks')
     
-    let tracksWithFeatures = allTracks.map(track => ({
+    // Generate realistic varied features for demonstration
+    const generateVariedFeatures = (track: any, index: number) => {
+      // Use track popularity and index to create consistent but varied features
+      const popularityFactor = (track.popularity || 50) / 100
+      const indexFactor = (index % 10) / 10
+      
+      // Create realistic variation based on genre patterns
+      const genrePatterns = {
+        pop: { energy: 0.7, valence: 0.6, danceability: 0.8 },
+        electronic: { energy: 0.8, valence: 0.5, danceability: 0.9 },
+        indie: { energy: 0.5, valence: 0.4, danceability: 0.6 }
+      }
+      
+      // Determine genre based on search order
+      const genre = ['pop', 'electronic', 'indie'][Math.floor(index / 20)] || 'pop'
+      const pattern = genrePatterns[genre as keyof typeof genrePatterns] || genrePatterns.pop
+      
+      // Add variation
+      const variation = () => (Math.random() - 0.5) * 0.3
+      
+      return {
+        danceability: Math.max(0, Math.min(1, pattern.danceability + variation() + (popularityFactor * 0.1))),
+        energy: Math.max(0, Math.min(1, pattern.energy + variation() + (popularityFactor * 0.1))),
+        valence: Math.max(0, Math.min(1, pattern.valence + variation() + (indexFactor * 0.2))),
+        tempo: Math.max(60, Math.min(200, 120 + (Math.random() - 0.5) * 60 + (popularityFactor * 20))),
+        acousticness: Math.max(0, Math.min(1, (1 - pattern.energy) + variation())),
+        instrumentalness: Math.max(0, Math.min(1, Math.random() * 0.3)),
+        liveness: Math.max(0, Math.min(1, Math.random() * 0.4)),
+        speechiness: Math.max(0, Math.min(1, Math.random() * 0.2)),
+        loudness: Math.max(-20, Math.min(0, -5 - (pattern.energy * 10) + (Math.random() - 0.5) * 5)),
+        mode: Math.random() > 0.5 ? 1 : 0,
+        key: Math.floor(Math.random() * 12),
+        time_signature: Math.random() > 0.1 ? 4 : 3
+      }
+    }
+    
+    let tracksWithFeatures = allTracks.map((track, index) => ({
       ...track,
-      // Default values in case audio features fail
-      danceability: 0.5,
-      energy: 0.5,
-      valence: 0.5,
-      tempo: 120,
-      acousticness: 0.5,
-      instrumentalness: 0.5,
-      liveness: 0.5,
-      speechiness: 0.5,
-      loudness: -10,
-      mode: 1,
-      key: 0,
-      time_signature: 4,
+      ...generateVariedFeatures(track, index),
       popularity: track.popularity ?? 50
     }))
     
@@ -152,7 +176,7 @@ export async function getRecommendations(
       console.log('This is normal for Client Credentials tokens - the algorithm will still work!')
     }
     
-    console.log('✅ Got REAL audio features for', tracksWithFeatures.length, 'tracks')
+    console.log('✅ Generated varied features for', tracksWithFeatures.length, 'tracks')
     
     // Filter for playable tracks, but be lenient
     let playableTracks = tracksWithFeatures.filter(track => track.preview_url)
