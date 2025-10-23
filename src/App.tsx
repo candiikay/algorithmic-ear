@@ -16,7 +16,7 @@ function App() {
   const normalizeTrack = (track: any): Track => ({
     id: track.id,
     name: track.name,
-    artist: track.artist || track.artists?.[0]?.name || 'Unknown Artist',
+    artist: track.artist || (Array.isArray(track.artists) ? track.artists[0]?.name : track.artists) || 'Unknown Artist',
     preview: track.preview ?? track.preview_url ?? null,
     popularity: track.popularity ?? 50,
     danceability: track.danceability ?? 0.5,
