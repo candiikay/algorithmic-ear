@@ -449,27 +449,54 @@ function App() {
                   </span>
                 </div>
                 
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={metricFilter.minValue}
-                  onChange={(e) => setMetricFilter(prev => ({ 
-                    ...prev, 
-                    minValue: parseInt(e.target.value),
-                    maxValue: parseInt(e.target.value) + 10 // Small range around the value
-                  }))}
-                  disabled={!metricFilter.feature}
-                  style={{
-                    width: '100%',
-                    height: '12px',
-                    borderRadius: '6px',
-                    background: metricFilter.feature ? 'rgba(102, 126, 234, 0.3)' : 'rgba(255,255,255,0.1)',
-                    outline: 'none',
-                    cursor: metricFilter.feature ? 'pointer' : 'not-allowed',
-                    opacity: metricFilter.feature ? 1 : 0.5
-                  }}
-                />
+                <div style={{ 
+                  width: '100%', 
+                  height: '20px', 
+                  backgroundColor: 'rgba(255,255,255,0.2)', 
+                  borderRadius: '10px',
+                  position: 'relative',
+                  margin: '10px 0'
+                }}>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={metricFilter.minValue}
+                    onChange={(e) => setMetricFilter(prev => ({ 
+                      ...prev, 
+                      minValue: parseInt(e.target.value),
+                      maxValue: parseInt(e.target.value) + 10 // Small range around the value
+                    }))}
+                    disabled={!metricFilter.feature}
+                    style={{
+                      width: '100%',
+                      height: '20px',
+                      background: 'transparent',
+                      outline: 'none',
+                      cursor: metricFilter.feature ? 'pointer' : 'not-allowed',
+                      opacity: metricFilter.feature ? 1 : 0.5,
+                      position: 'absolute',
+                      top: 0,
+                      left: 0,
+                      margin: 0,
+                      padding: 0,
+                      appearance: 'none',
+                      WebkitAppearance: 'none'
+                    }}
+                  />
+                  <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: `${metricFilter.minValue}%`,
+                    transform: 'translate(-50%, -50%)',
+                    width: '20px',
+                    height: '20px',
+                    backgroundColor: metricFilter.feature ? '#667eea' : 'rgba(255,255,255,0.5)',
+                    borderRadius: '50%',
+                    border: '2px solid white',
+                    pointerEvents: 'none'
+                  }} />
+                </div>
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
                   <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>0%</span>
