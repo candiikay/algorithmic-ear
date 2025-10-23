@@ -319,9 +319,9 @@ function App() {
             }
             
             .metrics-grid {
-              grid-template-columns: repeat(3, minmax(70px, 1fr)) !important;
-              gap: 0.75rem !important;
-              padding: 1.25rem !important;
+              grid-template-columns: repeat(3, 1fr) !important;
+              gap: 1rem !important;
+              padding: 1.5rem !important;
             }
           }
         `}</style>
@@ -759,11 +759,11 @@ function App() {
                   </div>
                   <div className="metrics-grid" style={{ 
                     display: 'grid', 
-                    gridTemplateColumns: 'repeat(5, minmax(80px, 1fr))', 
-                    gap: '1rem', 
+                    gridTemplateColumns: 'repeat(5, 1fr)', 
+                    gap: '1.5rem', 
                     fontSize: '0.875rem',
                     background: 'rgba(255, 255, 255, 0.02)',
-                    padding: '1.5rem',
+                    padding: '2rem',
                     borderRadius: '12px',
                     backdropFilter: 'blur(10px)',
                     WebkitBackdropFilter: 'blur(10px)',
@@ -771,13 +771,8 @@ function App() {
                     minWidth: '100%'
                   }}>
                     <div style={{ 
-                      textAlign: 'center', 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      minHeight: '60px',
-                      padding: '0.5rem'
+                      textAlign: 'center',
+                      padding: '0.75rem 0.5rem'
                     }}>
                       <div style={{ 
                         fontSize: '0.75rem', 
@@ -785,7 +780,6 @@ function App() {
                         marginBottom: '0.5rem', 
                         textTransform: 'uppercase', 
                         letterSpacing: '0.5px',
-                        lineHeight: '1.2',
                         fontWeight: '400'
                       }}>Dance</div>
                       <div style={{ 
@@ -795,13 +789,8 @@ function App() {
                       }}>{(selectedSong.danceability * 100).toFixed(0)}%</div>
                     </div>
                     <div style={{ 
-                      textAlign: 'center', 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      minHeight: '60px',
-                      padding: '0.5rem'
+                      textAlign: 'center',
+                      padding: '0.75rem 0.5rem'
                     }}>
                       <div style={{ 
                         fontSize: '0.75rem', 
@@ -809,7 +798,6 @@ function App() {
                         marginBottom: '0.5rem', 
                         textTransform: 'uppercase', 
                         letterSpacing: '0.5px',
-                        lineHeight: '1.2',
                         fontWeight: '400'
                       }}>Energy</div>
                       <div style={{ 
@@ -819,13 +807,8 @@ function App() {
                       }}>{(selectedSong.energy * 100).toFixed(0)}%</div>
                     </div>
                     <div style={{ 
-                      textAlign: 'center', 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      minHeight: '60px',
-                      padding: '0.5rem'
+                      textAlign: 'center',
+                      padding: '0.75rem 0.5rem'
                     }}>
                       <div style={{ 
                         fontSize: '0.75rem', 
@@ -833,7 +816,6 @@ function App() {
                         marginBottom: '0.5rem', 
                         textTransform: 'uppercase', 
                         letterSpacing: '0.5px',
-                        lineHeight: '1.2',
                         fontWeight: '400'
                       }}>Valence</div>
                       <div style={{ 
@@ -843,13 +825,8 @@ function App() {
                       }}>{(selectedSong.valence * 100).toFixed(0)}%</div>
                     </div>
                     <div style={{ 
-                      textAlign: 'center', 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      minHeight: '60px',
-                      padding: '0.5rem'
+                      textAlign: 'center',
+                      padding: '0.75rem 0.5rem'
                     }}>
                       <div style={{ 
                         fontSize: '0.75rem', 
@@ -857,7 +834,6 @@ function App() {
                         marginBottom: '0.5rem', 
                         textTransform: 'uppercase', 
                         letterSpacing: '0.5px',
-                        lineHeight: '1.2',
                         fontWeight: '400'
                       }}>Tempo</div>
                       <div style={{ 
@@ -867,13 +843,8 @@ function App() {
                       }}>{Math.round(selectedSong.tempo)}</div>
                     </div>
                     <div style={{ 
-                      textAlign: 'center', 
-                      display: 'flex', 
-                      flexDirection: 'column', 
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      minHeight: '60px',
-                      padding: '0.5rem'
+                      textAlign: 'center',
+                      padding: '0.75rem 0.5rem'
                     }}>
                       <div style={{ 
                         fontSize: '0.75rem', 
@@ -881,10 +852,7 @@ function App() {
                         marginBottom: '0.5rem', 
                         textTransform: 'uppercase', 
                         letterSpacing: '0.5px',
-                        lineHeight: '1.2',
-                        fontWeight: '400',
-                        wordWrap: 'break-word',
-                        textAlign: 'center'
+                        fontWeight: '400'
                       }}>Acoustic</div>
                       <div style={{ 
                         fontWeight: '500', 
@@ -979,11 +947,11 @@ function App() {
                       </div>
                       <div className="metrics-grid" style={{ 
                         display: 'grid', 
-                        gridTemplateColumns: 'repeat(5, minmax(80px, 1fr))', 
-                        gap: '1rem', 
+                        gridTemplateColumns: 'repeat(5, 1fr)', 
+                        gap: '1.5rem', 
                         fontSize: '0.875rem',
                         background: 'rgba(255, 255, 255, 0.02)',
-                        padding: '1.5rem',
+                        padding: '2rem',
                         borderRadius: '12px',
                         backdropFilter: 'blur(10px)',
                         WebkitBackdropFilter: 'blur(10px)',
@@ -991,13 +959,8 @@ function App() {
                         minWidth: '100%'
                       }}>
                         <div style={{ 
-                          textAlign: 'center', 
-                          display: 'flex', 
-                          flexDirection: 'column', 
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          minHeight: '60px',
-                          padding: '0.5rem'
+                          textAlign: 'center',
+                          padding: '0.75rem 0.5rem'
                         }}>
                           <div style={{ 
                             fontSize: '0.75rem', 
@@ -1005,7 +968,6 @@ function App() {
                             marginBottom: '0.5rem', 
                             textTransform: 'uppercase', 
                             letterSpacing: '0.5px',
-                            lineHeight: '1.2',
                             fontWeight: '400'
                           }}>Dance</div>
                           <div style={{ 
@@ -1015,13 +977,8 @@ function App() {
                           }}>{(nextSong.danceability * 100).toFixed(0)}%</div>
                         </div>
                         <div style={{ 
-                          textAlign: 'center', 
-                          display: 'flex', 
-                          flexDirection: 'column', 
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          minHeight: '60px',
-                          padding: '0.5rem'
+                          textAlign: 'center',
+                          padding: '0.75rem 0.5rem'
                         }}>
                           <div style={{ 
                             fontSize: '0.75rem', 
@@ -1029,7 +986,6 @@ function App() {
                             marginBottom: '0.5rem', 
                             textTransform: 'uppercase', 
                             letterSpacing: '0.5px',
-                            lineHeight: '1.2',
                             fontWeight: '400'
                           }}>Energy</div>
                           <div style={{ 
@@ -1039,13 +995,8 @@ function App() {
                           }}>{(nextSong.energy * 100).toFixed(0)}%</div>
                         </div>
                         <div style={{ 
-                          textAlign: 'center', 
-                          display: 'flex', 
-                          flexDirection: 'column', 
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          minHeight: '60px',
-                          padding: '0.5rem'
+                          textAlign: 'center',
+                          padding: '0.75rem 0.5rem'
                         }}>
                           <div style={{ 
                             fontSize: '0.75rem', 
@@ -1053,7 +1004,6 @@ function App() {
                             marginBottom: '0.5rem', 
                             textTransform: 'uppercase', 
                             letterSpacing: '0.5px',
-                            lineHeight: '1.2',
                             fontWeight: '400'
                           }}>Valence</div>
                           <div style={{ 
@@ -1063,13 +1013,8 @@ function App() {
                           }}>{(nextSong.valence * 100).toFixed(0)}%</div>
                         </div>
                         <div style={{ 
-                          textAlign: 'center', 
-                          display: 'flex', 
-                          flexDirection: 'column', 
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          minHeight: '60px',
-                          padding: '0.5rem'
+                          textAlign: 'center',
+                          padding: '0.75rem 0.5rem'
                         }}>
                           <div style={{ 
                             fontSize: '0.75rem', 
@@ -1077,7 +1022,6 @@ function App() {
                             marginBottom: '0.5rem', 
                             textTransform: 'uppercase', 
                             letterSpacing: '0.5px',
-                            lineHeight: '1.2',
                             fontWeight: '400'
                           }}>Tempo</div>
                           <div style={{ 
@@ -1087,13 +1031,8 @@ function App() {
                           }}>{Math.round(nextSong.tempo)}</div>
                         </div>
                         <div style={{ 
-                          textAlign: 'center', 
-                          display: 'flex', 
-                          flexDirection: 'column', 
-                          justifyContent: 'center',
-                          alignItems: 'center',
-                          minHeight: '60px',
-                          padding: '0.5rem'
+                          textAlign: 'center',
+                          padding: '0.75rem 0.5rem'
                         }}>
                           <div style={{ 
                             fontSize: '0.75rem', 
@@ -1101,10 +1040,7 @@ function App() {
                             marginBottom: '0.5rem', 
                             textTransform: 'uppercase', 
                             letterSpacing: '0.5px',
-                            lineHeight: '1.2',
-                            fontWeight: '400',
-                            wordWrap: 'break-word',
-                            textAlign: 'center'
+                            fontWeight: '400'
                           }}>Acoustic</div>
                           <div style={{ 
                             fontWeight: '500', 
