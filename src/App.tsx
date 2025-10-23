@@ -326,6 +326,45 @@ function App() {
         maxWidth: '100vw',
         overflowX: 'hidden'
     }}>
+      {/* Main Header */}
+      <header style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        background: 'rgba(10, 10, 10, 0.9)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
+        zIndex: 1000,
+        padding: '16px 0'
+      }}>
+        <div style={{
+          maxWidth: '1200px',
+          margin: '0 auto',
+          padding: '0 2rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <div style={{
+            fontSize: '18px',
+            fontWeight: '600',
+            color: '#E0CDA9',
+            fontFamily: 'Fira Code, monospace'
+          }}>
+            The Algorithmic Ear
+          </div>
+          <div style={{
+            fontSize: '14px',
+            color: 'rgba(255, 255, 255, 0.7)',
+            fontFamily: 'Fira Code, monospace'
+          }}>
+            Algorithmic Curation
+          </div>
+        </div>
+      </header>
+
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
@@ -333,14 +372,17 @@ function App() {
         position: 'relative',
         zIndex: 1,
         width: '100%',
-        overflow: 'hidden'
+        overflow: 'hidden',
+        paddingTop: '80px' // Add space for fixed header
       }}>
         {/* Header */}
         <header style={{ 
           textAlign: 'center', 
-          padding: '160px 0 100px',
-          background: 'radial-gradient(circle at top, rgba(255,255,255,0.02) 0%, transparent 70%)',
-          position: 'relative'
+          padding: '120px 0 80px',
+          background: 'radial-gradient(circle at top, rgba(255,255,255,0.03) 0%, transparent 60%)',
+          position: 'relative',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
+          marginBottom: '40px'
         }}>
           <div style={{
             fontSize: '11px',
@@ -417,11 +459,14 @@ function App() {
 
         {/* Step 1: Feature Selection */}
         <section style={{ 
-          padding: '96px 0',
+          padding: '80px 0',
           textAlign: 'center',
           borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-          marginTop: '80px',
-          paddingTop: '80px'
+          borderBottom: '1px solid rgba(255, 255, 255, 0.03)',
+          marginTop: '60px',
+          paddingTop: '60px',
+          marginBottom: '20px',
+          background: 'radial-gradient(circle at center, rgba(255,255,255,0.005) 0%, transparent 50%)'
         }}>
           <div style={{
             textAlign: 'center',
@@ -655,11 +700,14 @@ function App() {
 
         {/* Step 2: Select Musical Dimension */}
         <section style={{ 
-          padding: '96px 0',
+          padding: '80px 0',
           textAlign: 'center',
           borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-          marginTop: '80px',
-          paddingTop: '80px'
+          borderBottom: '1px solid rgba(255, 255, 255, 0.03)',
+          marginTop: '60px',
+          paddingTop: '60px',
+          marginBottom: '20px',
+          background: 'radial-gradient(circle at center, rgba(255,255,255,0.005) 0%, transparent 50%)'
         }}>
           <div style={{
             textAlign: 'center',
@@ -847,11 +895,14 @@ function App() {
         {/* Step 3: Slider */}
         {selectedFeature && sortedTracks.length > 0 && (
           <section style={{ 
-            padding: '96px 0',
+            padding: '80px 0',
             textAlign: 'center',
             borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-            marginTop: '80px',
-            paddingTop: '80px'
+            borderBottom: '1px solid rgba(255, 255, 255, 0.03)',
+            marginTop: '60px',
+            paddingTop: '60px',
+            marginBottom: '20px',
+            background: 'radial-gradient(circle at center, rgba(255,255,255,0.005) 0%, transparent 50%)'
           }}>
             <div style={{
               textAlign: 'center',
@@ -1069,11 +1120,13 @@ function App() {
         {/* Step 4: Results */}
         {selectedSong && (
           <section style={{ 
-            padding: '96px 0',
+            padding: '80px 0',
             background: 'radial-gradient(circle at center, rgba(224, 205, 169, 0.02) 0%, transparent 70%)',
             borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-            marginTop: '80px',
-            paddingTop: '80px'
+            borderBottom: '1px solid rgba(255, 255, 255, 0.03)',
+            marginTop: '60px',
+            paddingTop: '60px',
+            marginBottom: '20px'
           }}>
             <div style={{
               textAlign: 'center',
@@ -1298,9 +1351,9 @@ function App() {
               )}
             </div>
             </div>
-            
+
             {/* Why This Isn't True Taste Development */}
-            <div style={{
+              <div style={{
               maxWidth: '700px',
               margin: '60px auto 0 auto',
               padding: '24px',
@@ -1313,13 +1366,13 @@ function App() {
             }}>
               <h5 style={{
                 color: '#E0CDA9',
-                fontSize: '14px',
+                  fontSize: '14px',
                 fontWeight: '600',
                 textTransform: 'uppercase',
                 letterSpacing: '0.1em',
                 marginBottom: '12px',
-                fontFamily: 'Fira Code, monospace'
-              }}>
+                  fontFamily: 'Fira Code, monospace'
+                }}>
                 Why This Isn't True Taste Development
               </h5>
               <p style={{
@@ -1331,7 +1384,7 @@ function App() {
               }}>
                 The algorithmic recommendations you see here aren't truly developing your taste—they're reinforcing it. As Gillespie argues, "public relevance algorithms" don't just reflect what's relevant; they construct it. Every "similar" track the greedy algorithm suggests is a micro-decision about what counts as musical relevance. This creates a feedback loop: the more you interact with these recommendations, the more the system narrows your musical world. True taste development requires surprise, challenge, and discovery—qualities that greedy algorithms, by design, cannot provide. What you're experiencing isn't musical growth; it's algorithmic homogenization disguised as personalization.
               </p>
-            </div>
+                </div>
 
             
           </section>
@@ -1402,12 +1455,14 @@ function App() {
 
         {/* References Section */}
         <div id="references" style={{
-          marginTop: '80px',
-          paddingTop: '40px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
-          maxWidth: '700px',
-          margin: '80px auto 0 auto',
-          padding: '40px 0 0 0'
+          marginTop: '120px',
+          paddingTop: '60px',
+          paddingBottom: '80px',
+          borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+          background: 'radial-gradient(circle at center, rgba(255,255,255,0.01) 0%, transparent 70%)',
+          maxWidth: '800px',
+          margin: '120px auto 0 auto',
+          padding: '60px 0 80px 0'
         }}>
           <h4 style={{
             color: '#E0CDA9',
@@ -1633,6 +1688,55 @@ function App() {
         </div>
 
       </div>
+
+      {/* Footer */}
+      <footer style={{
+        background: 'rgba(10, 10, 10, 0.95)',
+        borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+        padding: '40px 0',
+        marginTop: '80px'
+      }}>
+        <div style={{
+          maxWidth: '1200px',
+          margin: '0 auto',
+          padding: '0 2rem',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          flexWrap: 'wrap',
+          gap: '20px'
+        }}>
+          <div style={{
+            fontSize: '14px',
+            color: 'rgba(255, 255, 255, 0.7)',
+            fontFamily: 'Fira Code, monospace'
+          }}>
+            © 2024 The Algorithmic Ear
+          </div>
+          <div style={{
+            display: 'flex',
+            gap: '24px',
+            fontSize: '14px',
+            color: 'rgba(255, 255, 255, 0.6)',
+            fontFamily: 'Fira Code, monospace'
+          }}>
+            <a href="#references" style={{
+              color: 'rgba(255, 255, 255, 0.6)',
+              textDecoration: 'none',
+              transition: 'color 0.2s ease'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.color = '#E0CDA9'}
+            onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.6)'}
+            >
+              References
+            </a>
+            <span style={{ color: 'rgba(255, 255, 255, 0.3)' }}>•</span>
+            <span style={{ color: 'rgba(255, 255, 255, 0.6)' }}>
+              Algorithmic Curation Research
+            </span>
+          </div>
+        </div>
+      </footer>
     </div>
     </>
   )
