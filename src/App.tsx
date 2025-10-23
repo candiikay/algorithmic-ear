@@ -180,18 +180,16 @@ function App() {
   }, [selectedFeature, sliderValue, sortedTracks])
 
   const renderFeatureStats = (track: Track) => (
-    <div className="metrics-container">
-      <div className="metrics-grid">
-        {FEATURE_STATS.map((stat) => {
-          const value = track[stat.key] as number
-          return (
-            <div key={stat.key} className="metric-item">
-              <div className="metric-label">{stat.label}</div>
-              <div className="metric-value">{stat.format(value)}</div>
-            </div>
-          )
-        })}
-      </div>
+    <div className="metric">
+      {FEATURE_STATS.map((stat) => {
+        const value = track[stat.key] as number
+        return (
+          <React.Fragment key={stat.key}>
+            <div>{stat.label}</div>
+            <div>{stat.format(value)}</div>
+          </React.Fragment>
+        )
+      })}
     </div>
   )
 
@@ -381,74 +379,6 @@ function App() {
         zIndex: 0
       }} />
       <style>{`
-        .metrics-container {
-          background: rgba(255, 255, 255, 0.04);
-          backdrop-filter: blur(20px);
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          border-radius: 16px;
-          padding: 24px;
-          box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
-        }
-
-        .metrics-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 20px;
-          width: 100%;
-        }
-
-        .metric-item {
-          display: flex;
-          flex-direction: column;
-          gap: 4px;
-          padding: 12px 0;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-          transition: all 0.2s ease;
-        }
-
-        .metric-item:last-child {
-          border-bottom: none;
-        }
-
-        .metric-item:hover {
-          background: rgba(255, 255, 255, 0.02);
-          border-radius: 8px;
-          padding: 12px 8px;
-        }
-
-        .metric-label {
-          font-size: 11px;
-          font-weight: 500;
-          letter-spacing: 0.5px;
-          color: #888888;
-          text-transform: uppercase;
-          margin-bottom: 2px;
-        }
-
-        .metric-value {
-          font-size: 18px;
-          font-weight: 600;
-          color: #ffffff;
-          letter-spacing: -0.01em;
-        }
-
-        @media (max-width: 1024px) {
-          .metrics-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-          }
-        }
-
-        @media (max-width: 640px) {
-          .metrics-grid {
-            grid-template-columns: 1fr;
-            gap: 12px;
-          }
-          
-          .metrics-container {
-            padding: 20px;
-          }
-        }
 
         .dimension-section {
           display: flex;
@@ -742,15 +672,41 @@ function App() {
           border-radius: 12px;
           padding: 24px;
           width: 280px;
-          min-height: 320px;
+          min-height: 360px;
           text-align: center;
           border: 1px solid rgba(255, 255, 255, 0.05);
           transition: all 0.2s ease;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
         }
 
         .recommendation-card:hover {
           transform: translateY(-2px);
           border-color: rgba(224, 205, 169, 0.2);
+        }
+
+        /* Fix for metrics grid (6 items) */
+        .metric {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          grid-auto-rows: minmax(20px, auto);
+          row-gap: 0.5rem;
+          column-gap: 1rem;
+          margin-top: 1.5rem;
+          text-transform: uppercase;
+          font-size: 0.8rem;
+          line-height: 1.4;
+        }
+
+        .metric div {
+          text-align: left;
+          color: #EAEAEA;
+        }
+
+        .metric div:nth-child(even) {
+          text-align: right;
+          opacity: 0.8;
         }
       `}</style>
 
