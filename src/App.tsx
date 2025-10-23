@@ -26,20 +26,27 @@ function App() {
     genreFilter: 'all'
   })
 
+  const [loadingProgress, setLoadingProgress] = useState(0)
+
   useEffect(() => {
     loadTracks()
   }, [])
 
   const loadTracks = async () => {
     setState(prev => ({ ...prev, isLoading: true, error: null }))
+    setLoadingProgress(10)
 
     try {
+      setLoadingProgress(20)
       const tokenData = await getToken()
+      
+      setLoadingProgress(40)
       const recommendations = await getRecommendations(tokenData.access_token, {
         genres: ['pop', 'electronic', 'indie', 'rock', 'hip-hop', 'jazz', 'classical', 'country', 'reggae', 'blues'],
         limit: 100
       })
       
+      setLoadingProgress(70)
       const tracksAsTrackType = recommendations.tracks.map(track => ({
         id: track.id,
         name: track.name,
@@ -60,8 +67,10 @@ function App() {
         time_signature: (track as any).time_signature || 4
       }))
       
+      setLoadingProgress(90)
       const normalizedTracks = normalizeFeatures(tracksAsTrackType)
       
+      setLoadingProgress(100)
       setState(prev => ({
         ...prev,
         tracks: normalizedTracks,
@@ -69,6 +78,7 @@ function App() {
         isLoading: false
       }))
     } catch (err) {
+      setLoadingProgress(100)
       const fallbackTracks = normalizeFeatures([...FALLBACK_TRACKS] as Track[])
       
       setState(prev => ({
@@ -243,8 +253,36 @@ function App() {
         color: 'white',
         fontFamily: 'Arial, sans-serif'
       }}>
-        <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎧 Greedy Listening</h1>
-        <p style={{ fontSize: '1.2rem', opacity: 0.9 }}>Loading how algorithms decide what sounds similar...</p>
+        <h1 style={{ fontSize: '3rem', marginBottom: '2rem' }}>🎧 Greedy Listening</h1>
+        <p style={{ fontSize: '1.2rem', marginBottom: '2rem', opacity: 0.9 }}>Loading how algorithms decide what sounds similar...</p>
+        
+        {/* Progress Bar */}
+        <div style={{ 
+          width: '300px', 
+          height: '8px', 
+          backgroundColor: 'rgba(255,255,255,0.2)', 
+          borderRadius: '4px',
+          marginBottom: '1rem',
+          overflow: 'hidden'
+        }}>
+          <div style={{
+            width: `${loadingProgress}%`,
+            height: '100%',
+            backgroundColor: 'white',
+            borderRadius: '4px',
+            transition: 'width 0.3s ease'
+          }} />
+        </div>
+        
+        <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>
+          {loadingProgress < 20 && '🔑 Getting access token...'}
+          {loadingProgress >= 20 && loadingProgress < 40 && '🎵 Searching for music...'}
+          {loadingProgress >= 40 && loadingProgress < 70 && '🎼 Processing tracks...'}
+          {loadingProgress >= 70 && loadingProgress < 90 && '⚡ Generating features...'}
+          {loadingProgress >= 90 && '✨ Almost ready...'}
+        </p>
+        
+        {state.error && <p style={{ color: '#ff6b6b', marginTop: '1rem' }}>Error: {state.error}</p>}
       </div>
     )
   }

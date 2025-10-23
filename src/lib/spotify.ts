@@ -122,32 +122,41 @@ export async function getRecommendations(
     
     console.log('🔍 Searching for popular tracks from well-known artists')
     
-    // Search for tracks by popular artists - MASSIVE SEARCH
-    console.log(`🎵 Searching ${popularArtists.length} artists for maximum music diversity!`)
+    // Search for tracks by popular artists - OPTIMIZED FOR SPEED
+    const topArtists = popularArtists.slice(0, 50) // Only search top 50 artists for speed
+    console.log(`🎵 Searching ${topArtists.length} top artists for fast loading!`)
     
-    for (const artist of popularArtists) {
-      try {
-        const searchUrl = `https://api.spotify.com/v1/search?q=artist:"${artist}"&type=track&limit=2`
-        console.log(`Searching ${artist}:`, searchUrl)
-        
-        const searchResponse = await fetch(searchUrl, {
-          headers: { 
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+    // Search in parallel batches for maximum speed
+    const batchSize = 10
+    for (let i = 0; i < topArtists.length; i += batchSize) {
+      const batch = topArtists.slice(i, i + batchSize)
+      
+      const batchPromises = batch.map(async (artist) => {
+        try {
+          const searchUrl = `https://api.spotify.com/v1/search?q=artist:"${artist}"&type=track&limit=3`
+          const searchResponse = await fetch(searchUrl, {
+            headers: { 
+              'Authorization': `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            }
+          })
+          
+          if (searchResponse.ok) {
+            const searchData = await searchResponse.json()
+            const tracks = searchData.tracks?.items || []
+            return tracks
           }
-        })
-        
-        if (searchResponse.ok) {
-          const searchData = await searchResponse.json()
-          const tracks = searchData.tracks?.items || []
-          console.log(`Found ${tracks.length} tracks by ${artist}`)
-          allTracks.push(...tracks)
-        } else {
-          console.warn(`Search failed for ${artist}:`, searchResponse.status)
+          return []
+        } catch (error) {
+          return []
         }
-      } catch (error) {
-        console.warn(`Search error for ${artist}:`, error)
-      }
+      })
+      
+      const batchResults = await Promise.all(batchPromises)
+      const batchTracks = batchResults.flat()
+      allTracks.push(...batchTracks)
+      
+      console.log(`✅ Batch ${Math.floor(i/batchSize) + 1} complete: ${batchTracks.length} tracks`)
     }
     
     console.log('Total tracks found:', allTracks.length)
@@ -344,11 +353,11 @@ export async function getRecommendations(
     
     console.log('Playable tracks:', playableTracks.length)
     
-    // Step 4: Return the tracks we found (no complex recommendations needed for greedy algorithm)
+    // Step 4: Return the tracks we found (optimized for speed)
     console.log('✅ Returning', playableTracks.length, 'tracks for greedy algorithm')
     
-    // Just return the tracks - the greedy algorithm will work with any tracks
-    const recommendations = playableTracks.slice(0, limit)
+    // Return a reasonable number of tracks for fast loading
+    const recommendations = playableTracks.slice(0, Math.min(limit, 100))
     
     return {
       tracks: recommendations
