@@ -33,8 +33,8 @@ function App() {
     maxValue: number
   }>({
     feature: null,
-    minValue: 0,
-    maxValue: 100
+    minValue: 50,
+    maxValue: 60
   })
 
   useEffect(() => {
@@ -157,13 +157,15 @@ function App() {
       })
     }
 
-    // Filter by metric range (NEW FEATURE!)
+    // Filter by metric value (NEW FEATURE!)
     if (metricFilter.feature) {
       filtered = filtered.filter(track => {
         const featureValue = track[metricFilter.feature] as number
         const percentageValue = featureValue * 100 // Convert 0-1 to 0-100
+        const targetValue = metricFilter.minValue
+        const range = 10 // ±10% range around the target value
         
-        return percentageValue >= metricFilter.minValue && percentageValue <= metricFilter.maxValue
+        return percentageValue >= (targetValue - range) && percentageValue <= (targetValue + range)
       })
     }
 
@@ -479,7 +481,7 @@ function App() {
               {/* Clear Filter Button */}
               {metricFilter.feature && (
                 <button
-                  onClick={() => setMetricFilter({ feature: null, minValue: 0, maxValue: 100 })}
+                  onClick={() => setMetricFilter({ feature: null, minValue: 50, maxValue: 60 })}
                   style={{
                     padding: '6px 12px',
                     borderRadius: '15px',
