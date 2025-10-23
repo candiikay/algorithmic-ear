@@ -175,12 +175,8 @@ function App() {
       
       filtered = filtered.filter(track => {
         const artistGenre = artistToGenre[track.artist] || 'pop'
-        const matches = artistGenre === state.genreFilter
-        console.log(`🎵 ${track.artist} -> ${artistGenre} (filter: ${state.genreFilter}) = ${matches ? '✅' : '❌'}`)
-        return matches
+        return artistGenre === state.genreFilter
       })
-      
-      console.log(`🎵 Genre filter "${state.genreFilter}" found ${filtered.length} tracks`)
     }
 
     return filtered
@@ -412,15 +408,6 @@ function App() {
                   <option value="rock" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Rock</option>
                   <option value="hip-hop" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Hip-Hop</option>
                   <option value="indie" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Indie</option>
-                  <option value="jazz" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Jazz</option>
-                  <option value="classical" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Classical</option>
-                  <option value="country" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Country</option>
-                  <option value="reggae" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Reggae</option>
-                  <option value="blues" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Blues</option>
-                  <option value="r&b" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>R&B/Soul</option>
-                  <option value="latin" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Latin</option>
-                  <option value="k-pop" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>K-Pop</option>
-                  <option value="world" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>World Music</option>
               </select>
               
               <button
