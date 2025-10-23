@@ -398,16 +398,16 @@ function App() {
               )}
             </div>
             
-            {/* Metric-Based Picker - PERFECT FOR MIDTERM DEMO! */}
+            {/* All Features Display with Single Slider */}
             <div style={{ marginBottom: '1rem' }}>
               <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: '#667eea' }}>
-                🎯 Pick a Metric & Range
+                🎯 Pick a Feature & Value
               </h3>
               <p style={{ fontSize: '0.9rem', opacity: 0.8, marginBottom: '1rem' }}>
-                Choose an audio feature and set a range to see how the algorithm finds songs in that range!
+                Choose a feature and use the slider to find songs with that value!
               </p>
               
-              {/* Metric Selection */}
+              {/* Feature Selection */}
               <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '1rem' }}>
                 {[
                   { key: 'danceability', label: '💃 Danceability', color: '#ff6b6b' },
@@ -436,61 +436,41 @@ function App() {
                 ))}
               </div>
 
-              {/* Range Slider */}
+              {/* Single Value Slider */}
               {metricFilter.feature && (
                 <div style={{ marginBottom: '1rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
                     <span style={{ fontSize: '0.9rem', color: '#667eea' }}>
-                      Range: {metricFilter.minValue}% - {metricFilter.maxValue}%
+                      {metricFilter.feature}: {metricFilter.minValue}%
                     </span>
                     <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>
-                      {getFilteredTracks().length} songs in range
+                      {getFilteredTracks().length} songs found
                     </span>
                   </div>
                   
-                  <div style={{ position: 'relative' }}>
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={metricFilter.minValue}
-                      onChange={(e) => setMetricFilter(prev => ({ 
-                        ...prev, 
-                        minValue: Math.min(parseInt(e.target.value), prev.maxValue - 1)
-                      }))}
-                      style={{
-                        width: '100%',
-                        height: '6px',
-                        borderRadius: '3px',
-                        background: 'rgba(255,255,255,0.2)',
-                        outline: 'none',
-                        position: 'absolute',
-                        zIndex: 1
-                      }}
-                    />
-                    <input
-                      type="range"
-                      min="0"
-                      max="100"
-                      value={metricFilter.maxValue}
-                      onChange={(e) => setMetricFilter(prev => ({ 
-                        ...prev, 
-                        maxValue: Math.max(parseInt(e.target.value), prev.minValue + 1)
-                      }))}
-                      style={{
-                        width: '100%',
-                        height: '6px',
-                        borderRadius: '3px',
-                        background: 'rgba(255,255,255,0.2)',
-                        outline: 'none',
-                        position: 'relative',
-                        zIndex: 2
-                      }}
-                    />
-                  </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={metricFilter.minValue}
+                    onChange={(e) => setMetricFilter(prev => ({ 
+                      ...prev, 
+                      minValue: parseInt(e.target.value),
+                      maxValue: parseInt(e.target.value) + 10 // Small range around the value
+                    }))}
+                    style={{
+                      width: '100%',
+                      height: '8px',
+                      borderRadius: '4px',
+                      background: 'rgba(255,255,255,0.2)',
+                      outline: 'none',
+                      cursor: 'pointer'
+                    }}
+                  />
                   
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
                     <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>0%</span>
+                    <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>50%</span>
                     <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>100%</span>
                   </div>
                 </div>
