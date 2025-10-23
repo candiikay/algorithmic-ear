@@ -362,29 +362,39 @@ function App() {
                 value={state.genreFilter || 'all'}
                 onChange={(e) => setState(prev => ({ ...prev, genreFilter: e.target.value }))}
                 style={{
-                  padding: '8px',
-                  borderRadius: '5px',
-                  border: '1px solid rgba(255,255,255,0.2)',
-                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  padding: '8px 12px',
+                  borderRadius: '8px',
+                  border: '2px solid rgba(255,255,255,0.2)',
+                  backgroundColor: 'rgba(0,0,0,0.8)',
                   color: 'white',
-                  fontSize: '12px'
+                  fontSize: '12px',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#667eea'
+                  e.target.style.backgroundColor = 'rgba(0,0,0,0.9)'
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'rgba(255,255,255,0.2)'
+                  e.target.style.backgroundColor = 'rgba(0,0,0,0.8)'
                 }}
               >
-                  <option value="all">All Genres</option>
-                  <option value="pop">Pop</option>
-                  <option value="electronic">Electronic</option>
-                  <option value="rock">Rock</option>
-                  <option value="hip-hop">Hip-Hop</option>
-                  <option value="indie">Indie</option>
-                  <option value="jazz">Jazz</option>
-                  <option value="classical">Classical</option>
-                  <option value="country">Country</option>
-                  <option value="reggae">Reggae</option>
-                  <option value="blues">Blues</option>
-                  <option value="r&b">R&B/Soul</option>
-                  <option value="latin">Latin</option>
-                  <option value="k-pop">K-Pop</option>
-                  <option value="world">World Music</option>
+                  <option value="all" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>All Genres</option>
+                  <option value="pop" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Pop</option>
+                  <option value="electronic" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Electronic</option>
+                  <option value="rock" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Rock</option>
+                  <option value="hip-hop" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Hip-Hop</option>
+                  <option value="indie" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Indie</option>
+                  <option value="jazz" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Jazz</option>
+                  <option value="classical" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Classical</option>
+                  <option value="country" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Country</option>
+                  <option value="reggae" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Reggae</option>
+                  <option value="blues" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Blues</option>
+                  <option value="r&b" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>R&B/Soul</option>
+                  <option value="latin" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>Latin</option>
+                  <option value="k-pop" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>K-Pop</option>
+                  <option value="world" style={{ backgroundColor: '#1a1a2e', color: 'white' }}>World Music</option>
               </select>
               
               <button
