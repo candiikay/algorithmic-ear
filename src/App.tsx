@@ -121,36 +121,42 @@ function App() {
   const getFilteredTracks = () => {
     let filtered = state.tracks
 
-    // Filter by search query
+    // Filter by search query - much more flexible search
     if (state.searchQuery) {
-      const query = state.searchQuery.toLowerCase()
-      filtered = filtered.filter(track => 
-        track.name.toLowerCase().includes(query) || 
-        track.artist.toLowerCase().includes(query)
-      )
+      const query = state.searchQuery.toLowerCase().trim()
+      filtered = filtered.filter(track => {
+        const trackName = track.name.toLowerCase()
+        const artistName = track.artist.toLowerCase()
+        
+        // Search by individual words
+        const queryWords = query.split(' ').filter(word => word.length > 0)
+        
+        return queryWords.every(word => 
+          trackName.includes(word) || 
+          artistName.includes(word)
+        )
+      })
     }
 
-    // Filter by genre (this is a simplified genre detection based on track position)
+    // Filter by genre using artist-based detection
     if (state.genreFilter !== 'all') {
-      // Since we don't have explicit genre data, we'll use the track order
-      // This is a simplified approach - in a real app you'd have genre metadata
-      const genreRanges = {
-        'pop': [0, 9],
-        'electronic': [10, 19],
-        'indie': [20, 29],
-        'rock': [30, 39],
-        'hip-hop': [40, 49],
-        'jazz': [50, 59],
-        'classical': [60, 69],
-        'country': [70, 79],
-        'reggae': [80, 89],
-        'blues': [90, 99]
+      const artistToGenre: { [key: string]: string } = {
+        'Taylor Swift': 'pop', 'Ariana Grande': 'pop', 'Billie Eilish': 'pop', 'Olivia Rodrigo': 'pop', 'Dua Lipa': 'pop',
+        'Calvin Harris': 'electronic', 'The Chainsmokers': 'electronic', 'Marshmello': 'electronic', 'Skrillex': 'electronic', 'Deadmau5': 'electronic',
+        'The Beatles': 'rock', 'Queen': 'rock', 'Led Zeppelin': 'rock', 'Pink Floyd': 'rock', 'AC/DC': 'rock',
+        'Drake': 'hip-hop', 'Kendrick Lamar': 'hip-hop', 'Travis Scott': 'hip-hop', 'Post Malone': 'hip-hop', 'Kanye West': 'hip-hop',
+        'Arctic Monkeys': 'indie', 'The 1975': 'indie', 'Tame Impala': 'indie', 'Lorde': 'indie', 'Phoebe Bridgers': 'indie',
+        'Miles Davis': 'jazz', 'John Coltrane': 'jazz', 'Ella Fitzgerald': 'jazz', 'Billie Holiday': 'jazz', 'Duke Ellington': 'jazz',
+        'Ludwig van Beethoven': 'classical', 'Wolfgang Amadeus Mozart': 'classical', 'Johann Sebastian Bach': 'classical', 'Pyotr Ilyich Tchaikovsky': 'classical', 'Frédéric Chopin': 'classical',
+        'Johnny Cash': 'country', 'Dolly Parton': 'country', 'Willie Nelson': 'country', 'Luke Combs': 'country',
+        'Bob Marley': 'reggae', 'Peter Tosh': 'reggae', 'Jimmy Cliff': 'reggae', 'UB40': 'reggae', 'Sean Paul': 'reggae',
+        'B.B. King': 'blues', 'Muddy Waters': 'blues', 'Howlin Wolf': 'blues', 'John Lee Hooker': 'blues', 'Etta James': 'blues'
       }
       
-      const range = genreRanges[state.genreFilter as keyof typeof genreRanges]
-      if (range) {
-        filtered = filtered.slice(range[0], range[1] + 1)
-      }
+      filtered = filtered.filter(track => {
+        const artistGenre = artistToGenre[track.artist] || 'pop'
+        return artistGenre === state.genreFilter
+      })
     }
 
     return filtered
@@ -222,22 +228,73 @@ function App() {
           
           {/* Search and Filter Controls */}
           <div style={{ marginBottom: '1rem' }}>
-            <input
-              type="text"
-              placeholder="🔍 Search songs or artists..."
-              value={state.searchQuery || ''}
-              onChange={(e) => setState(prev => ({ ...prev, searchQuery: e.target.value }))}
-              style={{
-                width: '100%',
-                padding: '10px',
-                borderRadius: '5px',
-                border: '1px solid rgba(255,255,255,0.2)',
-                backgroundColor: 'rgba(255,255,255,0.1)',
-                color: 'white',
-                fontSize: '14px',
-                marginBottom: '10px'
-              }}
-            />
+            <div style={{ position: 'relative' }}>
+              <input
+                type="text"
+                placeholder="🔍 Try: 'Taylor', 'Drake', 'Beatles', 'jazz', 'classical'..."
+                value={state.searchQuery || ''}
+                onChange={(e) => setState(prev => ({ ...prev, searchQuery: e.target.value }))}
+                style={{
+                  width: '100%',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  border: '2px solid rgba(255,255,255,0.2)',
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  color: 'white',
+                  fontSize: '14px',
+                  marginBottom: '10px',
+                  transition: 'all 0.2s ease'
+                }}
+                onFocus={(e) => {
+                  e.target.style.borderColor = '#667eea'
+                  e.target.style.backgroundColor = 'rgba(255,255,255,0.15)'
+                }}
+                onBlur={(e) => {
+                  e.target.style.borderColor = 'rgba(255,255,255,0.2)'
+                  e.target.style.backgroundColor = 'rgba(255,255,255,0.1)'
+                }}
+              />
+              
+              {/* Search suggestions */}
+              {state.searchQuery && state.searchQuery.length > 0 && (
+                <div style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  right: 0,
+                  backgroundColor: 'rgba(0,0,0,0.9)',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  borderRadius: '8px',
+                  padding: '10px',
+                  zIndex: 1000,
+                  maxHeight: '200px',
+                  overflowY: 'auto'
+                }}>
+                  <div style={{ fontSize: '12px', opacity: 0.7, marginBottom: '8px' }}>
+                    💡 Try searching for:
+                  </div>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
+                    {['Taylor', 'Drake', 'Beatles', 'jazz', 'classical', 'rock', 'pop', 'electronic'].map(suggestion => (
+                      <button
+                        key={suggestion}
+                        onClick={() => setState(prev => ({ ...prev, searchQuery: suggestion }))}
+                        style={{
+                          padding: '4px 8px',
+                          backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                          border: '1px solid #667eea',
+                          borderRadius: '4px',
+                          color: '#667eea',
+                          fontSize: '11px',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        {suggestion}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
             
             <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
               <select

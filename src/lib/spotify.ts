@@ -43,16 +43,39 @@ export async function getRecommendations(
     const targetValence = params.valence ?? 0.5
     const targetDanceability = params.danceability ?? 0.5
     
-    // Step 1: Search for tracks by genre
-    const searchQueries = params.genres || ['pop', 'electronic', 'indie', 'rock', 'hip-hop', 'jazz', 'classical', 'country', 'reggae', 'blues']
+    // Step 1: Search for popular tracks using well-known artists
+    const popularArtists = [
+      // Pop
+      'Taylor Swift', 'Ariana Grande', 'Billie Eilish', 'Olivia Rodrigo', 'Dua Lipa',
+      // Electronic
+      'Calvin Harris', 'The Chainsmokers', 'Marshmello', 'Skrillex', 'Deadmau5',
+      // Rock
+      'The Beatles', 'Queen', 'Led Zeppelin', 'Pink Floyd', 'AC/DC',
+      // Hip-Hop
+      'Drake', 'Kendrick Lamar', 'Travis Scott', 'Post Malone', 'Kanye West',
+      // Indie
+      'Arctic Monkeys', 'The 1975', 'Tame Impala', 'Lorde', 'Phoebe Bridgers',
+      // Jazz
+      'Miles Davis', 'John Coltrane', 'Ella Fitzgerald', 'Billie Holiday', 'Duke Ellington',
+      // Classical
+      'Ludwig van Beethoven', 'Wolfgang Amadeus Mozart', 'Johann Sebastian Bach', 'Pyotr Ilyich Tchaikovsky', 'Frédéric Chopin',
+      // Country
+      'Johnny Cash', 'Dolly Parton', 'Willie Nelson', 'Taylor Swift', 'Luke Combs',
+      // Reggae
+      'Bob Marley', 'Peter Tosh', 'Jimmy Cliff', 'UB40', 'Sean Paul',
+      // Blues
+      'B.B. King', 'Muddy Waters', 'Howlin Wolf', 'John Lee Hooker', 'Etta James'
+    ]
+    
     const allTracks: any[] = []
     
-    console.log('🔍 Searching for tracks with genres:', searchQueries)
+    console.log('🔍 Searching for popular tracks from well-known artists')
     
-    for (const genre of searchQueries.slice(0, 10)) {
+    // Search for tracks by popular artists
+    for (const artist of popularArtists.slice(0, 20)) {
       try {
-        const searchUrl = `https://api.spotify.com/v1/search?q=genre:${genre}&type=track&limit=10`
-        console.log(`Searching ${genre}:`, searchUrl)
+        const searchUrl = `https://api.spotify.com/v1/search?q=artist:"${artist}"&type=track&limit=3`
+        console.log(`Searching ${artist}:`, searchUrl)
         
         const searchResponse = await fetch(searchUrl, {
           headers: { 
@@ -64,13 +87,13 @@ export async function getRecommendations(
         if (searchResponse.ok) {
           const searchData = await searchResponse.json()
           const tracks = searchData.tracks?.items || []
-          console.log(`Found ${tracks.length} ${genre} tracks`)
+          console.log(`Found ${tracks.length} tracks by ${artist}`)
           allTracks.push(...tracks)
         } else {
-          console.warn(`Search failed for ${genre}:`, searchResponse.status)
+          console.warn(`Search failed for ${artist}:`, searchResponse.status)
         }
       } catch (error) {
-        console.warn(`Search error for ${genre}:`, error)
+        console.warn(`Search error for ${artist}:`, error)
       }
     }
     
@@ -103,9 +126,22 @@ export async function getRecommendations(
         blues: { energy: 0.5, valence: 0.3, danceability: 0.6, acousticness: 0.8 }
       }
       
-      // Determine genre based on search order (10 genres, 10 tracks each)
-      const genreList = ['pop', 'electronic', 'indie', 'rock', 'hip-hop', 'jazz', 'classical', 'country', 'reggae', 'blues']
-      const genre = genreList[Math.floor(index / 10)] || 'pop'
+      // Determine genre based on artist (simplified mapping)
+      const artistToGenre: { [key: string]: string } = {
+        'Taylor Swift': 'pop', 'Ariana Grande': 'pop', 'Billie Eilish': 'pop', 'Olivia Rodrigo': 'pop', 'Dua Lipa': 'pop',
+        'Calvin Harris': 'electronic', 'The Chainsmokers': 'electronic', 'Marshmello': 'electronic', 'Skrillex': 'electronic', 'Deadmau5': 'electronic',
+        'The Beatles': 'rock', 'Queen': 'rock', 'Led Zeppelin': 'rock', 'Pink Floyd': 'rock', 'AC/DC': 'rock',
+        'Drake': 'hip-hop', 'Kendrick Lamar': 'hip-hop', 'Travis Scott': 'hip-hop', 'Post Malone': 'hip-hop', 'Kanye West': 'hip-hop',
+        'Arctic Monkeys': 'indie', 'The 1975': 'indie', 'Tame Impala': 'indie', 'Lorde': 'indie', 'Phoebe Bridgers': 'indie',
+        'Miles Davis': 'jazz', 'John Coltrane': 'jazz', 'Ella Fitzgerald': 'jazz', 'Billie Holiday': 'jazz', 'Duke Ellington': 'jazz',
+        'Ludwig van Beethoven': 'classical', 'Wolfgang Amadeus Mozart': 'classical', 'Johann Sebastian Bach': 'classical', 'Pyotr Ilyich Tchaikovsky': 'classical', 'Frédéric Chopin': 'classical',
+        'Johnny Cash': 'country', 'Dolly Parton': 'country', 'Willie Nelson': 'country', 'Luke Combs': 'country',
+        'Bob Marley': 'reggae', 'Peter Tosh': 'reggae', 'Jimmy Cliff': 'reggae', 'UB40': 'reggae', 'Sean Paul': 'reggae',
+        'B.B. King': 'blues', 'Muddy Waters': 'blues', 'Howlin Wolf': 'blues', 'John Lee Hooker': 'blues', 'Etta James': 'blues'
+      }
+      
+      const artistName = track.artists?.[0]?.name || ''
+      const genre = artistToGenre[artistName] || 'pop'
       const pattern = genrePatterns[genre as keyof typeof genrePatterns] || genrePatterns.pop
       
       // Add variation
