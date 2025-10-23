@@ -95,28 +95,15 @@ function App() {
     return closest
   }
 
-  const generateGreedyPlaylist = () => {
+  const findNextSong = () => {
     if (!state.selectedSong) return
 
-    const playlist: Track[] = [state.selectedSong]
-    const usedIds = new Set([state.selectedSong.id])
-    let currentSong = state.selectedSong
-
-    // Generate 9 more songs (10 total)
-    for (let i = 0; i < 9; i++) {
-      const availableTracks = state.tracks.filter(track => !usedIds.has(track.id))
-      const nextSong = greedyNextSong(currentSong, availableTracks, state.selectedFeature)
-      
-      if (nextSong) {
-        playlist.push(nextSong)
-        usedIds.add(nextSong.id)
-        currentSong = nextSong
-      } else {
-        break // No more songs available
-      }
+    const availableTracks = state.tracks.filter(track => track.id !== state.selectedSong!.id)
+    const nextSong = greedyNextSong(state.selectedSong, availableTracks, state.selectedFeature)
+    
+    if (nextSong) {
+      setState(prev => ({ ...prev, greedyPlaylist: [state.selectedSong!, nextSong] }))
     }
-
-    setState(prev => ({ ...prev, greedyPlaylist: playlist }))
   }
 
   const handleSongSelect = (song: Track) => {
@@ -254,7 +241,7 @@ function App() {
       {/* Generate Button */}
       <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
         <button
-          onClick={generateGreedyPlaylist}
+          onClick={findNextSong}
           disabled={!state.selectedSong}
           style={{
             padding: '15px 30px',
@@ -267,12 +254,12 @@ function App() {
             fontWeight: 'bold'
           }}
         >
-          🎯 Generate Greedy Playlist
+          🎯 Find Next Song
         </button>
       </div>
 
-      {/* Greedy Playlist Results */}
-      {state.greedyPlaylist.length > 0 && (
+      {/* Next Song Result */}
+      {state.greedyPlaylist.length === 2 && (
         <div style={{ 
           backgroundColor: 'rgba(255,255,255,0.1)', 
           padding: '20px', 
@@ -280,38 +267,50 @@ function App() {
           marginBottom: '2rem'
         }}>
           <h2 style={{ marginBottom: '1rem' }}>
-            🎵 Greedy Algorithm Playlist ({state.greedyPlaylist.length} songs)
+            🎵 Greedy Algorithm Says: "Play This Next"
           </h2>
           <p style={{ marginBottom: '1rem', opacity: 0.8 }}>
-            <strong>Algorithm:</strong> Always pick the song with the closest {state.selectedFeature} value to the previous song.
+            <strong>Algorithm:</strong> Found the song with the closest {state.selectedFeature} value to your selection.
           </p>
           
-          <div style={{ display: 'grid', gap: '10px' }}>
-            {state.greedyPlaylist.map((track, index) => (
-              <div key={track.id} style={{ 
-                padding: '15px', 
-                backgroundColor: 'rgba(102, 126, 234, 0.2)',
-                borderRadius: '8px',
-                border: '1px solid rgba(102, 126, 234, 0.3)'
-              }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <strong>{index + 1}.</strong> {track.name} - {track.artist}
-                    <br />
-                    <small style={{ opacity: 0.7 }}>
-                      {state.selectedFeature}: {((track[state.selectedFeature] as number) * 100).toFixed(0)}%
-                    </small>
-                  </div>
-                  <div style={{ textAlign: 'right', fontSize: '0.9rem', opacity: 0.7 }}>
-                    {index > 0 && (
-                      <div>
-                        Diff: {Math.abs((track[state.selectedFeature] as number) - (state.greedyPlaylist[index - 1][state.selectedFeature] as number)).toFixed(3)}
-                      </div>
-                    )}
-                  </div>
-                </div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+            {/* Original Song */}
+            <div style={{ 
+              padding: '20px', 
+              backgroundColor: 'rgba(102, 126, 234, 0.2)',
+              borderRadius: '8px',
+              border: '2px solid #667eea'
+            }}>
+              <h3 style={{ margin: '0 0 10px 0', color: '#667eea' }}>🎧 Your Song</h3>
+              <div style={{ fontSize: '1.1rem', marginBottom: '10px' }}>
+                <strong>{state.greedyPlaylist[0].name}</strong>
+                <br />
+                <em>{state.greedyPlaylist[0].artist}</em>
               </div>
-            ))}
+              <div style={{ fontSize: '0.9rem', opacity: 0.8 }}>
+                {state.selectedFeature}: {((state.greedyPlaylist[0][state.selectedFeature] as number) * 100).toFixed(0)}%
+              </div>
+            </div>
+
+            {/* Next Song */}
+            <div style={{ 
+              padding: '20px', 
+              backgroundColor: 'rgba(46, 204, 113, 0.2)',
+              borderRadius: '8px',
+              border: '2px solid #2ecc71'
+            }}>
+              <h3 style={{ margin: '0 0 10px 0', color: '#2ecc71' }}>➡️ Next Song</h3>
+              <div style={{ fontSize: '1.1rem', marginBottom: '10px' }}>
+                <strong>{state.greedyPlaylist[1].name}</strong>
+                <br />
+                <em>{state.greedyPlaylist[1].artist}</em>
+              </div>
+              <div style={{ fontSize: '0.9rem', opacity: 0.8 }}>
+                {state.selectedFeature}: {((state.greedyPlaylist[1][state.selectedFeature] as number) * 100).toFixed(0)}%
+                <br />
+                <strong>Difference:</strong> {Math.abs((state.greedyPlaylist[1][state.selectedFeature] as number) - (state.greedyPlaylist[0][state.selectedFeature] as number)).toFixed(3)}
+              </div>
+            </div>
           </div>
         </div>
       )}
