@@ -280,6 +280,49 @@ function App() {
           ::-webkit-scrollbar-thumb:hover {
             background: rgba(212, 175, 55, 0.5);
           }
+          
+          /* Responsive Design */
+          @media (max-width: 768px) {
+            .grid-container {
+              grid-template-columns: 1fr !important;
+              gap: 1rem !important;
+            }
+            
+            .results-grid {
+              grid-template-columns: 1fr !important;
+              gap: 2rem !important;
+            }
+            
+            .arrow {
+              transform: rotate(90deg) !important;
+              margin: 1rem 0 !important;
+            }
+            
+            .card-padding {
+              padding: 1.5rem 1rem !important;
+            }
+            
+            .min-height-mobile {
+              min-height: 300px !important;
+            }
+          }
+          
+          @media (max-width: 480px) {
+            .button-grid {
+              grid-template-columns: 1fr !important;
+              gap: 0.75rem !important;
+            }
+            
+            .button-padding {
+              padding: 1.25rem 1rem !important;
+              min-height: 100px !important;
+            }
+            
+            .metrics-grid {
+              grid-template-columns: repeat(3, 1fr) !important;
+              gap: 0.75rem !important;
+            }
+          }
         `}</style>
       </div>
     )
@@ -393,11 +436,11 @@ function App() {
             </h2>
           </div>
           
-          <div style={{ 
+          <div className="button-grid" style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', 
-            gap: '1rem',
-            maxWidth: '800px',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', 
+            gap: '1.25rem',
+            maxWidth: '900px',
             margin: '0 auto'
           }}>
             {[
@@ -413,8 +456,9 @@ function App() {
                   setSelectedFeature(metric.key as keyof Track)
                   setSliderValue(0)
                 }}
+                className="button-padding"
                 style={{
-                  padding: '2rem 1.5rem',
+                  padding: '1.75rem 1.25rem',
                   borderRadius: '16px',
                   border: selectedFeature === metric.key 
                     ? '1px solid #d4af37' 
@@ -433,9 +477,11 @@ function App() {
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  gap: '0.5rem',
-                  minHeight: '120px',
-                  justifyContent: 'center'
+                  gap: '0.75rem',
+                  minHeight: '140px',
+                  justifyContent: 'center',
+                  width: '100%',
+                  boxSizing: 'border-box'
                 }}
                 onMouseEnter={(e) => {
                   if (selectedFeature !== metric.key) {
@@ -453,16 +499,26 @@ function App() {
                 }}
               >
                 <div style={{
-                  fontSize: '1.125rem',
+                  fontSize: '1rem',
                   fontWeight: '500',
-                  marginBottom: '0.25rem'
+                  marginBottom: '0.25rem',
+                  lineHeight: '1.2',
+                  wordWrap: 'break-word',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '100%'
                 }}>
                   {metric.label}
                 </div>
                 <div style={{
-                  fontSize: '0.875rem',
+                  fontSize: '0.8rem',
                   opacity: 0.6,
-                  fontWeight: '300'
+                  fontWeight: '300',
+                  lineHeight: '1.3',
+                  wordWrap: 'break-word',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  maxWidth: '100%'
                 }}>
                   {metric.description}
                 </div>
@@ -622,24 +678,30 @@ function App() {
               </h2>
             </div>
             
-            <div style={{ 
+            <div className="results-grid" style={{ 
               display: 'grid', 
               gridTemplateColumns: nextSong ? '1fr auto 1fr' : '1fr', 
-              gap: '4rem',
-              alignItems: 'center',
-              marginBottom: '3rem'
+              gap: '3rem',
+              alignItems: 'stretch',
+              marginBottom: '3rem',
+              maxWidth: '1000px',
+              margin: '0 auto 3rem auto'
             }}>
               {/* Selected Song */}
-              <div style={{
+              <div className="card-padding min-height-mobile" style={{
                 background: 'rgba(255, 255, 255, 0.02)',
                 backdropFilter: 'blur(15px)',
                 WebkitBackdropFilter: 'blur(15px)',
-                padding: '3rem 2rem',
+                padding: '2.5rem 1.5rem',
                 borderRadius: '16px',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
                 boxShadow: '0 8px 25px rgba(0, 0, 0, 0.2)',
                 position: 'relative',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                minHeight: '400px',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between'
               }}>
                 <div style={{
                   position: 'absolute',
@@ -663,19 +725,38 @@ function App() {
                   }}>
                     Current Selection
                   </div>
-                  <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem', lineHeight: '1.3', fontWeight: '400' }}>
+                  <div style={{ 
+                    fontSize: '1.25rem', 
+                    marginBottom: '0.5rem', 
+                    lineHeight: '1.3', 
+                    fontWeight: '400',
+                    wordWrap: 'break-word',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    maxHeight: '3.9rem',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical'
+                  }}>
                     {selectedSong.name}
                   </div>
                   <div style={{ 
                     opacity: 0.6, 
-                    fontSize: '1rem', 
+                    fontSize: '0.9rem', 
                     fontWeight: '300',
                     marginBottom: '2rem',
-                    color: '#888888'
+                    color: '#888888',
+                    wordWrap: 'break-word',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    maxHeight: '2.7rem',
+                    display: '-webkit-box',
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: 'vertical'
                   }}>
                     {selectedSong.artist}
                   </div>
-                  <div style={{ 
+                  <div className="metrics-grid" style={{ 
                     display: 'grid', 
                     gridTemplateColumns: 'repeat(5, 1fr)', 
                     gap: '1rem', 
@@ -714,7 +795,7 @@ function App() {
               {/* Arrow */}
               {nextSong && (
                 <>
-                  <div style={{ 
+                  <div className="arrow" style={{ 
                     fontSize: '2rem',
                     color: '#d4af37',
                     fontWeight: '300',
@@ -724,16 +805,20 @@ function App() {
                   </div>
                   
                   {/* Next Song */}
-                  <div style={{
+                  <div className="card-padding min-height-mobile" style={{
                     background: 'rgba(255, 255, 255, 0.02)',
                     backdropFilter: 'blur(15px)',
                     WebkitBackdropFilter: 'blur(15px)',
-                    padding: '3rem 2rem',
+                    padding: '2.5rem 1.5rem',
                     borderRadius: '16px',
                     border: '1px solid rgba(255, 255, 255, 0.08)',
                     boxShadow: '0 8px 25px rgba(0, 0, 0, 0.2)',
                     position: 'relative',
-                    overflow: 'hidden'
+                    overflow: 'hidden',
+                    minHeight: '400px',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between'
                   }}>
                     <div style={{
                       position: 'absolute',
@@ -757,19 +842,38 @@ function App() {
                       }}>
                         Algorithmic Next
                       </div>
-                      <div style={{ fontSize: '1.5rem', marginBottom: '0.5rem', lineHeight: '1.3', fontWeight: '400' }}>
+                      <div style={{ 
+                        fontSize: '1.25rem', 
+                        marginBottom: '0.5rem', 
+                        lineHeight: '1.3', 
+                        fontWeight: '400',
+                        wordWrap: 'break-word',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        maxHeight: '3.9rem',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical'
+                      }}>
                         {nextSong.name}
                       </div>
                       <div style={{ 
                         opacity: 0.6, 
-                        fontSize: '1rem', 
+                        fontSize: '0.9rem', 
                         fontWeight: '300',
                         marginBottom: '2rem',
-                        color: '#888888'
+                        color: '#888888',
+                        wordWrap: 'break-word',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        maxHeight: '2.7rem',
+                        display: '-webkit-box',
+                        WebkitLineClamp: 2,
+                        WebkitBoxOrient: 'vertical'
                       }}>
                         {nextSong.artist}
                       </div>
-                      <div style={{ 
+                      <div className="metrics-grid" style={{ 
                         display: 'grid', 
                         gridTemplateColumns: 'repeat(5, 1fr)', 
                         gap: '1rem', 
