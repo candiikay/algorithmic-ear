@@ -81,7 +81,7 @@ function App() {
       fontFamily: 'Arial, sans-serif'
     }}>
       <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
-        <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎧 Greedy Listening</h1>
+        <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>🎧 Greedy Listening (v6.0)</h1>
         <p style={{ fontSize: '1.2rem', opacity: 0.8 }}>
           Pick a song with a slider, then see what the algorithm suggests next
         </p>
