@@ -448,49 +448,74 @@ function App() {
           }
         }
 
+        .dimension-section {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 48px;
+        }
+
         .dimension-grid {
-          background: radial-gradient(circle at top, #0E0E10, #161618);
-          border-radius: 20px;
-          border: 1px solid rgba(255, 255, 255, 0.08);
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 24px;
+          justify-items: center;
+          align-items: center;
         }
 
         .dimension-card {
+          width: 240px;
+          height: 120px;
+          background: rgba(255, 255, 255, 0.04);
+          border-radius: 16px;
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          backdrop-filter: blur(12px);
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
           transition: all 0.3s ease;
         }
 
         .dimension-card:hover {
-          background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)) !important;
           transform: translateY(-4px);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25) !important;
+          background: rgba(255,255,255,0.08);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
         }
 
         .dimension-card.selected {
-          animation: pulseGlow 2s ease-in-out infinite;
-        }
-
-        @keyframes pulseGlow {
-          0% { box-shadow: 0 0 8px rgba(193,167,94,0.4); }
-          50% { box-shadow: 0 0 16px rgba(193,167,94,0.7); }
-          100% { box-shadow: 0 0 8px rgba(193,167,94,0.4); }
+          border: 1px solid #C1A75E;
+          background: rgba(193,167,94,0.1);
+          box-shadow: 0 0 12px rgba(193,167,94,0.3);
         }
 
         @media (max-width: 1024px) {
+          .dimension-section {
+            padding: 48px 60px;
+            gap: 40px;
+          }
+          
           .dimension-grid {
-            grid-template-columns: repeat(2, 1fr) !important;
-            gap: 20px !important;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
           }
         }
 
         @media (max-width: 640px) {
+          .dimension-section {
+            padding: 32px 24px;
+            gap: 32px;
+          }
+          
           .dimension-grid {
-            grid-template-columns: 1fr !important;
-            gap: 16px !important;
-            padding: 24px !important;
+            grid-template-columns: 1fr;
+            gap: 16px;
           }
           
           .dimension-card {
-            width: 100% !important;
-            height: 100px !important;
+            width: 100%;
+            height: 100px;
           }
         }
       `}</style>
@@ -547,35 +572,40 @@ function App() {
 
       <div style={{ maxWidth: '1000px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
         {/* Step 1: Choose Feature */}
-        <div style={{ 
+        <div className="dimension-section" style={{ 
           marginBottom: '4rem',
-          background: 'rgba(255, 255, 255, 0.02)',
+          background: 'linear-gradient(180deg, #0E0E10 0%, #161618 100%)',
           backdropFilter: 'blur(20px)',
           WebkitBackdropFilter: 'blur(20px)',
           border: '1px solid rgba(255, 255, 255, 0.08)',
           borderRadius: '20px',
-          padding: '3rem',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+          padding: '64px 80px',
+          maxWidth: '960px',
+          margin: '0 auto',
+          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '48px'
         }}>
           <div style={{
-            textAlign: 'center',
-            marginBottom: '3rem'
+            textAlign: 'center'
           }}>
-            <div style={{
-              fontSize: '0.875rem',
-              fontWeight: '400',
-              color: '#d4af37',
-              letterSpacing: '1.5px',
+            <div className="step-label" style={{
+              fontSize: '12px',
+              fontWeight: '500',
+              color: '#C1A75E',
+              letterSpacing: '0.1em',
               textTransform: 'uppercase',
-              marginBottom: '0.5rem'
+              marginBottom: '12px'
             }}>
               Step One
             </div>
-            <h2 style={{ 
-              fontSize: '2rem',
-              fontWeight: '300',
+            <h2 className="section-title" style={{ 
+              fontSize: '28px',
+              fontWeight: '600',
               color: '#ffffff',
-              letterSpacing: '-0.01em',
+              lineHeight: '1.3',
               margin: 0
             }}>
               Select Musical Dimension
@@ -585,10 +615,10 @@ function App() {
           <div className="dimension-grid" style={{ 
             display: 'grid', 
             gridTemplateColumns: 'repeat(3, 1fr)', 
+            gridTemplateRows: 'repeat(2, auto)',
             gap: '24px',
-            maxWidth: '800px',
-            margin: '0 auto',
-            padding: '32px'
+            justifyItems: 'center',
+            alignItems: 'center'
           }}>
             {[
               { key: 'danceability', label: 'Danceability', description: 'Rhythmic quality' },
@@ -611,12 +641,12 @@ function App() {
                   borderRadius: '16px',
                   border: selectedFeature === metric.key 
                     ? '1px solid #C1A75E' 
-                    : '1px solid rgba(255, 255, 255, 0.08)',
+                    : '1px solid rgba(255, 255, 255, 0.06)',
                   background: selectedFeature === metric.key 
-                    ? 'rgba(193, 167, 94, 0.08)' 
+                    ? 'rgba(193, 167, 94, 0.1)' 
                     : 'rgba(255, 255, 255, 0.04)',
-                  backdropFilter: 'blur(16px)',
-                  WebkitBackdropFilter: 'blur(16px)',
+                  backdropFilter: 'blur(12px)',
+                  WebkitBackdropFilter: 'blur(12px)',
                   color: selectedFeature === metric.key ? '#C1A75E' : '#ffffff',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
@@ -628,8 +658,8 @@ function App() {
                   gap: '8px',
                   boxSizing: 'border-box',
                   boxShadow: selectedFeature === metric.key 
-                    ? '0 0 12px rgba(193, 167, 94, 0.5)' 
-                    : '0 0 40px rgba(0, 0, 0, 0.25)'
+                    ? '0 0 12px rgba(193, 167, 94, 0.3)' 
+                    : '0 0 20px rgba(0, 0, 0, 0.15)'
                 }}
                 onMouseEnter={(e) => {
                   if (selectedFeature !== metric.key) {
