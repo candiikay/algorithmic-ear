@@ -13,6 +13,20 @@ function App() {
   const [sliderValue, setSliderValue] = useState(0)
   const [error, setError] = useState<string | null>(null)
 
+  const FEATURE_STATS: Array<{
+    key: keyof Pick<Track, 'danceability' | 'energy' | 'valence' | 'tempo' | 'acousticness' | 'liveness'>
+    label: string
+    description: string
+    format: (value: number) => string
+  }> = [
+    { key: 'danceability', label: 'Danceability', description: 'How rhythmically engaging the track feels', format: (value) => `${(value * 100).toFixed(0)}%` },
+    { key: 'energy', label: 'Energy', description: 'Overall intensity and drive', format: (value) => `${(value * 100).toFixed(0)}%` },
+    { key: 'valence', label: 'Valence', description: 'Emotional brightness of the song', format: (value) => `${(value * 100).toFixed(0)}%` },
+    { key: 'tempo', label: 'Tempo', description: 'Beats per minute', format: (value) => `${Math.round(value)} BPM` },
+    { key: 'acousticness', label: 'Acousticness', description: 'Organic vs. electronic instrumentation', format: (value) => `${(value * 100).toFixed(0)}%` },
+    { key: 'liveness', label: 'Liveness', description: 'Presence of a live performance feel', format: (value) => `${(value * 100).toFixed(0)}%` }
+  ]
+
   const normalizeTrack = (track: any): Track => ({
     id: track.id,
     name: track.name,
@@ -164,6 +178,40 @@ function App() {
     const clampedIndex = Math.min(sliderValue, sortedTracks.length - 1)
     setSelectedSong(sortedTracks[clampedIndex])
   }, [selectedFeature, sliderValue, sortedTracks])
+
+  const renderFeatureStats = (track: Track) => (
+    <div className="stats-grid">
+      {FEATURE_STATS.map((stat) => {
+        const value = track[stat.key] as number
+        return (
+          <div
+            key={stat.key}
+            className="stat-card"
+             style={{
+               background: 'linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
+               border: '1px solid rgba(255, 255, 255, 0.06)',
+               borderRadius: '12px',
+               padding: '1rem',
+               display: 'flex',
+               flexDirection: 'column',
+               gap: '0.5rem',
+               boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)'
+             }}
+          >
+            <div style={{ fontSize: '0.65rem', letterSpacing: '0.3em', color: '#b8b8b8', textTransform: 'uppercase' }}>
+              {stat.label}
+            </div>
+            <div style={{ fontSize: '1.4rem', fontWeight: 600, color: '#ffffff', letterSpacing: '-0.02em' }}>
+              {stat.format(value)}
+            </div>
+            <div style={{ fontSize: '0.75rem', color: '#8a8a8a', lineHeight: 1.4 }}>
+              {stat.description}
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
 
   if (isLoading) {
     return (
@@ -318,11 +366,10 @@ function App() {
               min-height: 100px !important;
             }
             
-            .metrics-grid {
-              grid-template-columns: repeat(3, 1fr) !important;
-              gap: 0.5rem !important;
-              padding: 0.75rem 1.5rem 0.75rem 0.25rem !important;
-            }
+             .stats-grid {
+               grid-template-columns: 1fr !important;
+               gap: 0.5rem !important;
+             }
           }
         `}</style>
       </div>
@@ -349,6 +396,35 @@ function App() {
         background: 'radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.02) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.01) 0%, transparent 50%)',
         zIndex: 0
       }} />
+      <style>{`
+         .stats-grid {
+           display: grid;
+           grid-template-columns: repeat(3, minmax(0, 1fr));
+           gap: 0.75rem;
+           width: 100%;
+         }
+
+        .stat-card {
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+         .stat-card:hover {
+           transform: translateY(-2px);
+           box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+         }
+
+        @media (max-width: 1024px) {
+          .stats-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+
+        @media (max-width: 640px) {
+          .stats-grid {
+            grid-template-columns: minmax(0, 1fr);
+          }
+        }
+      `}</style>
 
       <header style={{ 
         textAlign: 'center', 
@@ -449,7 +525,8 @@ function App() {
               { key: 'energy', label: 'Energy', description: 'Intensity level' },
               { key: 'valence', label: 'Valence', description: 'Emotional positivity' },
               { key: 'tempo', label: 'Tempo', description: 'Beats per minute' },
-              { key: 'acousticness', label: 'Acousticness', description: 'Instrumental purity' }
+              { key: 'acousticness', label: 'Acousticness', description: 'Instrumental purity' },
+              { key: 'liveness', label: 'Liveness', description: 'Live performance energy' }
             ].map(metric => (
               <button
                 key={metric.key}
@@ -757,110 +834,7 @@ function App() {
                   }}>
                     {selectedSong.artist}
                   </div>
-                  <div className="metrics-grid" style={{ 
-                    display: 'grid', 
-                    gridTemplateColumns: 'repeat(5, 1fr)', 
-                    gap: '0.75rem', 
-                    fontSize: '0.75rem',
-                    background: 'rgba(255, 255, 255, 0.02)',
-                    padding: '1rem 2rem 1rem 0.25rem',
-                    borderRadius: '12px',
-                    backdropFilter: 'blur(10px)',
-                    WebkitBackdropFilter: 'blur(10px)',
-                    border: '1px solid rgba(255, 255, 255, 0.05)',
-                    minWidth: '100%'
-                  }}>
-                    <div style={{ 
-                      textAlign: 'center',
-                      padding: '0.5rem 0.4rem'
-                    }}>
-                      <div style={{ 
-                        fontSize: '0.65rem', 
-                        color: '#888888', 
-                        marginBottom: '0.25rem', 
-                        textTransform: 'uppercase', 
-                        letterSpacing: '0.3px',
-                        fontWeight: '400'
-                      }}>Dance</div>
-                      <div style={{ 
-                        fontWeight: '500', 
-                        fontSize: '0.8rem',
-                        color: '#ffffff'
-                      }}>{(selectedSong.danceability * 100).toFixed(0)}%</div>
-                    </div>
-                    <div style={{ 
-                      textAlign: 'center',
-                      padding: '0.5rem 0.4rem'
-                    }}>
-                      <div style={{ 
-                        fontSize: '0.65rem', 
-                        color: '#888888', 
-                        marginBottom: '0.25rem', 
-                        textTransform: 'uppercase', 
-                        letterSpacing: '0.3px',
-                        fontWeight: '400'
-                      }}>Energy</div>
-                      <div style={{ 
-                        fontWeight: '500', 
-                        fontSize: '0.8rem',
-                        color: '#ffffff'
-                      }}>{(selectedSong.energy * 100).toFixed(0)}%</div>
-                    </div>
-                    <div style={{ 
-                      textAlign: 'center',
-                      padding: '0.5rem 0.4rem'
-                    }}>
-                      <div style={{ 
-                        fontSize: '0.65rem', 
-                        color: '#888888', 
-                        marginBottom: '0.25rem', 
-                        textTransform: 'uppercase', 
-                        letterSpacing: '0.3px',
-                        fontWeight: '400'
-                      }}>Valence</div>
-                      <div style={{ 
-                        fontWeight: '500', 
-                        fontSize: '0.8rem',
-                        color: '#ffffff'
-                      }}>{(selectedSong.valence * 100).toFixed(0)}%</div>
-                    </div>
-                    <div style={{ 
-                      textAlign: 'center',
-                      padding: '0.5rem 0.4rem'
-                    }}>
-                      <div style={{ 
-                        fontSize: '0.65rem', 
-                        color: '#888888', 
-                        marginBottom: '0.25rem', 
-                        textTransform: 'uppercase', 
-                        letterSpacing: '0.3px',
-                        fontWeight: '400'
-                      }}>Tempo</div>
-                      <div style={{ 
-                        fontWeight: '500', 
-                        fontSize: '0.8rem',
-                        color: '#ffffff'
-                      }}>{Math.round(selectedSong.tempo)}</div>
-                    </div>
-                    <div style={{ 
-                      textAlign: 'center',
-                      padding: '0.5rem 0.4rem'
-                    }}>
-                      <div style={{ 
-                        fontSize: '0.65rem', 
-                        color: '#888888', 
-                        marginBottom: '0.25rem', 
-                        textTransform: 'uppercase', 
-                        letterSpacing: '0.3px',
-                        fontWeight: '400'
-                      }}>Acoustic</div>
-                      <div style={{ 
-                        fontWeight: '500', 
-                        fontSize: '0.8rem',
-                        color: '#ffffff'
-                      }}>{(selectedSong.acousticness * 100).toFixed(0)}%</div>
-                    </div>
-                  </div>
+                  {renderFeatureStats(selectedSong)}
                 </div>
               </div>
 
@@ -945,110 +919,7 @@ function App() {
                       }}>
                         {nextSong.artist}
                       </div>
-                      <div className="metrics-grid" style={{ 
-                        display: 'grid', 
-                        gridTemplateColumns: 'repeat(5, 1fr)', 
-                        gap: '0.75rem', 
-                        fontSize: '0.75rem',
-                        background: 'rgba(255, 255, 255, 0.02)',
-                        padding: '1rem 2rem 1rem 0.25rem',
-                        borderRadius: '12px',
-                        backdropFilter: 'blur(10px)',
-                        WebkitBackdropFilter: 'blur(10px)',
-                        border: '1px solid rgba(255, 255, 255, 0.05)',
-                        minWidth: '100%'
-                      }}>
-                        <div style={{ 
-                          textAlign: 'center',
-                          padding: '0.5rem 0.4rem'
-                        }}>
-                          <div style={{ 
-                            fontSize: '0.65rem', 
-                            color: '#888888', 
-                            marginBottom: '0.25rem', 
-                            textTransform: 'uppercase', 
-                            letterSpacing: '0.3px',
-                            fontWeight: '400'
-                          }}>Dance</div>
-                          <div style={{ 
-                            fontWeight: '500', 
-                            fontSize: '0.8rem',
-                            color: '#ffffff'
-                          }}>{(nextSong.danceability * 100).toFixed(0)}%</div>
-                        </div>
-                        <div style={{ 
-                          textAlign: 'center',
-                          padding: '0.5rem 0.4rem'
-                        }}>
-                          <div style={{ 
-                            fontSize: '0.65rem', 
-                            color: '#888888', 
-                            marginBottom: '0.25rem', 
-                            textTransform: 'uppercase', 
-                            letterSpacing: '0.3px',
-                            fontWeight: '400'
-                          }}>Energy</div>
-                          <div style={{ 
-                            fontWeight: '500', 
-                            fontSize: '0.8rem',
-                            color: '#ffffff'
-                          }}>{(nextSong.energy * 100).toFixed(0)}%</div>
-                        </div>
-                        <div style={{ 
-                          textAlign: 'center',
-                          padding: '0.5rem 0.4rem'
-                        }}>
-                          <div style={{ 
-                            fontSize: '0.65rem', 
-                            color: '#888888', 
-                            marginBottom: '0.25rem', 
-                            textTransform: 'uppercase', 
-                            letterSpacing: '0.3px',
-                            fontWeight: '400'
-                          }}>Valence</div>
-                          <div style={{ 
-                            fontWeight: '500', 
-                            fontSize: '0.8rem',
-                            color: '#ffffff'
-                          }}>{(nextSong.valence * 100).toFixed(0)}%</div>
-                        </div>
-                        <div style={{ 
-                          textAlign: 'center',
-                          padding: '0.5rem 0.4rem'
-                        }}>
-                          <div style={{ 
-                            fontSize: '0.65rem', 
-                            color: '#888888', 
-                            marginBottom: '0.25rem', 
-                            textTransform: 'uppercase', 
-                            letterSpacing: '0.3px',
-                            fontWeight: '400'
-                          }}>Tempo</div>
-                          <div style={{ 
-                            fontWeight: '500', 
-                            fontSize: '0.8rem',
-                            color: '#ffffff'
-                          }}>{Math.round(nextSong.tempo)}</div>
-                        </div>
-                        <div style={{ 
-                          textAlign: 'center',
-                          padding: '0.5rem 0.4rem'
-                        }}>
-                          <div style={{ 
-                            fontSize: '0.65rem', 
-                            color: '#888888', 
-                            marginBottom: '0.25rem', 
-                            textTransform: 'uppercase', 
-                            letterSpacing: '0.3px',
-                            fontWeight: '400'
-                          }}>Acoustic</div>
-                          <div style={{ 
-                            fontWeight: '500', 
-                            fontSize: '0.8rem',
-                            color: '#ffffff'
-                          }}>{(nextSong.acousticness * 100).toFixed(0)}%</div>
-                        </div>
-                      </div>
+                      {renderFeatureStats(nextSong)}
                     </div>
                   </div>
                 </>
