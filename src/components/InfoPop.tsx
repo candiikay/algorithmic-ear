@@ -35,16 +35,17 @@ export default function InfoPop({
             style={{
               position: 'absolute',
               zIndex: 50,
-              maxWidth: '260px',
+              maxWidth: '280px',
               padding: '12px',
               borderRadius: '12px',
               border: '1px solid rgba(255, 255, 255, 0.1)',
-              background: 'rgba(0, 0, 0, 0.8)',
+              background: 'rgba(25, 25, 25, 0.9)',
               backdropFilter: 'blur(16px)',
               WebkitBackdropFilter: 'blur(16px)',
-              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.3)',
-              color: 'rgba(255, 255, 255, 0.85)',
+              boxShadow: '0 4px 12px rgba(0, 0, 0, 0.4)',
+              color: 'rgba(255, 255, 255, 0.9)',
               fontSize: '14px',
+              lineHeight: '1.4',
               ...(position === "top"
                 ? { bottom: '100%', marginBottom: '8px' }
                 : position === "bottom"
@@ -59,12 +60,12 @@ export default function InfoPop({
               textTransform: 'uppercase',
               letterSpacing: '0.1em',
               color: '#C1A75E',
-              marginBottom: '4px',
+              marginBottom: '6px',
               fontWeight: '500'
             }}>
               {label}
             </h4>
-            <p style={{ margin: 0, lineHeight: '1.4' }}>{description}</p>
+            <p style={{ margin: 0 }}>{description}</p>
           </motion.div>
         )}
       </AnimatePresence>

@@ -1,76 +1,63 @@
 export const INFO_CONTENT = {
   project: {
-    label: "About this project",
-    description:
-      "An interactive exploration of algorithmic mediation — how computational systems listen, decide, and recommend. Following Panos's framing, this interface turns data-driven logic into an aesthetic experience, showing how optimization shapes cultural flow.",
+    label: "The Greedy Algorithm: A Study in Computational Curation",
+    description: "This interface demonstrates Spotify's recommendation system at its most basic level: the greedy algorithm. By always choosing the 'nearest neighbor' based on a single feature, it reveals a fundamental limitation of algorithmic curation—you cannot quantify feeling. As Panos argues, algorithms don't just describe music; they create perceptual frameworks that reshape how we understand it."
   },
 
   stepOne: {
-    label: "Why this step?",
-    description:
-      "Each musical dimension — danceability, energy, valence, tempo, acousticness, liveness — represents how Spotify quantifies sound. You're choosing the lens the algorithm will use to define similarity.",
-  },
-
-  spotifyFeatures: {
-    label: "How Spotify measures this",
-    description:
-      "Spotify's system uses digital signal processing and machine-learning models to predict perceptual features from waveform data — estimating traits like energy, mood, or acousticness. They're statistical guesses about feel, not objective truths.",
+    label: "Choosing the Lens of Quantification",
+    description: "Each feature represents how Spotify attempts to measure the unmeasurable. Danceability, energy, valence—these are statistical approximations of human experience, not the experience itself. The greedy algorithm will use whichever feature you select to make its 'optimal' choice, but as we'll see, optimal for data doesn't mean optimal for humans."
   },
 
   stepTwo: {
-    label: "What the slider does",
-    description:
-      "This slider mirrors how recommendation systems represent taste numerically. As you drag, you're setting a target feeling — the zone the algorithm will try to stay near.",
+    label: "Setting the Target: The Illusion of Precision",
+    description: "You're setting a numerical target for an emotional experience. The algorithm will find the song closest to this number, believing proximity equals similarity. But what if the perfect song for this moment exists outside this mathematical space? This is where Serve's insight becomes crucial—there are no features that could be combined to produce what you actually need."
   },
 
   greedy: {
-    label: "Greedy logic",
-    description:
-      "The algorithm picks the next song by minimizing distance between your chosen feature values — a greedy approach that always takes the nearest option, without considering long-term diversity.",
+    label: "The Greedy Choice: Why Algorithms Fail at Curation",
+    description: "The greedy algorithm always picks the nearest neighbor—the song with the smallest difference in your chosen feature. It never considers context, surprise, or the complex web of human emotion. This is why algorithmic playlists feel 'off'—they optimize for data, not feeling. As Panos writes, algorithms create perceptual frameworks that redefine proximity, rhythm, and taste through quantification."
+  },
+
+  nearestNeighbor: {
+    label: "The Greedy Step: Nearest Neighbor Selection",
+    description: "The algorithm calculated the absolute difference between your chosen feature values and selected the song with the smallest gap. It believes this is 'optimal,' but optimal for what? Data points, not human experience. This one-step optimization reveals why greedy algorithms produce coherence without curiosity."
   },
 
   panos: {
     label: "Algorithmic Mediation (Panos)",
-    description:
-      "Algorithms don't just describe the world — they create perceptual frameworks. This interface lets us feel how a listening system redefines proximity, rhythm, and taste through quantification.",
+    description: "As Panos argues, algorithms don't just describe the world—they create perceptual frameworks. This interface lets us feel how a listening system redefines proximity, rhythm, and taste through quantification. Every recommendation teaches us that music can be reduced to numbers, but the question remains: can it really?"
   },
 
   serve: {
     label: "Culture as System (Serve)",
-    description:
-      "Culture now flows through patterned infrastructures. What we see and hear is increasingly shaped by the logic of optimization — what fits next, what feels consistent, what keeps the loop moving.",
-  },
+    description: "Serve's work reveals the fundamental problem: there are no features that could be combined to produce what you actually need. Human curation understands context, surprise, and the ineffable quality of 'rightness.' Algorithmic curation can only approximate—it cannot feel. The greedy algorithm, though simple, demonstrates this truth: you cannot curate feeling through data alone."
+  }
 };
 
 export const FEATURE_DETAILS = {
   danceability: {
-    label: "Danceability",
-    description:
-      "How easily a track invites movement. Spotify estimates this using rhythmic stability, beat strength, and tempo regularity.",
+    label: "Danceability: 0.0 to 1.0",
+    description: "Spotify calculates this using beat strength, tempo stability, and rhythmic regularity. But here's the catch—a funeral march and a club banger can have the same danceability score. The algorithm thinks they're similar. Your body knows better. This reveals how statistical approximations miss the contextual nature of human experience."
   },
   energy: {
-    label: "Energy",
-    description:
-      "Overall intensity or drive, based on loudness, tempo, and timbral brightness. 1.0 feels charged; 0.0 feels calm.",
+    label: "Energy: 0.0 to 1.0", 
+    description: "Overall intensity based on loudness, tempo, and timbral brightness. The algorithm believes 0.8 energy equals 'high energy,' but energy is contextual—what energizes you at 2pm differs from 2am. This highlights the limitation of treating emotional states as objective, measurable quantities."
   },
   valence: {
-    label: "Valence",
-    description:
-      "Emotional positivity — how bright or happy a track feels, estimated from harmonic mode and tonality.",
+    label: "Valence: 0.0 to 1.0",
+    description: "Emotional positivity estimated from harmonic mode and tonality. But happiness isn't a number—it's complex, situational, and deeply personal. The greedy algorithm reduces your entire emotional landscape to a decimal, demonstrating how algorithmic systems flatten human experience into data points."
   },
   tempo: {
-    label: "Tempo",
-    description:
-      "The song's speed, measured in beats per minute (BPM). Detected using onset and beat periodicity analysis.",
+    label: "Tempo: Beats Per Minute",
+    description: "The song's speed detected through onset analysis. But tempo alone can't capture the difference between a funeral march and a dance track at 60 BPM. Context matters more than data. This shows how single-dimensional measurements fail to capture the richness of musical meaning."
   },
   acousticness: {
-    label: "Acousticness",
-    description:
-      "The likelihood a track uses acoustic instrumentation, predicted from a machine-learning classifier.",
+    label: "Acousticness: 0.0 to 1.0",
+    description: "Probability of acoustic instrumentation from machine learning. But 'acoustic' doesn't mean 'authentic' or 'emotional'—it's just a technical classification that misses the point entirely. This reveals how algorithmic categorization can obscure rather than illuminate musical meaning."
   },
   liveness: {
-    label: "Liveness",
-    description:
-      "Probability that the recording feels live — background noise, audience reverb, mic bleed.",
-  },
+    label: "Liveness: 0.0 to 1.0",
+    description: "Probability of live performance elements like audience noise and reverb. But liveness isn't about technical recording quality—it's about energy, connection, that feeling you get when you're there. You can't measure that. This demonstrates the gap between what algorithms can detect and what humans actually experience."
+  }
 };

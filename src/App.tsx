@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { getToken, getRecommendations, FALLBACK_TRACKS } from './lib/spotify'
 import type { Track } from './types'
-// import InfoPop from './components/InfoPop'
-// import { INFO_CONTENT, FEATURE_DETAILS } from './data/infoContent'
+import InfoPop from './components/InfoPop'
+import { INFO_CONTENT, FEATURE_DETAILS } from './data/infoContent'
 
 function App() {
   const [tracks, setTracks] = useState<Track[]>([])
@@ -49,90 +49,80 @@ function App() {
     time_signature: track.time_signature ?? 4
   })
 
-  // Load tracks
+  // Load tracks on component mount
   useEffect(() => {
-    loadTracks()
-  }, [])
+    const loadTracks = async () => {
+      try {
+        setIsLoading(true)
+        setLoadingMessage('Initializing...')
+        setLoadingProgress(10)
 
-  const loadTracks = async () => {
-    setIsLoading(true)
-    setLoadingProgress(0)
-    setLoadingMessage('Starting...')
-    
-    // Check if we're running locally (no Spotify credentials)
-    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    
-    if (isLocal) {
-      // For local development, use sample data immediately
-      setLoadingProgress(50)
-      setLoadingMessage('Loading sample data for local testing...')
-      
-      setTimeout(() => {
+        // Check if we're in local development
+        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        
+        if (isLocal) {
+          // Use fallback data immediately for local development
+          setLoadingMessage('Using sample data for local development...')
+          setLoadingProgress(50)
+          const fallbackTracks: Track[] = FALLBACK_TRACKS.map(track => normalizeTrack(track))
+          setTracks(fallbackTracks)
+          setError('Using sample data for local development. Deploy to Vercel for real Spotify data!')
+          setIsLoading(false)
+          return
+        }
+        
+        // Set a timeout to fall back to sample data if Spotify takes too long
+        const timeoutId = setTimeout(() => {
+          setLoadingMessage('Spotify is slow, using sample data...')
+          const fallbackTracks: Track[] = FALLBACK_TRACKS.map(track => normalizeTrack(track))
+          setTracks(fallbackTracks)
+          setError('Using sample data because Spotify is unavailable right now.')
+          setIsLoading(false)
+        }, 10000) // 10 second timeout
+
+        setLoadingMessage('Connecting to Spotify...')
+        setLoadingProgress(20)
+        
+        const token = await getToken()
+        setLoadingMessage('Fetching recommendations...')
+        setLoadingProgress(40)
+        
+        const recommendations = await getRecommendations(token.access_token)
+        setLoadingMessage('Processing track data...')
+        const normalizedTracks: Track[] = recommendations.tracks.map(normalizeTrack)
+
+        if (normalizedTracks.length === 0) {
+          throw new Error('No tracks returned from Spotify')
+        }
+
+        clearTimeout(timeoutId) // Cancel timeout since we got data
         setLoadingProgress(100)
         setLoadingMessage('Complete!')
+        setTracks(normalizedTracks)
+        setError(null)
+      } catch (err) {
+        console.error('Error loading tracks:', err)
+        setLoadingMessage('Loading sample data...')
         const fallbackTracks: Track[] = FALLBACK_TRACKS.map(track => normalizeTrack(track))
         setTracks(fallbackTracks)
-        setError('Using sample data for local development. Deploy to Vercel for real Spotify data!')
-        setIsLoading(false)
-      }, 1000)
-      return
-    }
-    
-    // Set a timeout to fall back to sample data if Spotify takes too long
-    const timeoutId = setTimeout(() => {
-      setLoadingMessage('Spotify is slow, using sample data...')
-      const fallbackTracks: Track[] = FALLBACK_TRACKS.map(track => normalizeTrack(track))
-      setTracks(fallbackTracks)
-      setError('Using sample data because Spotify is taking too long to respond.')
-      setIsLoading(false)
-    }, 10000) // 10 second timeout
-    
-    try {
-      setLoadingProgress(10)
-      setLoadingMessage('Getting Spotify access token...')
-      const tokenData = await getToken()
-      
-      setLoadingProgress(20)
-      setLoadingMessage('Searching for popular tracks...')
-      const recommendations = await getRecommendations(tokenData.access_token, {
-        genres: ['pop', 'electronic', 'indie', 'rock', 'hip-hop'],
-        limit: 100
-      })
-
-      setLoadingProgress(80)
-      setLoadingMessage('Processing track data...')
-      const normalizedTracks: Track[] = recommendations.tracks.map(normalizeTrack)
-
-      if (normalizedTracks.length === 0) {
-        throw new Error('No tracks returned from Spotify')
+        setError('Using sample data because Spotify is unavailable right now.')
+      } finally {
+        setTimeout(() => setIsLoading(false), 500) // Small delay to show completion
       }
-
-      clearTimeout(timeoutId) // Cancel timeout since we got data
-      setLoadingProgress(100)
-      setLoadingMessage('Complete!')
-      setTracks(normalizedTracks)
-      setError(null)
-    } catch (err) {
-      console.error('Error loading tracks:', err)
-      clearTimeout(timeoutId) // Cancel timeout
-      setLoadingMessage('Using fallback data...')
-      const fallbackTracks: Track[] = FALLBACK_TRACKS.map(track => normalizeTrack(track))
-      setTracks(fallbackTracks)
-      setError('Using sample data because Spotify is unavailable right now.')
-    } finally {
-      setTimeout(() => setIsLoading(false), 500) // Small delay to show completion
     }
-  }
+
+    loadTracks()
+  }, [])
 
   // Sort tracks when the feature selection changes
   const sortedTracks = useMemo(() => {
     if (!selectedFeature) return tracks
     return [...tracks].sort((a, b) => {
-      const aVal = a[selectedFeature] as number
-      const bVal = b[selectedFeature] as number
-      return aVal - bVal
+      const aValue = a[selectedFeature] as number
+      const bValue = b[selectedFeature] as number
+      return Math.abs(aValue - sliderValue) - Math.abs(bValue - sliderValue)
     })
-  }, [tracks, selectedFeature])
+  }, [tracks, selectedFeature, sliderValue])
 
   // Handle slider change
   const handleSliderChange = (value: number) => {
@@ -168,7 +158,7 @@ function App() {
       const maxIndex = sortedTracks.length - 1
       return prev > maxIndex ? maxIndex : prev
     })
-  }, [sortedTracks])
+  }, [sortedTracks.length])
 
   // Keep the selected song aligned with the slider position
   useEffect(() => {
@@ -182,17 +172,31 @@ function App() {
   }, [selectedFeature, sliderValue, sortedTracks])
 
   const renderFeatureStats = (track: Track) => (
-    <div className="metric">
+    <>
       {FEATURE_STATS.map((stat) => {
         const value = track[stat.key] as number
         return (
           <React.Fragment key={stat.key}>
-            <div>{stat.label}</div>
-            <div>{stat.format(value)}</div>
+            <div style={{
+              fontSize: '0.8rem',
+              color: '#B8B8B8',
+              textTransform: 'uppercase',
+              letterSpacing: '0.05em',
+              fontWeight: '500'
+            }}>
+              {stat.label}
+            </div>
+            <div style={{
+              fontSize: '0.8rem',
+              color: '#EAEAEA',
+              fontWeight: '600'
+            }}>
+              {stat.format(value)}
+            </div>
           </React.Fragment>
         )
       })}
-    </div>
+    </>
   )
 
   if (isLoading) {
@@ -211,7 +215,6 @@ function App() {
         overflow: 'hidden',
         fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
       }}>
-        {/* Subtle background texture */}
         <div style={{
           position: 'absolute',
           top: 0,
@@ -222,145 +225,44 @@ function App() {
           zIndex: 0
         }} />
         
-        {/* Loading panel */}
-        <div style={{
-          background: 'rgba(255, 255, 255, 0.02)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '16px',
-          padding: '4rem 3rem',
-          textAlign: 'center',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-          maxWidth: '480px',
-          width: '100%',
-          position: 'relative',
-          zIndex: 1
-        }}>
-          <div style={{ 
-            marginBottom: '3rem', 
-            fontSize: '1.5rem',
-            fontWeight: '300',
-            color: '#ffffff',
-            letterSpacing: '0.5px',
-            textTransform: 'uppercase'
+        <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
+          <div style={{
+            fontSize: '2rem',
+            fontWeight: '600',
+            marginBottom: '1rem',
+            color: '#E0CDA9'
+          }}>
+            The Algorithmic Ear
+          </div>
+          <div style={{
+            fontSize: '1rem',
+            marginBottom: '2rem',
+            color: '#B8B8B8'
           }}>
             {loadingMessage}
           </div>
-          
           <div style={{
-            width: '100%',
-            height: '2px',
-            backgroundColor: 'rgba(255, 255, 255, 0.1)',
-            borderRadius: '1px',
+            width: '300px',
+            height: '4px',
+            background: 'rgba(255, 255, 255, 0.1)',
+            borderRadius: '2px',
             overflow: 'hidden',
-            marginBottom: '2rem'
+            marginBottom: '1rem'
           }}>
             <div style={{
               width: `${loadingProgress}%`,
               height: '100%',
-              background: 'linear-gradient(90deg, #d4af37, #ffd700)',
-              transition: 'width 0.8s cubic-bezier(0.4, 0, 0.2, 1)',
-              borderRadius: '1px'
+              background: 'linear-gradient(90deg, #E0CDA9, #F8E39E)',
+              transition: 'width 0.3s ease'
             }} />
           </div>
-          
-          <div style={{ 
-            fontSize: '0.875rem', 
-            color: '#888888',
-            fontWeight: '400',
-            letterSpacing: '0.3px'
+          <div style={{
+            fontSize: '0.875rem',
+            color: '#888888'
           }}>
-            {loadingProgress}% complete
+            {loadingProgress}%
           </div>
         </div>
-        
-        <style>{`
-          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-          @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&display=swap');
-          
-          * {
-            box-sizing: border-box;
-          }
-          
-          html {
-            overflow-x: hidden;
-            width: 100vw;
-            max-width: 100vw;
-            scroll-behavior: smooth;
-          }
-          
-          body {
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            overflow-x: hidden;
-            background: #121212;
-            color: #EAEAEA;
-            width: 100vw;
-            max-width: 100vw;
-          }
-          
-          ::-webkit-scrollbar {
-            width: 6px;
-          }
-          
-          ::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.05);
-          }
-          
-          ::-webkit-scrollbar-thumb {
-            background: rgba(212, 175, 55, 0.3);
-            border-radius: 3px;
-          }
-          
-          ::-webkit-scrollbar-thumb:hover {
-            background: rgba(212, 175, 55, 0.5);
-          }
-          
-          /* Responsive Design */
-          @media (max-width: 768px) {
-            .grid-container {
-              grid-template-columns: 1fr !important;
-              gap: 1rem !important;
-            }
-            
-            .results-grid {
-              grid-template-columns: 1fr !important;
-              gap: 2rem !important;
-            }
-            
-            .arrow {
-              transform: rotate(90deg) !important;
-              margin: 1rem 0 !important;
-            }
-            
-            .card-padding {
-              padding: 1.5rem 1rem !important;
-            }
-            
-            .min-height-mobile {
-              min-height: 300px !important;
-            }
-          }
-          
-          @media (max-width: 480px) {
-            .button-grid {
-              grid-template-columns: 1fr !important;
-              gap: 0.75rem !important;
-            }
-            
-            .button-padding {
-              padding: 1.25rem 1rem !important;
-              min-height: 100px !important;
-            }
-            
-             .metrics-grid {
-               grid-template-columns: 1fr !important;
-               gap: 12px !important;
-             }
-          }
-        `}</style>
       </div>
     )
   }
@@ -385,400 +287,52 @@ function App() {
         width: '100%',
         overflow: 'hidden'
       }}>
-      {/* Subtle editorial background texture */}
-      <div style={{
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-        background: 'radial-gradient(circle at 20% 80%, rgba(255, 215, 0, 0.02) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.01) 0%, transparent 50%)',
-        zIndex: 0
-      }} />
-      <style>{`
-
-        .dimension-section {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 48px;
-        }
-
-        .dimension-grid {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 24px;
-          justify-items: center;
-          align-items: center;
-        }
-
-        .dimension-card {
-          width: 240px;
-          height: 120px;
-          background: rgba(255, 255, 255, 0.04);
-          border-radius: 16px;
-          border: 1px solid rgba(255, 255, 255, 0.06);
-          backdrop-filter: blur(12px);
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          text-align: center;
-          transition: all 0.3s ease;
-        }
-
-        .dimension-card:hover {
-          transform: translateY(-4px);
-          background: rgba(255,255,255,0.08);
-          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-        }
-
-        .dimension-card.selected {
-          border: 1px solid #C1A75E;
-          background: rgba(193,167,94,0.1);
-          box-shadow: 0 0 12px rgba(193,167,94,0.3);
-        }
-
-        @media (max-width: 1024px) {
-          .dimension-section {
-            padding: 48px 60px;
-            gap: 40px;
-          }
-          
-          .dimension-grid {
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-          }
-        }
-
-        @media (max-width: 640px) {
-          .dimension-section {
-            padding: 32px 24px;
-            gap: 32px;
-          }
-          
-          .dimension-grid {
-            grid-template-columns: 1fr;
-            gap: 16px;
-          }
-          
-          .dimension-card {
-            width: 100%;
-            height: 100px;
-          }
-        }
-
-        .slider-section {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 48px;
-        }
-
-        .slider-container {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          padding: 48px 0;
-          width: 100%;
-          position: relative;
-        }
-
-        .slider-track {
-          position: relative;
-          width: 100%;
-          height: 4px;
-          background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.1) 100%);
-          border-radius: 4px;
-          overflow: hidden;
-        }
-
-        .slider-fill {
-          position: absolute;
-          height: 100%;
-          left: 0;
-          top: 0;
-          border-radius: 4px;
-          background: linear-gradient(90deg, #c1a75e, #f8e39e);
-          box-shadow: 0 0 20px rgba(193, 167, 94, 0.3);
-          transition: width 0.3s ease;
-        }
-
-        .slider-handle {
-          position: absolute;
-          top: 50%;
-          transform: translate(-50%, -50%);
-          width: 20px;
-          height: 20px;
-          background: radial-gradient(circle, #f3d177 0%, #c1a75e 70%);
-          border: 1px solid rgba(255, 255, 255, 0.2);
-          border-radius: 50%;
-          box-shadow: 0 0 20px rgba(193, 167, 94, 0.4);
-          cursor: pointer;
-          transition: all 0.2s ease;
-        }
-
-        .slider-handle:hover {
-          transform: translate(-50%, -50%) scale(1.2);
-          box-shadow: 0 0 28px rgba(193, 167, 94, 0.6);
-        }
-
-        .slider-label {
-          margin-top: 24px;
-          color: rgba(255, 255, 255, 0.6);
-          font-size: 14px;
-          transition: all 0.3s ease;
-          text-align: center;
-        }
-
-        @media (max-width: 1024px) {
-          .slider-section {
-            padding: 48px 60px;
-            gap: 40px;
-          }
-        }
-
-        @media (max-width: 640px) {
-          .slider-section {
-            padding: 32px 24px;
-            gap: 32px;
-          }
-          
-          .slider-container {
-            padding: 32px 0;
-          }
-        }
-
-        .hero {
-          text-align: center;
-          padding: 160px 0 100px;
-          background: radial-gradient(circle at top, rgba(255,255,255,0.05) 0%, transparent 70%);
-          position: relative;
-        }
-
-        .step-section {
-          padding: 96px 0;
-          text-align: center;
-        }
-
-        .results-comparison {
-          display: flex;
-          justify-content: center;
-          align-items: stretch;
-          gap: 40px;
-          max-width: 900px;
-          margin: 0 auto;
-          position: relative;
-        }
-
-        .recommendation-card {
-          background: rgba(255, 255, 255, 0.04);
-          backdrop-filter: blur(20px);
-          padding: 32px 24px;
-          border-radius: 16px;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-          position: relative;
-          overflow: hidden;
-          width: 300px;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-        }
-
-        .divider {
-          width: 1px;
-          height: 100%;
-          background: linear-gradient(180deg, transparent 0%, rgba(193, 167, 94, 0.3) 50%, transparent 100%);
-          position: relative;
-        }
-
-        @media (max-width: 1024px) {
-          .results-comparison {
-            flex-direction: column;
-            align-items: center;
-            gap: 32px;
-          }
-          
-          .divider {
-            width: 100%;
-            height: 1px;
-            background: linear-gradient(90deg, transparent 0%, rgba(193, 167, 94, 0.3) 50%, transparent 100%);
-          }
-          
-          .divider div {
-            left: 50%;
-            top: 50%;
-            transform: translate(-50%, -50%);
-          }
-        }
-
-        @media (max-width: 640px) {
-          .hero {
-            padding: 120px 0 80px;
-          }
-          
-          .step-section {
-            padding: 80px 0;
-          }
-          
-          .recommendation-card {
-            width: 100%;
-            max-width: 400px;
-          }
-        }
-
-        /* Slider Styling */
-        .slider-container {
-          width: 80%;
-          margin: 2rem auto;
-          text-align: center;
-        }
-
-        input[type="range"] {
-          -webkit-appearance: none;
-          width: 100%;
-          height: 4px;
-          background: rgba(255, 255, 255, 0.1);
-          border-radius: 2px;
-          outline: none;
-          cursor: pointer;
-          transition: background 0.2s;
-        }
-
-        input[type="range"]:hover {
-          background: rgba(255, 255, 255, 0.2);
-        }
-
-        input[type="range"]::-webkit-slider-thumb {
-          -webkit-appearance: none;
-          appearance: none;
-          width: 18px;
-          height: 18px;
-          border-radius: 50%;
-          background: #E0CDA9;
-          border: 2px solid #121212;
-          cursor: pointer;
-          transition: transform 0.2s ease;
-        }
-
-        input[type="range"]::-webkit-slider-thumb:hover {
-          transform: scale(1.2);
-        }
-
-        input[type="range"]::-moz-range-thumb {
-          width: 18px;
-          height: 18px;
-          border-radius: 50%;
-          background: #E0CDA9;
-          border: 2px solid #121212;
-          cursor: pointer;
-        }
-
-        /* Recommendation Cards */
-        .recommendation-grid {
-          display: flex;
-          justify-content: center;
-          gap: 2rem;
-          margin-top: 2rem;
-          flex-wrap: wrap;
-        }
-
-        .recommendation-card {
-          background: rgba(255, 255, 255, 0.01);
-          border-radius: 12px;
-          padding: 24px;
-          width: 280px;
-          min-height: 360px;
-          text-align: center;
-          border: 1px solid rgba(255, 255, 255, 0.05);
-          transition: all 0.2s ease;
-          display: flex;
-          flex-direction: column;
-          justify-content: space-between;
-        }
-
-        .recommendation-card:hover {
-          transform: translateY(-2px);
-          border-color: rgba(224, 205, 169, 0.2);
-        }
-
-        /* Fix for metrics grid (6 items) */
-        .metric {
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          grid-auto-rows: minmax(20px, auto);
-          row-gap: 0.5rem;
-          column-gap: 1rem;
-          margin-top: 1.5rem;
-          text-transform: uppercase;
-          font-size: 0.8rem;
-          line-height: 1.4;
-        }
-
-        .metric div {
-          text-align: left;
-          color: #EAEAEA;
-        }
-
-        .metric div:nth-child(even) {
-          text-align: right;
-          opacity: 0.8;
-        }
-      `}</style>
-
-      <header className="hero" style={{ 
-        textAlign: 'center', 
-        padding: '160px 0 100px',
-        background: 'radial-gradient(circle at top, rgba(255,255,255,0.02) 0%, transparent 70%)',
-        position: 'relative'
-      }}>
-        <div style={{
-          fontSize: '11px',
-          fontWeight: '500',
-          color: '#E0CDA9',
-          letterSpacing: '0.15em',
-          textTransform: 'uppercase',
-          fontFamily: 'Fira Code, monospace',
-          marginBottom: '24px'
+        {/* Header */}
+        <header style={{ 
+          textAlign: 'center', 
+          padding: '160px 0 100px',
+          background: 'radial-gradient(circle at top, rgba(255,255,255,0.02) 0%, transparent 70%)',
+          position: 'relative'
         }}>
-          Algorithmic Curation
-        </div>
-        <h1 style={{ 
-          fontSize: '52px',
-          fontWeight: '500',
-          color: '#FFFFFF',
-          letterSpacing: '-0.02em',
-          margin: '0 0 32px 0',
-          lineHeight: '1.1'
-        }}>
-          The Algorithmic Ear
-        </h1>
-        <p style={{ 
-          fontSize: '18px',
-          color: '#B8B8B8',
-          fontWeight: '400',
-          lineHeight: '1.6',
-          maxWidth: '640px',
-          margin: '0 auto',
-          letterSpacing: '-0.01em'
-        }}>
-          Discover your next track through quiet precision. Select a musical dimension and explore curated recommendations.
-        </p>
-      </header>
+          <div style={{
+            fontSize: '11px',
+            fontWeight: '500',
+            color: '#E0CDA9',
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase',
+            fontFamily: 'Fira Code, monospace',
+            marginBottom: '24px'
+          }}>
+            Algorithmic Curation
+          </div>
+          <InfoPop {...INFO_CONTENT.project}>
+            <h1 style={{ 
+              fontSize: '52px',
+              fontWeight: '500',
+              color: '#FFFFFF',
+              letterSpacing: '-0.02em',
+              margin: '0 0 32px 0',
+              lineHeight: '1.1',
+              cursor: 'help'
+            }}>
+              The Algorithmic Ear
+            </h1>
+          </InfoPop>
+          <p style={{ 
+            fontSize: '18px',
+            color: '#B8B8B8',
+            fontWeight: '400',
+            lineHeight: '1.6',
+            maxWidth: '640px',
+            margin: '0 auto',
+            letterSpacing: '-0.01em'
+          }}>
+            Discover the next song through algorithmic precision. Select a musical dimension and explore curated recommendations.
+          </p>
+        </header>
 
-      <div style={{ 
-        maxWidth: '1000px', 
-        margin: '0 auto', 
-        position: 'relative', 
-        zIndex: 1,
-        background: 'radial-gradient(circle at top, #1A1A1A, #121212)',
-        minHeight: '100vh',
-        width: '100%',
-        overflow: 'hidden'
-      }}>
-        {/* Step 1: Choose Feature */}
-        <section className="step-section" style={{ 
+        {/* Step 1: Feature Selection */}
+        <section style={{ 
           padding: '96px 0',
           textAlign: 'center'
         }}>
@@ -786,7 +340,7 @@ function App() {
             textAlign: 'center',
             marginBottom: '48px'
           }}>
-            <div className="step-label" style={{
+            <div style={{
               fontSize: '11px',
               fontWeight: '500',
               color: '#E0CDA9',
@@ -797,26 +351,26 @@ function App() {
             }}>
               Step One
             </div>
-            <h2 className="section-title" style={{ 
-              fontSize: '32px',
-              fontWeight: '500',
-              color: '#FFFFFF',
-              lineHeight: '1.3',
-              margin: 0
-            }}>
-              Select Musical Dimension
-            </h2>
+            <InfoPop {...INFO_CONTENT.stepOne}>
+              <h2 style={{ 
+                fontSize: '32px',
+                fontWeight: '500',
+                color: '#FFFFFF',
+                lineHeight: '1.3',
+                margin: 0,
+                cursor: 'help'
+              }}>
+                Select Musical Dimension
+              </h2>
+            </InfoPop>
           </div>
           
-          <div className="dimension-grid" style={{ 
+          <div style={{ 
             display: 'grid', 
             gridTemplateColumns: 'repeat(3, 1fr)', 
-            gap: '32px',
+            gap: '12px',
             justifyItems: 'center',
-            alignItems: 'center',
-            maxWidth: '800px',
-            margin: '0 auto',
-            paddingTop: '60px'
+            alignItems: 'center'
           }}>
             {[
               { key: 'danceability', label: 'Danceability', description: 'Rhythmic quality' },
@@ -826,74 +380,80 @@ function App() {
               { key: 'acousticness', label: 'Acousticness', description: 'Instrumental purity' },
               { key: 'liveness', label: 'Liveness', description: 'Live performance energy' }
             ].map(metric => (
+              <InfoPop 
+                key={metric.key}
+                {...FEATURE_DETAILS[metric.key as keyof typeof FEATURE_DETAILS]}
+                position="top"
+              >
                 <button
-                  key={metric.key}
                   onClick={() => {
                     setSelectedFeature(metric.key as keyof Track)
                     setSliderValue(0)
                   }}
-                  className="dimension-card"
                   style={{
-                    width: '240px',
-                    height: '120px',
-                    borderRadius: '12px',
-                    border: selectedFeature === metric.key 
-                      ? '1px solid #E0CDA9' 
-                      : '1px solid rgba(255, 255, 255, 0.05)',
-                    background: selectedFeature === metric.key 
-                      ? 'rgba(224, 205, 169, 0.08)' 
-                      : 'rgba(255, 255, 255, 0.01)',
-                    color: selectedFeature === metric.key ? '#E0CDA9' : '#EAEAEA',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    textAlign: 'center',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '8px',
-                    boxSizing: 'border-box'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (selectedFeature !== metric.key) {
-                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
-                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)'
-                      e.currentTarget.style.transform = 'translateY(-2px)'
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (selectedFeature !== metric.key) {
-                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)'
-                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'
-                      e.currentTarget.style.transform = 'translateY(0)'
-                    }
-                  }}
-                >
-                  <div style={{
-                    fontSize: '16px',
-                    fontWeight: '500',
-                    color: selectedFeature === metric.key ? '#E0CDA9' : '#EAEAEA',
-                    lineHeight: '1.2',
-                    marginBottom: '4px'
-                  }}>
-                    {metric.label}
-                  </div>
-                  <div style={{
-                    fontSize: '13px',
-                    fontWeight: '400',
-                    lineHeight: '1.3',
-                    color: selectedFeature === metric.key ? 'rgba(224, 205, 169, 0.7)' : '#B8B8B8'
-                  }}>
+                  width: '240px',
+                  height: '120px',
+                  borderRadius: '12px',
+                  border: selectedFeature === metric.key 
+                    ? '1px solid #E0CDA9' 
+                    : '1px solid rgba(255, 255, 255, 0.05)',
+                  background: selectedFeature === metric.key 
+                    ? 'rgba(224, 205, 169, 0.08)' 
+                    : 'rgba(255, 255, 255, 0.01)',
+                  color: selectedFeature === metric.key ? '#E0CDA9' : '#EAEAEA',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease',
+                  textAlign: 'center',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  boxSizing: 'border-box'
+                }}
+                onMouseEnter={(e) => {
+                  if (selectedFeature !== metric.key) {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)'
+                    e.currentTarget.style.transform = 'translateY(-2px)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (selectedFeature !== metric.key) {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)'
+                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'
+                    e.currentTarget.style.transform = 'translateY(0)'
+                  }
+                }}
+              >
+                <div style={{
+                  fontSize: '16px',
+                  fontWeight: '500',
+                  color: selectedFeature === metric.key ? '#E0CDA9' : '#EAEAEA',
+                  lineHeight: '1.2',
+                  marginBottom: '4px',
+                  textAlign: 'center'
+                }}>
+                  {metric.label}
+                </div>
+                <div style={{
+                  fontSize: '13px',
+                  fontWeight: '400',
+                  lineHeight: '1.3',
+                  color: selectedFeature === metric.key ? 'rgba(224, 205, 169, 0.7)' : '#B8B8B8',
+                  textAlign: 'center'
+                }}>
                     {metric.description}
                   </div>
                 </button>
+              </InfoPop>
             ))}
           </div>
         </section>
 
         {/* Step 2: Slider */}
         {selectedFeature && sortedTracks.length > 0 && (
-          <section className="step-section" style={{ 
+          <section style={{ 
             padding: '96px 0',
             textAlign: 'center'
           }}>
@@ -901,7 +461,7 @@ function App() {
               textAlign: 'center',
               marginBottom: '48px'
             }}>
-              <div className="step-label" style={{
+              <div style={{
                 fontSize: '11px',
                 fontWeight: '500',
                 color: '#E0CDA9',
@@ -912,18 +472,25 @@ function App() {
               }}>
                 Step Two
               </div>
-              <h2 className="section-title" style={{ 
-                fontSize: '32px',
-                fontWeight: '500',
-                color: '#FFFFFF',
-                lineHeight: '1.3',
-                margin: 0
-              }}>
-                Navigate by {selectedFeature}
-              </h2>
+              <InfoPop {...INFO_CONTENT.stepTwo}>
+                <h2 style={{ 
+                  fontSize: '32px',
+                  fontWeight: '500',
+                  color: '#FFFFFF',
+                  lineHeight: '1.3',
+                  margin: 0,
+                  cursor: 'help'
+                }}>
+                  Navigate by {selectedFeature}
+                </h2>
+              </InfoPop>
             </div>
             
-            <div className="slider-container">
+            <div style={{
+              padding: '48px 0',
+              maxWidth: '640px',
+              margin: '0 auto'
+            }}>
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
@@ -936,7 +503,7 @@ function App() {
               }}>
                 <span>{selectedFeature}:</span>
                 <span style={{ color: '#E0CDA9' }}>
-                  {((sortedTracks[Math.min(sliderValue, sortedTracks.length - 1)]?.[selectedFeature] as number) || 0).toFixed(2)}
+                  {selectedSong ? (selectedSong[selectedFeature] as number).toFixed(2) : '0.00'}
                 </span>
               </div>
               
@@ -944,24 +511,32 @@ function App() {
                 type="range"
                 min="0"
                 max={sortedTracks.length - 1}
-                value={Math.min(sliderValue, sortedTracks.length - 1)}
-                onChange={(e) => handleSliderChange(parseInt(e.target.value))}
+                step="1"
+                value={sliderValue}
+                onChange={(e) => handleSliderChange(Number(e.target.value))}
                 style={{
                   width: '100%',
-                  marginBottom: '16px'
+                  height: '4px',
+                  background: 'rgba(255, 255, 255, 0.1)',
+                  borderRadius: '2px',
+                  outline: 'none',
+                  cursor: 'pointer',
+                  WebkitAppearance: 'none',
+                  appearance: 'none'
                 }}
               />
               
               <div style={{
+                marginTop: '24px',
                 color: '#B8B8B8',
                 fontSize: '13px',
-                fontFamily: 'Fira Code, monospace',
-                marginBottom: '8px'
+                fontFamily: 'Fira Code, monospace'
               }}>
-                Track {Math.min(sliderValue, sortedTracks.length - 1) + 1} of {sortedTracks.length}
+                {sortedTracks.length} tracks available
               </div>
               
               <div style={{
+                marginTop: '12px',
                 fontSize: '12px',
                 color: 'rgba(184, 184, 184, 0.6)',
                 fontFamily: 'Fira Code, monospace'
@@ -974,9 +549,8 @@ function App() {
 
         {/* Step 3: Results */}
         {selectedSong && (
-          <section className="step-section" style={{ 
+          <section style={{ 
             padding: '96px 0',
-            textAlign: 'center',
             background: 'radial-gradient(circle at center, rgba(224, 205, 169, 0.02) 0%, transparent 70%)'
           }}>
             <div style={{
@@ -994,25 +568,42 @@ function App() {
               }}>
                 Step Three
               </div>
-              <h2 style={{ 
-                fontSize: '32px',
-                fontWeight: '500',
-                color: '#FFFFFF',
-                letterSpacing: '-0.01em',
-                margin: 0
-              }}>
-                Algorithmic Recommendation
-              </h2>
+              <InfoPop {...INFO_CONTENT.greedy}>
+                <h2 style={{ 
+                  fontSize: '32px',
+                  fontWeight: '500',
+                  color: '#FFFFFF',
+                  letterSpacing: '-0.01em',
+                  margin: 0,
+                  cursor: 'help'
+                }}>
+                  Algorithmic Recommendation
+                </h2>
+              </InfoPop>
             </div>
             
-            <div className="recommendation-grid">
+            <div className="recommendation-grid" style={{
+              display: 'flex',
+              justifyContent: 'center',
+              gap: '2rem',
+              marginTop: '2rem',
+              flexWrap: 'wrap'
+            }}>
               {/* Selected Song */}
               <div className="recommendation-card" style={{
                 position: 'relative',
                 overflow: 'hidden',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                background: 'rgba(255, 255, 255, 0.01)',
+                borderRadius: '16px',
+                padding: '24px',
+                width: '280px',
+                minHeight: '360px',
+                textAlign: 'center',
+                border: '1px solid rgba(255, 255, 255, 0.05)',
+                transition: 'all 0.2s ease'
               }}>
                 <div style={{
                   position: 'absolute',
@@ -1068,97 +659,125 @@ function App() {
                   }}>
                     {selectedSong.artist}
                   </div>
-                  {renderFeatureStats(selectedSong)}
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gridAutoRows: 'minmax(20px, auto)',
+                    rowGap: '0.5rem',
+                    columnGap: '1rem',
+                    textTransform: 'uppercase',
+                    fontSize: '0.8rem',
+                    lineHeight: '1.4'
+                  }}>
+                    {renderFeatureStats(selectedSong)}
+                  </div>
                 </div>
               </div>
 
-              
               {/* Next Song */}
               {nextSong && (
-                  <div className="recommendation-card" style={{
-                    position: 'relative',
-                    overflow: 'hidden',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between'
-                  }}>
+                <div className="recommendation-card" style={{
+                  position: 'relative',
+                  overflow: 'hidden',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  background: 'rgba(255, 255, 255, 0.01)',
+                  borderRadius: '16px',
+                  padding: '24px',
+                  width: '280px',
+                  minHeight: '360px',
+                  textAlign: 'center',
+                  border: '1px solid rgba(255, 255, 255, 0.05)',
+                  transition: 'all 0.2s ease'
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(212, 175, 55, 0.03) 100%)',
+                    borderRadius: '16px',
+                    zIndex: 0
+                  }} />
+                  
+                  <div style={{ position: 'relative', zIndex: 1 }}>
                     <div style={{
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      right: 0,
-                      bottom: 0,
-                      background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(212, 175, 55, 0.03) 100%)',
-                      borderRadius: '16px',
-                      zIndex: 0
-                    }} />
-                    
-                    <div style={{ position: 'relative', zIndex: 1 }}>
-                      <div style={{
-                        fontSize: '11px',
-                        fontWeight: '500',
-                        color: '#E0CDA9',
-                        letterSpacing: '0.15em',
-                        textTransform: 'uppercase',
-                        fontFamily: 'Fira Code, monospace',
-                        marginBottom: '16px'
-                      }}>
-                        Algorithmic Next
-                      </div>
-                      <div style={{ 
-                        fontSize: '20px', 
-                        marginBottom: '8px', 
-                        lineHeight: '1.3', 
-                        fontWeight: '500',
-                        color: '#EAEAEA',
-                        wordWrap: 'break-word',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        maxHeight: '3.9rem',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical'
-                      }}>
-                        {nextSong.name}
-                      </div>
-                      <div style={{ 
-                        fontSize: '14px', 
-                        fontWeight: '400',
-                        marginBottom: '24px',
-                        color: '#B8B8B8',
-                        wordWrap: 'break-word',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        maxHeight: '2.7rem',
-                        display: '-webkit-box',
-                        WebkitLineClamp: 2,
-                        WebkitBoxOrient: 'vertical'
-                      }}>
-                        {nextSong.artist}
-                      </div>
+                      fontSize: '11px',
+                      fontWeight: '500',
+                      color: '#E0CDA9',
+                      letterSpacing: '0.15em',
+                      textTransform: 'uppercase',
+                      fontFamily: 'Fira Code, monospace',
+                      marginBottom: '16px'
+                    }}>
+                      Algorithmic Next
+                    </div>
+                    <div style={{ 
+                      fontSize: '20px', 
+                      marginBottom: '8px', 
+                      lineHeight: '1.3', 
+                      fontWeight: '500',
+                      color: '#EAEAEA',
+                      wordWrap: 'break-word',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      maxHeight: '3.9rem',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical'
+                    }}>
+                      {nextSong.name}
+                    </div>
+                    <div style={{ 
+                      fontSize: '14px', 
+                      fontWeight: '400',
+                      marginBottom: '24px',
+                      color: '#B8B8B8',
+                      wordWrap: 'break-word',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      maxHeight: '2.7rem',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical'
+                    }}>
+                      {nextSong.artist}
+                    </div>
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gridAutoRows: 'minmax(20px, auto)',
+                      rowGap: '0.5rem',
+                      columnGap: '1rem',
+                      textTransform: 'uppercase',
+                      fontSize: '0.8rem',
+                      lineHeight: '1.4'
+                    }}>
                       {renderFeatureStats(nextSong)}
                     </div>
                   </div>
+                </div>
               )}
             </div>
 
             {nextSong && (
-              <div style={{ 
-                marginTop: '40px',
-                textAlign: 'center'
+              <div style={{
+                textAlign: 'center',
+                marginTop: '48px'
               }}>
                 <div style={{
-                  width: '200px',
                   height: '1px',
                   background: 'rgba(224, 205, 169, 0.3)',
-                  margin: '0 auto 16px auto'
+                  margin: '0 auto 16px',
+                  maxWidth: '200px'
                 }} />
-                <div style={{ 
-                  fontSize: '13px', 
+                <div style={{
+                  fontSize: '14px',
                   color: '#B8B8B8',
-                  fontWeight: '400',
-                  fontFamily: 'Fira Code, monospace',
-                  letterSpacing: '0.3px'
+                  fontStyle: 'italic',
+                  fontFamily: 'Fira Code, monospace'
                 }}>
                   The algorithm listened closely — here's what it heard.
                 </div>
@@ -1166,55 +785,6 @@ function App() {
             )}
           </section>
         )}
-
-        {/* Theoretical Framing Footer */}
-        <footer style={{
-          textAlign: 'center',
-          padding: '80px 0 40px',
-          borderTop: '1px solid rgba(255, 255, 255, 0.05)',
-          marginTop: '80px'
-        }}>
-          <div style={{
-            fontSize: '14px',
-            color: '#B8B8B8',
-            marginBottom: '16px',
-            fontFamily: 'Fira Code, monospace'
-          }}>
-            Theoretical Framing
-          </div>
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '32px',
-            flexWrap: 'wrap',
-            marginBottom: '24px'
-          }}>
-            <span style={{
-              color: '#E0CDA9',
-              fontSize: '13px',
-              fontFamily: 'Fira Code, monospace'
-            }}>
-              Panos — Algorithmic Mediation
-            </span>
-            <span style={{
-              color: '#E0CDA9',
-              fontSize: '13px',
-              fontFamily: 'Fira Code, monospace'
-            }}>
-              Serve — Culture as System
-            </span>
-          </div>
-          <div style={{
-            fontSize: '12px',
-            color: 'rgba(184, 184, 184, 0.6)',
-            fontStyle: 'italic',
-            maxWidth: '600px',
-            margin: '0 auto',
-            lineHeight: '1.5'
-          }}>
-            Feature values derived from Spotify's audio analysis pipeline (Digital Signal Processing + machine learning estimation).
-          </div>
-        </footer>
 
         {/* Instructions */}
         {!selectedFeature && (
@@ -1276,7 +846,6 @@ function App() {
             </div>
           </div>
         )}
-      </div>
       </div>
     </div>
   )
