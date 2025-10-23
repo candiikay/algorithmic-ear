@@ -438,45 +438,45 @@ function App() {
                 ))}
               </div>
 
-              {/* Single Value Slider */}
-              {metricFilter.feature && (
-                <div style={{ marginBottom: '1rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                    <span style={{ fontSize: '0.9rem', color: '#667eea' }}>
-                      {metricFilter.feature}: {metricFilter.minValue}%
-                    </span>
-                    <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>
-                      {getFilteredTracks().length} songs found
-                    </span>
-                  </div>
-                  
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={metricFilter.minValue}
-                    onChange={(e) => setMetricFilter(prev => ({ 
-                      ...prev, 
-                      minValue: parseInt(e.target.value),
-                      maxValue: parseInt(e.target.value) + 10 // Small range around the value
-                    }))}
-                    style={{
-                      width: '100%',
-                      height: '8px',
-                      borderRadius: '4px',
-                      background: 'rgba(255,255,255,0.2)',
-                      outline: 'none',
-                      cursor: 'pointer'
-                    }}
-                  />
-                  
-                  <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
-                    <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>0%</span>
-                    <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>50%</span>
-                    <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>100%</span>
-                  </div>
+              {/* Single Value Slider - ALWAYS VISIBLE */}
+              <div style={{ marginBottom: '1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+                  <span style={{ fontSize: '0.9rem', color: '#667eea' }}>
+                    {metricFilter.feature ? `${metricFilter.feature}: ${metricFilter.minValue}%` : 'Select a feature above'}
+                  </span>
+                  <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>
+                    {getFilteredTracks().length} songs found
+                  </span>
                 </div>
-              )}
+                
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={metricFilter.minValue}
+                  onChange={(e) => setMetricFilter(prev => ({ 
+                    ...prev, 
+                    minValue: parseInt(e.target.value),
+                    maxValue: parseInt(e.target.value) + 10 // Small range around the value
+                  }))}
+                  disabled={!metricFilter.feature}
+                  style={{
+                    width: '100%',
+                    height: '12px',
+                    borderRadius: '6px',
+                    background: metricFilter.feature ? 'rgba(102, 126, 234, 0.3)' : 'rgba(255,255,255,0.1)',
+                    outline: 'none',
+                    cursor: metricFilter.feature ? 'pointer' : 'not-allowed',
+                    opacity: metricFilter.feature ? 1 : 0.5
+                  }}
+                />
+                
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
+                  <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>0%</span>
+                  <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>50%</span>
+                  <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>100%</span>
+                </div>
+              </div>
 
               {/* Clear Filter Button */}
               {metricFilter.feature && (
