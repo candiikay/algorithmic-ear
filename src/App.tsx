@@ -18,40 +18,40 @@ function App() {
   const [selectedAlgorithm, setSelectedAlgorithm] = useState('greedy')
 
   const FEATURE_STATS: Array<{
-    key: keyof Pick<Track, 'danceability' | 'energy' | 'valence' | 'tempo' | 'acousticness' | 'liveness'>
+    key: keyof Pick<Track, 'danceability' | 'energy' | 'valence' | 'tempo' | 'loudness' | 'acousticness'>
     label: string
     description: string
     format: (value: number) => string
   }> = [
-    { key: 'danceability', label: 'Danceability', description: 'How rhythmically engaging the track feels', format: (value) => `${(value * 100).toFixed(0)}%` },
-    { key: 'energy', label: 'Energy', description: 'Overall intensity and drive', format: (value) => `${(value * 100).toFixed(0)}%` },
-    { key: 'valence', label: 'Valence', description: 'Emotional brightness of the song', format: (value) => `${(value * 100).toFixed(0)}%` },
-    { key: 'tempo', label: 'Tempo', description: 'Beats per minute', format: (value) => `${Math.round(value)} BPM` },
-    { key: 'acousticness', label: 'Acousticness', description: 'Organic vs. electronic instrumentation', format: (value) => `${(value * 100).toFixed(0)}%` },
-    { key: 'liveness', label: 'Liveness', description: 'Presence of a live performance feel', format: (value) => `${(value * 100).toFixed(0)}%` }
+    { key: 'danceability', label: 'Danceability', description: 'How suitable the track is for dancing', format: (value) => `${(value * 100).toFixed(0)}%` },
+    { key: 'energy', label: 'Energy', description: 'Perceptual intensity and activity level', format: (value) => `${(value * 100).toFixed(0)}%` },
+    { key: 'valence', label: 'Valence', description: 'Musical positivity (happy vs. sad)', format: (value) => `${(value * 100).toFixed(0)}%` },
+    { key: 'tempo', label: 'Tempo', description: 'Speed of the track in BPM', format: (value) => `${Math.round(value)} BPM` },
+    { key: 'loudness', label: 'Loudness', description: 'Overall loudness level', format: (value) => `${Math.round(value)} dB` },
+    { key: 'acousticness', label: 'Acousticness', description: 'Likelihood of being acoustic vs. electronic', format: (value) => `${(value * 100).toFixed(0)}%` }
   ]
 
   const ALGORITHMS = [
     { 
       id: 'greedy', 
       name: 'Greedy Algorithm', 
-      description: 'A greedy algorithm always makes the locally optimal choice at each step. In music recommendation, it picks the song most similar to your current selection based on a single feature. This approach is simple and fast, but often leads to repetitive playlists because it never considers long-term variety or context.',
-      pros: ['Simple and precise', 'Fast and explainable', 'Good for similarity search'],
-      cons: ['Reduces diversity', 'Creates echo chambers', 'Poor for discovery']
+      description: 'I chose greedy algorithms as the foundation for this prototype because they represent the most fundamental approach to optimization problems. Every complex recommendation system starts with greedy principles—from Spotify\'s initial similarity matching to Netflix\'s early collaborative filtering. By starting with greedy algorithms, we can isolate the core challenge: how feature selection constrains recommendation quality. This foundational approach makes the limitations visible and understandable, providing a clear baseline for understanding why more sophisticated systems are necessary.',
+      pros: ['Foundational algorithmic concept', 'Clear baseline for comparison', 'Makes limitations visible', 'Fast and explainable'],
+      cons: ['Locally optimal, globally suboptimal', 'Creates recommendation loops', 'Poor long-term user satisfaction']
     },
     { 
-      id: 'sorting', 
-      name: 'Sorting Algorithm', 
-      description: 'Sorting algorithms organize data in a specific order. In music, this could mean arranging tracks by tempo progression, energy curves, or emotional arcs to create coherent listening experiences. This approach considers the sequence and flow of music rather than just individual similarities.',
-      pros: ['Considers multiple factors', 'Creates coherent playlists', 'Better for long-form listening'],
-      cons: ['More complex computation', 'Slower processing', 'Requires more data']
+      id: 'collaborative', 
+      name: 'Collaborative Filtering', 
+      description: 'Collaborative filtering recommends items based on user behavior patterns. It finds users with similar taste and suggests songs they liked. This approach leverages collective intelligence but can create filter bubbles and struggles with new users or niche content.',
+      pros: ['Leverages collective wisdom', 'Works without content analysis', 'Good for popular music'],
+      cons: ['Cold start problem', 'Creates filter bubbles', 'Poor for niche content']
     },
     { 
-      id: 'searching', 
-      name: 'Searching Algorithm', 
-      description: 'Search algorithms find specific items in a dataset. In music recommendation, this could involve complex queries like "find songs that are energetic but not too fast" or "discover tracks that bridge two different genres." This approach allows for more nuanced and flexible music discovery.',
-      pros: ['Handles complex queries', 'Flexible matching', 'Good for discovery'],
-      cons: ['Requires query understanding', 'More computational overhead', 'Less predictable results']
+      id: 'content', 
+      name: 'Content-Based Filtering', 
+      description: 'Content-based filtering analyzes the actual musical content (audio features, lyrics, metadata) to find similar songs. It recommends based on musical similarity rather than user behavior. This approach works well for new users but can be limited by the quality of feature extraction.',
+      pros: ['Works for new users', 'Based on musical content', 'Good for niche genres'],
+      cons: ['Limited by feature quality', 'Can be too narrow', 'Requires content analysis']
     }
   ]
 
@@ -499,7 +499,7 @@ function App() {
         {/* Header */}
         <header style={{ 
           textAlign: 'center', 
-          padding: '120px 0 80px',
+          padding: '120px 0 100px',
           background: 'radial-gradient(circle at top, rgba(255,255,255,0.03) 0%, transparent 60%)',
           position: 'relative',
           borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
@@ -559,7 +559,11 @@ function App() {
               margin: 0,
               fontWeight: '400'
             }}>
-              The Algorithmic Ear explores a fundamental question: can algorithms truly 'hear' better than humans? From platform to platform, music curation varies dramatically—different algorithms, different human curators, different approaches to taste. Spotify attempts to quantify and qualify taste through audio features<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[1]</a></sup>, but as Louridas explains<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[2]</a></sup>, greedy algorithms make locally optimal choices that often lead to suboptimal global outcomes. As Seaver argues<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[3]</a></sup>, algorithms are not just technical objects but cultural ensembles—ways of enacting taste as logic. This interface exposes how recommendation systems become what Gillespie calls "public relevance algorithms"<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[4]</a></sup> that shape our musical worlds. When platforms try to measure the unmeasurable, what gets lost in translation?
+              Every music platform faces the same fundamental challenge: how do you predict what someone will love before they've heard it? Spotify's approach—converting audio signals into numerical features like danceability, energy, and valence—represents one solution to this prediction problem<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[1]</a></sup>. But this raises deeper questions about the relationship between measurable audio properties and subjective musical experience.<br /><br />
+              
+              This interface lets you explore how recommendation systems translate musical experience into computational decisions. You'll select a feature and watch as the algorithm constructs a similarity space—but as you'll discover, mathematical proximity doesn't guarantee emotional resonance<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[3]</a></sup>. Two tracks with identical energy scores might belong to completely different cultural contexts: a punk anthem and a techno banger occupy the same numerical space but different emotional territories. This reveals the core challenge: how do you optimize for user engagement when the features that drive engagement aren't the same as the features you can measure<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[2]</a></sup>?<br /><br />
+              
+              For product teams, this creates a tension between optimization and discovery. The features that predict short-term engagement (familiarity, energy, danceability) might not be the same features that drive long-term user satisfaction and platform growth<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[4]</a></sup>. The question isn't just whether algorithms can find similar songs—it's whether the metrics we optimize for align with the experiences users actually value.
             </p>
           </div>
           
@@ -580,7 +584,7 @@ function App() {
           {/* Scroll Indicator */}
           <div style={{
             position: 'absolute',
-            bottom: '40px',
+            bottom: '20px',
             left: '50%',
             transform: 'translateX(-50%)',
             display: 'flex',
@@ -589,7 +593,8 @@ function App() {
             color: '#E0CDA9',
             fontSize: '12px',
             fontFamily: 'Fira Code, monospace',
-            animation: 'bounce 2s infinite'
+            animation: 'bounce 2s infinite',
+            zIndex: 10
           }}>
             <div style={{ marginBottom: '8px' }}>Scroll to explore</div>
             <div style={{ fontSize: '20px' }}>↓</div>
@@ -661,13 +666,15 @@ function App() {
                 }))}
                 value={selectedAlgorithm}
                 onChange={(value) => {
-                  setSelectedAlgorithm(value)
+                  if (value === 'greedy') {
+                    setSelectedAlgorithm(value)
+                  }
                 }}
               />
               
             </div>
             
-            {/* Greedy Algorithm Explanation Box */}
+            {/* Algorithm Explanation Box */}
             <div style={{
               maxWidth: '600px',
               margin: '32px auto 0 auto',
@@ -688,7 +695,7 @@ function App() {
                 marginBottom: '12px',
                 fontFamily: 'Fira Code, monospace'
               }}>
-                About the Greedy Algorithm
+                About {ALGORITHMS.find(a => a.id === selectedAlgorithm)?.name}
               </h5>
               <p style={{
                 color: 'rgba(255, 255, 255, 0.85)',
@@ -697,7 +704,7 @@ function App() {
                 margin: '0 0 20px 0',
                 fontStyle: 'normal'
               }}>
-                A Greedy Algorithm picks the closest match at each step — simple but often repetitive. It makes locally optimal choices without considering the global picture, which can lead to suboptimal overall outcomes.
+                {ALGORITHMS.find(a => a.id === selectedAlgorithm)?.description}
               </p>
               
               <div style={{
@@ -714,7 +721,8 @@ function App() {
                     marginBottom: '8px',
                     textTransform: 'uppercase',
                     letterSpacing: '0.1em',
-                    fontFamily: 'Fira Code, monospace'
+                    fontFamily: 'Fira Code, monospace',
+                    textAlign: 'center'
                   }}>
                     Strengths
                   </h6>
@@ -723,57 +731,25 @@ function App() {
                     padding: 0,
                     margin: 0
                   }}>
-                    <li style={{
-                      fontSize: '12px',
-                      color: 'rgba(255, 255, 255, 0.7)',
-                      marginBottom: '6px',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '10px',
-                      lineHeight: '1.4'
-                    }}>
-                      <span style={{
-                        color: '#E0CDA9',
+                    {ALGORITHMS.find(a => a.id === selectedAlgorithm)?.pros.map((pro, index) => (
+                      <li key={index} style={{
                         fontSize: '12px',
-                        marginTop: '1px',
-                        flexShrink: 0
-                      }}>•</span>
-                      <span>Simple and precise</span>
-                    </li>
-                    <li style={{
-                      fontSize: '12px',
-                      color: 'rgba(255, 255, 255, 0.7)',
-                      marginBottom: '6px',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '10px',
-                      lineHeight: '1.4'
-                    }}>
-                      <span style={{
-                        color: '#E0CDA9',
-                        fontSize: '12px',
-                        marginTop: '1px',
-                        flexShrink: 0
-                      }}>•</span>
-                      <span>Fast and explainable</span>
-                    </li>
-                    <li style={{
-                      fontSize: '12px',
-                      color: 'rgba(255, 255, 255, 0.7)',
-                      marginBottom: '6px',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '10px',
-                      lineHeight: '1.4'
-                    }}>
-                      <span style={{
-                        color: '#E0CDA9',
-                        fontSize: '12px',
-                        marginTop: '1px',
-                        flexShrink: 0
-                      }}>•</span>
-                      <span>Good for similarity search</span>
-                    </li>
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        marginBottom: '6px',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '10px',
+                        lineHeight: '1.4'
+                      }}>
+                        <span style={{
+                          color: '#E0CDA9',
+                          fontSize: '12px',
+                          marginTop: '1px',
+                          flexShrink: 0
+                        }}>•</span>
+                        <span>{pro}</span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
                 
@@ -785,7 +761,8 @@ function App() {
                     marginBottom: '8px',
                     textTransform: 'uppercase',
                     letterSpacing: '0.1em',
-                    fontFamily: 'Fira Code, monospace'
+                    fontFamily: 'Fira Code, monospace',
+                    textAlign: 'center'
                   }}>
                     Weaknesses
                   </h6>
@@ -794,61 +771,68 @@ function App() {
                     padding: 0,
                     margin: 0
                   }}>
-                    <li style={{
-                      fontSize: '12px',
-                      color: 'rgba(255, 255, 255, 0.7)',
-                      marginBottom: '6px',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '10px',
-                      lineHeight: '1.4'
-                    }}>
-                      <span style={{
-                        color: '#E0CDA9',
+                    {ALGORITHMS.find(a => a.id === selectedAlgorithm)?.cons.map((con, index) => (
+                      <li key={index} style={{
                         fontSize: '12px',
-                        marginTop: '1px',
-                        flexShrink: 0
-                      }}>•</span>
-                      <span>Reduces diversity</span>
-                    </li>
-                    <li style={{
-                      fontSize: '12px',
-                      color: 'rgba(255, 255, 255, 0.7)',
-                      marginBottom: '6px',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '10px',
-                      lineHeight: '1.4'
-                    }}>
-                      <span style={{
-                        color: '#E0CDA9',
-                        fontSize: '12px',
-                        marginTop: '1px',
-                        flexShrink: 0
-                      }}>•</span>
-                      <span>Creates echo chambers</span>
-                    </li>
-                    <li style={{
-                      fontSize: '12px',
-                      color: 'rgba(255, 255, 255, 0.7)',
-                      marginBottom: '6px',
-                      display: 'flex',
-                      alignItems: 'flex-start',
-                      gap: '10px',
-                      lineHeight: '1.4'
-                    }}>
-                      <span style={{
-                        color: '#E0CDA9',
-                        fontSize: '12px',
-                        marginTop: '1px',
-                        flexShrink: 0
-                      }}>•</span>
-                      <span>Poor for discovery</span>
-                    </li>
+                        color: 'rgba(255, 255, 255, 0.7)',
+                        marginBottom: '6px',
+                        display: 'flex',
+                        alignItems: 'flex-start',
+                        gap: '10px',
+                        lineHeight: '1.4'
+                      }}>
+                        <span style={{
+                          color: '#E0CDA9',
+                          fontSize: '12px',
+                          marginTop: '1px',
+                          flexShrink: 0
+                        }}>•</span>
+                        <span>{con}</span>
+                      </li>
+                    ))}
                   </ul>
                 </div>
               </div>
             </div>
+            
+            {/* Coming Soon Message for Non-Greedy Algorithms */}
+            {selectedAlgorithm !== 'greedy' && (
+              <div style={{
+                maxWidth: '600px',
+                margin: '24px auto 0 auto',
+                padding: '20px 24px',
+                borderRadius: '16px',
+                background: 'rgba(224, 205, 169, 0.05)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(224, 205, 169, 0.2)',
+                textAlign: 'center'
+              }}>
+                <h5 style={{
+                  color: '#E0CDA9',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  textTransform: 'uppercase',
+                  letterSpacing: '0.1em',
+                  marginBottom: '12px',
+                  fontFamily: 'Fira Code, monospace'
+                }}>
+                  Coming Soon
+                </h5>
+                <p style={{
+                  color: 'rgba(255, 255, 255, 0.8)',
+                  fontSize: '0.85rem',
+                  lineHeight: '1.6',
+                  margin: 0,
+                  fontStyle: 'italic'
+                }}>
+                  {selectedAlgorithm === 'collaborative' 
+                    ? 'Collaborative filtering requires user behavior data and would need a completely different interface focused on user similarity rather than musical features.'
+                    : 'Content-based filtering would need a multi-dimensional interface to handle multiple features simultaneously, which requires a different interaction model.'
+                  }
+                </p>
+              </div>
+            )}
             
           </div>
 
@@ -889,6 +873,7 @@ function App() {
         </section>
 
         {/* Step 2: Select Musical Dimension */}
+        {selectedAlgorithm === 'greedy' && (
         <section id="step2" style={{ 
           padding: '80px 0',
           textAlign: 'center',
@@ -964,7 +949,7 @@ function App() {
                 margin: 0,
                 fontStyle: 'normal'
               }}>
-                This interface makes visible what usually remains hidden: how platforms like Spotify construct musical taste through algorithmic logic. When you select a feature like "danceability" or "valence," you're not just choosing a parameter—you're entering a system that has already decided what musical qualities matter<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[1]</a></sup>. The greedy algorithm's behavior—always picking the nearest match—demonstrates how recommendation systems prioritize similarity over discovery<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[2]</a></sup>. As Seaver argues, algorithms are "cultural multiples" shaped by human practices<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[3]</a></sup>—and Gillespie shows how they become "public relevance algorithms" that decide what counts as culturally important<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[4]</a></sup>. Every interaction here exposes how platforms don't just reflect taste—they actively construct it.
+                This interface reveals the product strategy behind recommendation systems: feature engineering as user behavior optimization. When you select a feature like "danceability" or "valence," you're not just choosing a parameter—you're entering Spotify's optimization framework, where these features represent hypotheses about what drives user engagement<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[1]</a></sup>. Each feature is a product decision: danceability because it correlates with skip rates, energy because it predicts playlist completion, valence because it drives sharing behavior. The algorithm's behavior—whether greedy, collaborative filtering, or content-based—operates within this feature space, but the real constraint is the business logic embedded in feature selection<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[2]</a></sup>. As Seaver argues, algorithms are "cultural multiples" shaped by human practices<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[3]</a></sup>—and Gillespie shows how they become "public relevance algorithms" that decide what counts as culturally important<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[4]</a></sup>. The critical question for product teams isn't just about algorithmic performance, but about whether the features you optimize for actually capture the user experiences that drive retention, discovery, and long-term platform value.
               </p>
             </div>
           </div>
@@ -1066,7 +1051,7 @@ function App() {
                 marginBottom: '8px',
                 fontFamily: 'Fira Code, monospace'
               }}>
-                {FEATURE_DETAILS[selectedFeature as keyof typeof FEATURE_DETAILS]?.label || selectedFeature}: 0.0 to 1.0
+                {FEATURE_DETAILS[selectedFeature as keyof typeof FEATURE_DETAILS]?.label || selectedFeature}
               </h4>
               <p style={{
                 color: 'rgba(255, 255, 255, 0.9)',
@@ -1117,6 +1102,7 @@ function App() {
           )}
           
         </section>
+        )}
 
         {/* Step 3: Slider */}
         {selectedFeature && sortedTracks.length > 0 && (
@@ -1163,7 +1149,41 @@ function App() {
                 margin: '0 auto',
                 letterSpacing: '-0.01em'
               }}>
-                The slider defines your preferred range; below are tracks that fit this profile.
+                The slider defines your preferred range; below are {sortedTracks.length} tracks that fit this profile. Drag the slider or click any track to explore.
+              </p>
+            </div>
+            
+            {/* Algorithmic Recommendations Info */}
+            <div style={{
+              maxWidth: '700px',
+              margin: '40px auto 0 auto',
+              padding: '24px',
+              borderRadius: '16px',
+              background: 'rgba(255, 255, 255, 0.02)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              textAlign: 'center'
+            }}>
+              <h4 style={{
+                color: '#E0CDA9',
+                fontSize: '14px',
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: '16px',
+                fontFamily: 'Fira Code, monospace'
+              }}>
+                Algorithmic Recommendations
+              </h4>
+              <p style={{
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontSize: '0.9rem',
+                lineHeight: '1.6',
+                margin: 0,
+                fontStyle: 'italic'
+              }}>
+                Every playlist here demonstrates why greedy algorithms provide the ideal foundation for understanding recommendation systems. Greedy algorithms make locally optimal choices at each step—a fundamental principle that underlies most recommendation approaches, from Spotify's similarity matching to Netflix's collaborative filtering<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[2]</a></sup>. By starting with greedy algorithms, we can isolate the core constraint: the feature space itself. When we reduce musical experience to a fixed set of numerical dimensions, we create what mathematicians call a "manifold" of possible recommendations—a curved space where only certain types of similarity can be expressed<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[3]</a></sup>. As Seaver observes, algorithms are "cultural multiples" — made through the practices, preferences, and compromises of engineers and listeners alike<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[3]</a></sup>. This greedy approach reveals how recommendation systems become what he calls "ensembles of human practice" rather than neutral technical tools. The homogenization isn't just algorithmic—it's geometric, constrained by the very dimensions we choose to measure.
               </p>
             </div>
             
@@ -1188,24 +1208,42 @@ function App() {
                 </span>
               </div>
               
-              <input
-                type="range"
-                min="0"
-                max={sortedTracks.length - 1}
-                step="1"
-                value={sliderValue}
-                onChange={(e) => handleSliderChange(Number(e.target.value))}
-                style={{
-                  width: '100%',
-                  height: '4px',
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  borderRadius: '2px',
-                  outline: 'none',
-                  cursor: 'pointer',
-                  WebkitAppearance: 'none',
-                  appearance: 'none'
-                }}
-              />
+              <div style={{ position: 'relative', width: '100%' }}>
+                <input
+                  type="range"
+                  min="0"
+                  max={sortedTracks.length - 1}
+                  step="1"
+                  value={sliderValue}
+                  onChange={(e) => handleSliderChange(Number(e.target.value))}
+                  style={{
+                    width: '100%',
+                    height: '6px',
+                    background: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: '3px',
+                    outline: 'none',
+                    cursor: 'pointer',
+                    WebkitAppearance: 'none',
+                    appearance: 'none',
+                    position: 'relative'
+                  }}
+                />
+                <div style={{
+                  position: 'absolute',
+                  top: '-8px',
+                  left: `${(sliderValue / (sortedTracks.length - 1)) * 100}%`,
+                  transform: 'translateX(-50%)',
+                  fontSize: '12px',
+                  color: '#E0CDA9',
+                  fontFamily: 'Fira Code, monospace',
+                  background: 'rgba(0, 0, 0, 0.8)',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  whiteSpace: 'nowrap'
+                }}>
+                  {sliderValue + 1} of {sortedTracks.length}
+                </div>
+              </div>
               
               <div style={{
                 marginTop: '24px',
@@ -1239,7 +1277,7 @@ function App() {
                 scrollbarWidth: 'thin',
                 scrollbarColor: 'rgba(193, 167, 94, 0.3) transparent'
               }}>
-                {sortedTracks.slice(0, 20).map((track, index) => (
+                {sortedTracks.map((track, index) => (
                   <div
                     key={track.id}
                     onClick={() => {
@@ -1306,40 +1344,6 @@ function App() {
               </div>
             </div>
             
-            {/* Algorithmic Recommendations Info */}
-            <div style={{
-              maxWidth: '700px',
-              margin: '60px auto 0 auto',
-              padding: '24px',
-              borderRadius: '16px',
-              background: 'rgba(255, 255, 255, 0.02)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              textAlign: 'center'
-            }}>
-              <h4 style={{
-                color: '#E0CDA9',
-                fontSize: '14px',
-                fontWeight: '600',
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                marginBottom: '16px',
-                fontFamily: 'Fira Code, monospace'
-              }}>
-                Algorithmic Recommendations
-              </h4>
-              <p style={{
-                color: 'rgba(255, 255, 255, 0.8)',
-                fontSize: '0.9rem',
-                lineHeight: '1.6',
-                margin: 0,
-                fontStyle: 'italic'
-              }}>
-                Every playlist here is the product of a logic that prioritizes proximity. As Louridas demonstrates, greedy algorithms make locally optimal choices that often lead to suboptimal global outcomes—a perfect metaphor for how recommendation systems can create echo chambers. As Seaver observes, algorithms are "cultural multiples" — made through the practices, preferences, and compromises of engineers and listeners alike. This interface exposes how recommendation systems become what he calls "ensembles of human practice" rather than neutral technical tools. The greedy algorithm's tendency toward homogenization reveals the cultural work embedded in what appears to be pure computation.
-              </p>
-            </div>
-            
           </section>
         )}
 
@@ -1388,6 +1392,40 @@ function App() {
                 letterSpacing: '-0.01em'
               }}>
                 The algorithm listened closely — here's what it heard.
+              </p>
+            </div>
+            
+            {/* Why This Isn't True Taste Development */}
+            <div style={{
+              maxWidth: '700px',
+              margin: '40px auto 0 auto',
+              padding: '24px',
+              borderRadius: '16px',
+              background: 'rgba(255, 255, 255, 0.02)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              textAlign: 'left'
+            }}>
+              <h5 style={{
+                color: '#E0CDA9',
+                fontSize: '14px',
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: '12px',
+                fontFamily: 'Fira Code, monospace'
+              }}>
+                Why This Isn't True Taste Development
+              </h5>
+              <p style={{
+                color: 'rgba(255, 255, 255, 0.85)',
+                fontSize: '0.85rem',
+                lineHeight: '1.6',
+                margin: 0,
+                fontStyle: 'normal'
+              }}>
+                The algorithmic recommendations you see here reveal the epistemological constraints of feature-based music curation. As Gillespie argues, "public relevance algorithms" don't just reflect what's relevant; they construct it through the categories and measurements that engineers choose to include<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[4]</a></sup>. The deeper issue isn't algorithmic choice—whether greedy, collaborative filtering, or content-based—but the axiomatic foundation of the feature space itself. By treating musical experience as a vector in a fixed-dimensional space, we create what computer scientists call a "representation learning" problem: the algorithm can only discover patterns within the representational constraints we've imposed<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[2]</a></sup>. Every "similar" track represents not just a computational decision, but an ontological commitment to a particular way of understanding musical meaning. The real question is whether engineering teams should have the epistemic authority to define the fundamental categories through which we experience music—or whether this represents a form of cultural imperialism disguised as technical optimization.
               </p>
             </div>
             
@@ -1578,43 +1616,149 @@ function App() {
             </div>
             </div>
 
-            {/* Why This Isn't True Taste Development */}
-              <div style={{
-              maxWidth: '700px',
-              margin: '60px auto 0 auto',
-              padding: '24px',
-              borderRadius: '16px',
-              background: 'rgba(255, 255, 255, 0.02)',
-              backdropFilter: 'blur(20px)',
-              WebkitBackdropFilter: 'blur(20px)',
-              border: '1px solid rgba(255, 255, 255, 0.08)',
-              textAlign: 'left'
-            }}>
-              <h5 style={{
-                color: '#E0CDA9',
-                  fontSize: '14px',
-                fontWeight: '600',
-                textTransform: 'uppercase',
-                letterSpacing: '0.1em',
-                marginBottom: '12px',
-                  fontFamily: 'Fira Code, monospace'
-                }}>
-                Why This Isn't True Taste Development
-              </h5>
-              <p style={{
-                color: 'rgba(255, 255, 255, 0.85)',
-                fontSize: '0.85rem',
-                lineHeight: '1.6',
-                margin: 0,
-                fontStyle: 'normal'
-              }}>
-                The algorithmic recommendations you see here aren't truly developing your taste—they're reinforcing it. As Gillespie argues, "public relevance algorithms" don't just reflect what's relevant; they construct it. Every "similar" track the greedy algorithm suggests is a micro-decision about what counts as musical relevance. This creates a feedback loop: the more you interact with these recommendations, the more the system narrows your musical world. True taste development requires surprise, challenge, and discovery—qualities that greedy algorithms, by design, cannot provide. What you're experiencing isn't musical growth; it's algorithmic homogenization disguised as personalization.
-              </p>
-                </div>
 
             
           </section>
         )}
+
+        {/* Future of Algorithmic Curation */}
+        <section style={{ 
+          padding: '80px 0',
+          textAlign: 'center',
+          borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+          background: 'radial-gradient(circle at center, rgba(255,255,255,0.01) 0%, transparent 50%)'
+        }}>
+          <div style={{
+            maxWidth: '800px',
+            margin: '0 auto',
+            padding: '0 2rem'
+          }}>
+            <div style={{
+              color: '#E0CDA9',
+              fontSize: '12px',
+              fontWeight: '600',
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              fontFamily: 'Fira Code, monospace',
+              marginBottom: '12px'
+            }}>
+              Looking Forward
+            </div>
+            <h2 style={{ 
+              fontSize: '32px',
+              fontWeight: '500',
+              color: '#FFFFFF',
+              marginBottom: '24px',
+              letterSpacing: '-0.02em'
+            }}>
+              The Future of Algorithmic Curation
+            </h2>
+            <p style={{
+              color: 'rgba(255, 255, 255, 0.8)',
+              fontSize: '1.1rem',
+              lineHeight: '1.6',
+              maxWidth: '700px',
+              margin: '0 auto 40px auto',
+              letterSpacing: '-0.01em'
+            }}>
+              This prototype demonstrates the limitations of simple algorithms, but it's not the whole story. Beyond simple algorithms, the future of music discovery lies in hybrid approaches that combine algorithmic efficiency with human insight.
+            </p>
+            
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(2, 1fr)',
+              gap: '32px',
+              marginTop: '48px'
+            }}>
+              <div style={{
+                padding: '32px',
+                borderRadius: '16px',
+                background: 'rgba(255, 255, 255, 0.02)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                textAlign: 'left'
+              }}>
+                <h3 style={{
+                  color: '#E0CDA9',
+                  fontSize: '18px',
+                  fontWeight: '600',
+                  marginBottom: '16px',
+                  fontFamily: 'Fira Code, monospace'
+                }}>
+                  Beyond Simple Algorithms
+                </h3>
+                <p style={{
+                  color: 'rgba(255, 255, 255, 0.85)',
+                  fontSize: '0.9rem',
+                  lineHeight: '1.6',
+                  margin: 0
+                }}>
+                  Modern platforms use ensemble methods, collaborative filtering, content-based filtering, and contextual awareness. Spotify's Discover Weekly combines multiple algorithms with user behavior patterns, while Apple Music emphasizes human curation. The key is balancing algorithmic efficiency with serendipitous discovery—moving beyond simple similarity matching to understand musical context and cultural meaning.
+                </p>
+              </div>
+              
+              <div style={{
+                padding: '32px',
+                borderRadius: '16px',
+                background: 'rgba(255, 255, 255, 0.02)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                border: '1px solid rgba(255, 255, 255, 0.08)',
+                textAlign: 'left'
+              }}>
+                <h3 style={{
+                  color: '#E0CDA9',
+                  fontSize: '18px',
+                  fontWeight: '600',
+                  marginBottom: '16px',
+                  fontFamily: 'Fira Code, monospace'
+                }}>
+                  The Human Element
+                </h3>
+                <p style={{
+                  color: 'rgba(255, 255, 255, 0.85)',
+                  fontSize: '0.9rem',
+                  lineHeight: '1.6',
+                  margin: 0
+                }}>
+                  True taste development requires human context: cultural knowledge, emotional resonance, and the ability to make unexpected connections. The best recommendation systems don't replace human curators—they amplify their work, using algorithms to surface hidden gems that human experts can then contextualize and present.
+                </p>
+              </div>
+            </div>
+            
+            <div style={{
+              maxWidth: '700px',
+              margin: '48px auto 0 auto',
+              padding: '32px',
+              borderRadius: '16px',
+              background: 'rgba(224, 205, 169, 0.05)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(224, 205, 169, 0.2)',
+              textAlign: 'center'
+            }}>
+              <h3 style={{
+                color: '#E0CDA9',
+                fontSize: '20px',
+                fontWeight: '600',
+                marginBottom: '16px',
+                fontFamily: 'Fira Code, monospace'
+              }}>
+                The Path Forward
+              </h3>
+              <p style={{
+                color: 'rgba(255, 255, 255, 0.9)',
+                fontSize: '1rem',
+                lineHeight: '1.6',
+                margin: 0,
+                fontStyle: 'italic'
+              }}>
+                The future isn't about choosing between algorithms and humans—it's about designing systems that honor both the efficiency of computation and the wisdom of human experience. As we build the next generation of music discovery tools, we must remember that the goal isn't to replace taste, but to expand it.
+              </p>
+            </div>
+          </div>
+        </section>
 
         {/* Instructions */}
         {!selectedFeature && (

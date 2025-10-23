@@ -38,26 +38,30 @@ export const INFO_CONTENT = {
 export const FEATURE_DETAILS = {
   danceability: {
     label: "Danceability: 0.0 to 1.0",
-    description: "Spotify calculates this using beat strength, tempo stability, and rhythmic regularity. But here's the catch—a funeral march and a club banger can have the same danceability score. The algorithm thinks they're similar. Your body knows better. This reveals how statistical approximations miss the contextual nature of human experience."
+    description: "When you choose this, the algorithm will find songs with similar rhythmic patterns and beat strength. It will group together tracks that feel equally 'danceable'—so you might get a disco hit, a reggaeton track, and a techno song all in a row. The algorithm thinks they're similar because they have the same danceability score, but they might feel completely different to you."
   },
   energy: {
     label: "Energy: 0.0 to 1.0", 
-    description: "Overall intensity based on loudness, tempo, and timbral brightness. The algorithm believes 0.8 energy equals 'high energy,' but energy is contextual—what energizes you at 2pm differs from 2am. This highlights the limitation of treating emotional states as objective, measurable quantities."
+    description: "When you choose this, the algorithm will match songs based on their intensity level—loudness, speed, and overall drive. It will group together tracks that have similar energy scores, so you might get a punk song, a metal track, and an electronic banger all together. The algorithm thinks they're similar because they're equally 'energetic,' but they might be from completely different genres."
   },
   valence: {
     label: "Valence: 0.0 to 1.0",
-    description: "Emotional positivity estimated from harmonic mode and tonality. But happiness isn't a number—it's complex, situational, and deeply personal. The greedy algorithm reduces your entire emotional landscape to a decimal, demonstrating how algorithmic systems flatten human experience into data points."
+    description: "When you choose this, the algorithm will find songs with similar emotional 'brightness'—happy vs. sad, major vs. minor keys. It will group together tracks that sound equally 'positive' or 'negative' to the algorithm, so you might get a pop song, a folk ballad, and a jazz standard all together. The algorithm thinks they're similar because they have the same emotional tone, but they might feel completely different to you."
   },
   tempo: {
     label: "Tempo: Beats Per Minute",
-    description: "The song's speed detected through onset analysis. But tempo alone can't capture the difference between a funeral march and a dance track at 60 BPM. Context matters more than data. This shows how single-dimensional measurements fail to capture the richness of musical meaning."
+    description: "When you choose this, the algorithm will match songs based on their speed—how many beats per minute. It will group together tracks that have similar tempos, so you might get a slow ballad, a mid-tempo rock song, and a fast electronic track all together. The algorithm thinks they're similar because they have the same BPM, but they might be from completely different genres and moods."
   },
   acousticness: {
     label: "Acousticness: 0.0 to 1.0",
-    description: "Probability of acoustic instrumentation from machine learning. But 'acoustic' doesn't mean 'authentic' or 'emotional'—it's just a technical classification that misses the point entirely. This reveals how algorithmic categorization can obscure rather than illuminate musical meaning."
+    description: "When you choose this, the algorithm will find songs with similar instrumentation—acoustic vs. electronic sounds. It will group together tracks that have similar 'acoustic' scores, so you might get a folk song, a classical piece, and an acoustic pop track all together. The algorithm thinks they're similar because they use similar instruments, but they might be from completely different eras and styles."
   },
   liveness: {
     label: "Liveness: 0.0 to 1.0",
-    description: "Probability of live performance elements like audience noise and reverb. But liveness isn't about technical recording quality—it's about energy, connection, that feeling you get when you're there. You can't measure that. This demonstrates the gap between what algorithms can detect and what humans actually experience."
+    description: "When you choose this, the algorithm will match songs based on whether they sound 'live' or 'studio-recorded.' It will group together tracks that have similar 'liveness' scores, so you might get a live concert recording, a studio track with audience sounds, and a raw demo all together. The algorithm thinks they're similar because they have the same 'live' quality, but they might be from completely different artists and contexts."
+  },
+  loudness: {
+    label: "Loudness: Decibels (dB)",
+    description: "When you choose this, the algorithm will find songs with similar volume levels—how loud or quiet they are overall. It will group together tracks that have similar loudness scores, so you might get a quiet ballad, a mid-volume pop song, and a loud rock track all together. The algorithm thinks they're similar because they have the same volume level, but they might be from completely different genres and moods."
   }
 };
