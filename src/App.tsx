@@ -680,6 +680,78 @@ function App() {
             max-width: 400px;
           }
         }
+
+        /* Slider Styling */
+        .slider-container {
+          width: 80%;
+          margin: 2rem auto;
+          text-align: center;
+        }
+
+        input[type="range"] {
+          -webkit-appearance: none;
+          width: 100%;
+          height: 4px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 2px;
+          outline: none;
+          cursor: pointer;
+          transition: background 0.2s;
+        }
+
+        input[type="range"]:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          appearance: none;
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: #E0CDA9;
+          border: 2px solid #121212;
+          cursor: pointer;
+          transition: transform 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+          transform: scale(1.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+          width: 18px;
+          height: 18px;
+          border-radius: 50%;
+          background: #E0CDA9;
+          border: 2px solid #121212;
+          cursor: pointer;
+        }
+
+        /* Recommendation Cards */
+        .recommendation-grid {
+          display: flex;
+          justify-content: center;
+          gap: 2rem;
+          margin-top: 2rem;
+          flex-wrap: wrap;
+        }
+
+        .recommendation-card {
+          background: rgba(255, 255, 255, 0.01);
+          border-radius: 12px;
+          padding: 24px;
+          width: 280px;
+          min-height: 320px;
+          text-align: center;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          transition: all 0.2s ease;
+        }
+
+        .recommendation-card:hover {
+          transform: translateY(-2px);
+          border-color: rgba(224, 205, 169, 0.2);
+        }
       `}</style>
 
       <header className="hero" style={{ 
@@ -876,19 +948,11 @@ function App() {
               </h2>
             </div>
             
-            <div className="slider-container" style={{ 
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              padding: '48px 0',
-              width: '100%',
-              maxWidth: '640px',
-              margin: '0 auto',
-              position: 'relative'
-            }}>
+            <div className="slider-container">
               <div style={{
                 display: 'flex',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '16px',
                 marginBottom: '24px',
                 fontFamily: 'Fira Code, monospace',
@@ -901,51 +965,6 @@ function App() {
                 </span>
               </div>
               
-              <div className="slider-track" style={{
-                position: 'relative',
-                width: '100%',
-                height: '2px',
-                background: 'rgba(255, 255, 255, 0.1)',
-                borderRadius: '1px',
-                overflow: 'hidden'
-              }}>
-                <div 
-                  className="slider-fill"
-                  style={{
-                    position: 'absolute',
-                    height: '100%',
-                    left: 0,
-                    top: 0,
-                    borderRadius: '1px',
-                    background: '#E0CDA9',
-                    width: `${(Math.min(sliderValue, sortedTracks.length - 1) / (sortedTracks.length - 1)) * 100}%`,
-                    transition: 'width 0.2s ease'
-                  }}
-                />
-                <div 
-                  className="slider-handle"
-                  style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: `${(Math.min(sliderValue, sortedTracks.length - 1) / (sortedTracks.length - 1)) * 100}%`,
-                    transform: 'translate(-50%, -50%)',
-                    width: '12px',
-                    height: '12px',
-                    background: '#E0CDA9',
-                    border: '2px solid #121212',
-                    borderRadius: '50%',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.2)'
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1)'
-                  }}
-                />
-              </div>
-              
               <input
                 type="range"
                 min="0"
@@ -953,24 +972,26 @@ function App() {
                 value={Math.min(sliderValue, sortedTracks.length - 1)}
                 onChange={(e) => handleSliderChange(parseInt(e.target.value))}
                 style={{
-                  position: 'absolute',
                   width: '100%',
-                  height: '20px',
-                  opacity: 0,
-                  cursor: 'pointer',
-                  zIndex: 2
+                  marginBottom: '16px'
                 }}
               />
               
-              <div className="slider-label" style={{
-                marginTop: '24px',
+              <div style={{
                 color: '#B8B8B8',
                 fontSize: '13px',
                 fontFamily: 'Fira Code, monospace',
-                transition: 'all 0.2s ease',
-                textAlign: 'center'
+                marginBottom: '8px'
               }}>
                 Track {Math.min(sliderValue, sortedTracks.length - 1) + 1} of {sortedTracks.length}
+              </div>
+              
+              <div style={{
+                fontSize: '12px',
+                color: 'rgba(184, 184, 184, 0.6)',
+                fontFamily: 'Fira Code, monospace'
+              }}>
+                ⬅️ Drag to adjust {selectedFeature} ➡️
               </div>
             </div>
           </section>
@@ -1009,28 +1030,14 @@ function App() {
               </h2>
             </div>
             
-            <div className="results-comparison" style={{ 
-              display: 'flex', 
-              justifyContent: 'center',
-              alignItems: 'stretch',
-              gap: '40px',
-              maxWidth: '900px',
-              margin: '0 auto',
-              position: 'relative'
-            }}>
+            <div className="recommendation-grid">
               {/* Selected Song */}
               <div className="recommendation-card" style={{
-                background: 'rgba(255, 255, 255, 0.01)',
-                padding: '24px',
-                borderRadius: '12px',
-                border: '1px solid rgba(255, 255, 255, 0.05)',
                 position: 'relative',
                 overflow: 'hidden',
-                width: '300px',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'space-between',
-                transition: 'all 0.2s ease'
+                justifyContent: 'space-between'
               }}>
                 <div style={{
                   position: 'absolute',
@@ -1114,17 +1121,11 @@ function App() {
               {/* Next Song */}
               {nextSong && (
                   <div className="recommendation-card" style={{
-                    background: 'rgba(255, 255, 255, 0.01)',
-                    padding: '24px',
-                    borderRadius: '12px',
-                    border: '1px solid rgba(255, 255, 255, 0.05)',
                     position: 'relative',
                     overflow: 'hidden',
-                    width: '300px',
                     display: 'flex',
                     flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    transition: 'all 0.2s ease'
+                    justifyContent: 'space-between'
                   }}>
                     <div style={{
                       position: 'absolute',
