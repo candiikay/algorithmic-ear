@@ -256,22 +256,46 @@ function App() {
         <h1 style={{ fontSize: '3rem', marginBottom: '2rem' }}>🎧 Greedy Listening</h1>
         <p style={{ fontSize: '1.2rem', marginBottom: '2rem', opacity: 0.9 }}>Loading how algorithms decide what sounds similar...</p>
         
-        {/* Progress Bar */}
+        {/* Enhanced Progress Bar */}
         <div style={{ 
-          width: '300px', 
-          height: '8px', 
+          width: '400px', 
+          height: '12px', 
           backgroundColor: 'rgba(255,255,255,0.2)', 
-          borderRadius: '4px',
-          marginBottom: '1rem',
-          overflow: 'hidden'
+          borderRadius: '6px',
+          marginBottom: '1.5rem',
+          overflow: 'hidden',
+          boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
         }}>
           <div style={{
             width: `${loadingProgress}%`,
             height: '100%',
-            backgroundColor: 'white',
-            borderRadius: '4px',
-            transition: 'width 0.3s ease'
-          }} />
+            background: 'linear-gradient(90deg, #667eea 0%, #764ba2 100%)',
+            borderRadius: '6px',
+            transition: 'width 0.5s ease',
+            boxShadow: '0 2px 4px rgba(102, 126, 234, 0.3)',
+            position: 'relative'
+          }}>
+            {/* Animated shine effect */}
+            <div style={{
+              position: 'absolute',
+              top: 0,
+              left: '-100%',
+              width: '100%',
+              height: '100%',
+              background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
+              animation: 'shine 2s infinite'
+            }} />
+          </div>
+        </div>
+        
+        {/* Progress Percentage */}
+        <div style={{ 
+          fontSize: '1.2rem', 
+          fontWeight: 'bold', 
+          marginBottom: '1rem',
+          color: '#667eea'
+        }}>
+          {loadingProgress}%
         </div>
         
         <p style={{ fontSize: '0.9rem', opacity: 0.7 }}>
@@ -288,13 +312,24 @@ function App() {
   }
 
   return (
-    <div style={{ 
-      padding: '20px', 
-      fontFamily: 'Arial, sans-serif',
-      backgroundColor: '#1a1a2e',
-      color: 'white',
-      minHeight: '100vh'
-    }}>
+    <>
+      {/* Add CSS animation for shine effect */}
+      <style>
+        {`
+          @keyframes shine {
+            0% { left: -100%; }
+            100% { left: 100%; }
+          }
+        `}
+      </style>
+      
+      <div style={{ 
+        padding: '20px', 
+        fontFamily: 'Arial, sans-serif',
+        backgroundColor: '#1a1a2e',
+        color: 'white',
+        minHeight: '100vh'
+      }}>
       <header style={{ textAlign: 'center', marginBottom: '3rem' }}>
         <h1 style={{ fontSize: '3rem', marginBottom: '1rem' }}>
           🎧 Greedy Listening
@@ -658,6 +693,7 @@ function App() {
         </div>
       </div>
     </div>
+    </>
   )
 }
 
