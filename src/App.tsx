@@ -447,6 +447,52 @@ function App() {
             padding: 20px;
           }
         }
+
+        .dimension-grid {
+          background: radial-gradient(circle at top, #0E0E10, #161618);
+          border-radius: 20px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .dimension-card {
+          transition: all 0.3s ease;
+        }
+
+        .dimension-card:hover {
+          background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)) !important;
+          transform: translateY(-4px);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25) !important;
+        }
+
+        .dimension-card.selected {
+          animation: pulseGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseGlow {
+          0% { box-shadow: 0 0 8px rgba(193,167,94,0.4); }
+          50% { box-shadow: 0 0 16px rgba(193,167,94,0.7); }
+          100% { box-shadow: 0 0 8px rgba(193,167,94,0.4); }
+        }
+
+        @media (max-width: 1024px) {
+          .dimension-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+            gap: 20px !important;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .dimension-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+            padding: 24px !important;
+          }
+          
+          .dimension-card {
+            width: 100% !important;
+            height: 100px !important;
+          }
+        }
       `}</style>
 
       <header style={{ 
@@ -536,12 +582,13 @@ function App() {
             </h2>
           </div>
           
-          <div className="button-grid" style={{ 
+          <div className="dimension-grid" style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', 
-            gap: '1.25rem',
-            maxWidth: '900px',
-            margin: '0 auto'
+            gridTemplateColumns: 'repeat(3, 1fr)', 
+            gap: '24px',
+            maxWidth: '800px',
+            margin: '0 auto',
+            padding: '32px'
           }}>
             {[
               { key: 'danceability', label: 'Danceability', description: 'Rhythmic quality' },
@@ -557,32 +604,32 @@ function App() {
                   setSelectedFeature(metric.key as keyof Track)
                   setSliderValue(0)
                 }}
-                className="button-padding"
+                className="dimension-card"
                 style={{
-                  padding: '1.75rem 1.25rem',
+                  width: '240px',
+                  height: '120px',
                   borderRadius: '16px',
                   border: selectedFeature === metric.key 
-                    ? '1px solid #d4af37' 
-                    : '1px solid rgba(255, 255, 255, 0.1)',
+                    ? '1px solid #C1A75E' 
+                    : '1px solid rgba(255, 255, 255, 0.08)',
                   background: selectedFeature === metric.key 
-                    ? 'rgba(212, 175, 55, 0.1)' 
-                    : 'rgba(255, 255, 255, 0.02)',
-                  backdropFilter: 'blur(10px)',
-                  WebkitBackdropFilter: 'blur(10px)',
-                  color: selectedFeature === metric.key ? '#d4af37' : '#ffffff',
-                  fontSize: '1rem',
+                    ? 'rgba(193, 167, 94, 0.08)' 
+                    : 'rgba(255, 255, 255, 0.04)',
+                  backdropFilter: 'blur(16px)',
+                  WebkitBackdropFilter: 'blur(16px)',
+                  color: selectedFeature === metric.key ? '#C1A75E' : '#ffffff',
                   cursor: 'pointer',
-                  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                  fontWeight: '400',
+                  transition: 'all 0.3s ease',
                   textAlign: 'center',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  gap: '0.75rem',
-                  minHeight: '140px',
                   justifyContent: 'center',
-                  width: '100%',
-                  boxSizing: 'border-box'
+                  gap: '8px',
+                  boxSizing: 'border-box',
+                  boxShadow: selectedFeature === metric.key 
+                    ? '0 0 12px rgba(193, 167, 94, 0.5)' 
+                    : '0 0 40px rgba(0, 0, 0, 0.25)'
                 }}
                 onMouseEnter={(e) => {
                   if (selectedFeature !== metric.key) {
@@ -600,26 +647,20 @@ function App() {
                 }}
               >
                 <div style={{
-                  fontSize: '1rem',
+                  fontSize: '16px',
                   fontWeight: '500',
-                  marginBottom: '0.25rem',
+                  color: selectedFeature === metric.key ? '#C1A75E' : '#ffffff',
                   lineHeight: '1.2',
-                  wordWrap: 'break-word',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  maxWidth: '100%'
+                  marginBottom: '4px'
                 }}>
                   {metric.label}
                 </div>
                 <div style={{
-                  fontSize: '0.8rem',
+                  fontSize: '13px',
                   opacity: 0.6,
-                  fontWeight: '300',
+                  fontWeight: '400',
                   lineHeight: '1.3',
-                  wordWrap: 'break-word',
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  maxWidth: '100%'
+                  color: selectedFeature === metric.key ? 'rgba(193, 167, 94, 0.8)' : 'rgba(255, 255, 255, 0.6)'
                 }}>
                   {metric.description}
                 </div>
