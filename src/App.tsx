@@ -400,23 +400,23 @@ function App() {
               )}
             </div>
             
-            {/* METRIC SLIDER - MOVED TO TOP FOR VISIBILITY */}
+            {/* SONG PICKER SLIDER - THE RIGHT WAY! */}
             <div style={{ 
               marginBottom: '1.5rem', 
-              padding: '15px', 
+              padding: '20px', 
               backgroundColor: 'rgba(102, 126, 234, 0.1)', 
               borderRadius: '10px',
               border: '1px solid rgba(102, 126, 234, 0.3)'
             }}>
-              <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: '#667eea' }}>
-                🎯 Pick a Feature & Value
+              <h3 style={{ fontSize: '1.2rem', marginBottom: '0.5rem', color: '#667eea' }}>
+                🎵 Pick Your Song with a Slider
               </h3>
               <p style={{ fontSize: '0.9rem', opacity: 0.8, marginBottom: '1rem' }}>
-                Choose a feature and use the slider to find songs with that value!
+                Choose a feature, then slide to pick a song based on that feature!
               </p>
               
               {/* Feature Selection */}
-              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '1rem' }}>
+              <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginBottom: '1.5rem' }}>
                 {[
                   { key: 'danceability', label: '💃 Danceability', color: '#ff6b6b' },
                   { key: 'energy', label: '⚡ Energy', color: '#4ecdc4' },
@@ -428,12 +428,12 @@ function App() {
                     key={metric.key}
                     onClick={() => setMetricFilter(prev => ({ ...prev, feature: metric.key as any }))}
                     style={{
-                      padding: '8px 12px',
-                      borderRadius: '20px',
+                      padding: '10px 16px',
+                      borderRadius: '25px',
                       border: `2px solid ${metricFilter.feature === metric.key ? metric.color : 'rgba(255,255,255,0.2)'}`,
                       backgroundColor: metricFilter.feature === metric.key ? metric.color : 'rgba(255,255,255,0.1)',
                       color: metricFilter.feature === metric.key ? 'white' : 'rgba(255,255,255,0.8)',
-                      fontSize: '12px',
+                      fontSize: '14px',
                       cursor: 'pointer',
                       transition: 'all 0.2s ease',
                       fontWeight: metricFilter.feature === metric.key ? 'bold' : 'normal'
@@ -444,91 +444,106 @@ function App() {
                 ))}
               </div>
 
-              {/* Single Value Slider - ALWAYS VISIBLE */}
-              <div style={{ marginBottom: '1rem' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-                  <span style={{ fontSize: '0.9rem', color: '#667eea' }}>
-                    {metricFilter.feature ? `${metricFilter.feature}: ${metricFilter.minValue}%` : 'Select a feature above'}
-                  </span>
-                  <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>
-                    {getFilteredTracks().length} songs found
-                  </span>
-                </div>
-                
-                <div style={{ 
-                  width: '100%', 
-                  height: '20px', 
-                  backgroundColor: 'rgba(255,255,255,0.2)', 
-                  borderRadius: '10px',
-                  position: 'relative',
-                  margin: '10px 0'
-                }}>
-                  <input
-                    type="range"
-                    min="0"
-                    max="100"
-                    value={metricFilter.minValue}
-                    onChange={(e) => setMetricFilter(prev => ({ 
-                      ...prev, 
-                      minValue: parseInt(e.target.value),
-                      maxValue: parseInt(e.target.value) + 10 // Small range around the value
-                    }))}
-                    disabled={!metricFilter.feature}
-                    style={{
-                      width: '100%',
-                      height: '20px',
-                      background: 'transparent',
-                      outline: 'none',
-                      cursor: metricFilter.feature ? 'pointer' : 'not-allowed',
-                      opacity: metricFilter.feature ? 1 : 0.5,
-                      position: 'absolute',
-                      top: 0,
-                      left: 0,
-                      margin: 0,
-                      padding: 0,
-                      appearance: 'none',
-                      WebkitAppearance: 'none'
-                    }}
-                  />
-                  <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: `${metricFilter.minValue}%`,
-                    transform: 'translate(-50%, -50%)',
-                    width: '20px',
-                    height: '20px',
-                    backgroundColor: metricFilter.feature ? '#667eea' : 'rgba(255,255,255,0.5)',
-                    borderRadius: '50%',
-                    border: '2px solid white',
-                    pointerEvents: 'none'
-                  }} />
-                </div>
-                
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '0.5rem' }}>
-                  <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>0%</span>
-                  <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>50%</span>
-                  <span style={{ fontSize: '0.8rem', opacity: 0.6 }}>100%</span>
-                </div>
-              </div>
-
-              {/* Clear Filter Button */}
-              {metricFilter.feature && (
-                <button
-                  onClick={() => setMetricFilter({ feature: null, minValue: 50, maxValue: 60 })}
-                  style={{
-                    padding: '6px 12px',
+              {/* Song Picker Slider */}
+              {metricFilter.feature ? (
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem' }}>
+                    <span style={{ fontSize: '1rem', color: '#667eea', fontWeight: 'bold' }}>
+                      Slide to pick a song by {metricFilter.feature}
+                    </span>
+                    <span style={{ fontSize: '0.9rem', opacity: 0.7 }}>
+                      {getFilteredTracks().length} songs available
+                    </span>
+                  </div>
+                  
+                  {/* The Actual Song Picker Slider */}
+                  <div style={{ 
+                    width: '100%', 
+                    height: '30px', 
+                    backgroundColor: 'rgba(255,255,255,0.2)', 
                     borderRadius: '15px',
-                    border: '1px solid rgba(255,255,255,0.3)',
-                    backgroundColor: 'rgba(255,255,255,0.1)',
-                    color: 'rgba(255,255,255,0.8)',
-                    fontSize: '11px',
-                    cursor: 'pointer'
-                  }}
-                >
-                  ✕ Clear Filter
-                </button>
+                    position: 'relative',
+                    margin: '15px 0'
+                  }}>
+                    <input
+                      type="range"
+                      min="0"
+                      max={Math.max(0, getFilteredTracks().length - 1)}
+                      value={Math.min(metricFilter.minValue, getFilteredTracks().length - 1)}
+                      onChange={(e) => {
+                        const index = parseInt(e.target.value)
+                        const song = getFilteredTracks()[index]
+                        if (song) {
+                          setState(prev => ({ ...prev, selectedSong: song }))
+                          setMetricFilter(prev => ({ ...prev, minValue: index }))
+                        }
+                      }}
+                      style={{
+                        width: '100%',
+                        height: '30px',
+                        background: 'transparent',
+                        outline: 'none',
+                        cursor: 'pointer',
+                        position: 'absolute',
+                        top: 0,
+                        left: 0,
+                        margin: 0,
+                        padding: 0,
+                        appearance: 'none',
+                        WebkitAppearance: 'none'
+                      }}
+                    />
+                    <div style={{
+                      position: 'absolute',
+                      top: '50%',
+                      left: `${(metricFilter.minValue / Math.max(1, getFilteredTracks().length - 1)) * 100}%`,
+                      transform: 'translate(-50%, -50%)',
+                      width: '30px',
+                      height: '30px',
+                      backgroundColor: '#667eea',
+                      borderRadius: '50%',
+                      border: '3px solid white',
+                      pointerEvents: 'none',
+                      boxShadow: '0 2px 8px rgba(102, 126, 234, 0.4)'
+                    }} />
+                  </div>
+                  
+                  {/* Current Song Display */}
+                  {state.selectedSong && (
+                    <div style={{
+                      backgroundColor: 'rgba(102, 126, 234, 0.2)',
+                      padding: '15px',
+                      borderRadius: '10px',
+                      marginTop: '15px',
+                      border: '2px solid #667eea'
+                    }}>
+                      <h4 style={{ margin: '0 0 10px 0', color: '#667eea', fontSize: '1.1rem' }}>
+                        🎵 Selected Song
+                      </h4>
+                      <div style={{ fontSize: '1rem', marginBottom: '10px' }}>
+                        <strong>{state.selectedSong.name}</strong><br />
+                        <em>{state.selectedSong.artist}</em>
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '10px', fontSize: '0.9rem' }}>
+                        <div>💃 {(state.selectedSong.danceability * 100).toFixed(0)}%</div>
+                        <div>⚡ {(state.selectedSong.energy * 100).toFixed(0)}%</div>
+                        <div>😊 {(state.selectedSong.valence * 100).toFixed(0)}%</div>
+                        <div>🎵 {(state.selectedSong.tempo * 100).toFixed(0)}%</div>
+                        <div>🎸 {(state.selectedSong.acousticness * 100).toFixed(0)}%</div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div style={{ 
+                  textAlign: 'center', 
+                  padding: '20px', 
+                  color: 'rgba(255,255,255,0.6)',
+                  fontSize: '1rem'
+                }}>
+                  👆 Select a feature above to start picking songs!
+                </div>
               )}
-            </div>
             </div>
               
               <button
