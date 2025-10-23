@@ -320,7 +320,8 @@ function App() {
             
             .metrics-grid {
               grid-template-columns: repeat(3, 1fr) !important;
-              gap: 0.75rem !important;
+              gap: 0.5rem !important;
+              padding: 1rem !important;
             }
           }
         `}</style>
@@ -759,10 +760,10 @@ function App() {
                   <div className="metrics-grid" style={{ 
                     display: 'grid', 
                     gridTemplateColumns: 'repeat(5, 1fr)', 
-                    gap: '1rem', 
+                    gap: '0.75rem', 
                     fontSize: '0.875rem',
                     background: 'rgba(255, 255, 255, 0.02)',
-                    padding: '1.5rem',
+                    padding: '1.25rem',
                     borderRadius: '12px',
                     backdropFilter: 'blur(10px)',
                     WebkitBackdropFilter: 'blur(10px)',
@@ -785,7 +786,18 @@ function App() {
                       <div style={{ fontWeight: '500' }}>{Math.round(selectedSong.tempo)}</div>
                     </div>
                     <div style={{ textAlign: 'center' }}>
-                      <div style={{ fontSize: '0.75rem', color: '#888888', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Acoustic</div>
+                      <div style={{ 
+                        fontSize: '0.75rem', 
+                        color: '#888888', 
+                        marginBottom: '0.25rem', 
+                        textTransform: 'uppercase', 
+                        letterSpacing: '0.5px',
+                        wordWrap: 'break-word',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                        maxWidth: '100%',
+                        lineHeight: '1.2'
+                      }}>Acoustic</div>
                       <div style={{ fontWeight: '500' }}>{(selectedSong.acousticness * 100).toFixed(0)}%</div>
                     </div>
                   </div>
@@ -876,10 +888,10 @@ function App() {
                       <div className="metrics-grid" style={{ 
                         display: 'grid', 
                         gridTemplateColumns: 'repeat(5, 1fr)', 
-                        gap: '1rem', 
+                        gap: '0.75rem', 
                         fontSize: '0.875rem',
                         background: 'rgba(255, 255, 255, 0.02)',
-                        padding: '1.5rem',
+                        padding: '1.25rem',
                         borderRadius: '12px',
                         backdropFilter: 'blur(10px)',
                         WebkitBackdropFilter: 'blur(10px)',
@@ -902,7 +914,18 @@ function App() {
                           <div style={{ fontWeight: '500' }}>{Math.round(nextSong.tempo)}</div>
                         </div>
                         <div style={{ textAlign: 'center' }}>
-                          <div style={{ fontSize: '0.75rem', color: '#888888', marginBottom: '0.25rem', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Acoustic</div>
+                          <div style={{ 
+                            fontSize: '0.75rem', 
+                            color: '#888888', 
+                            marginBottom: '0.25rem', 
+                            textTransform: 'uppercase', 
+                            letterSpacing: '0.5px',
+                            wordWrap: 'break-word',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '100%',
+                            lineHeight: '1.2'
+                          }}>Acoustic</div>
                           <div style={{ fontWeight: '500' }}>{(nextSong.acousticness * 100).toFixed(0)}%</div>
                         </div>
                       </div>
