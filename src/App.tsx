@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { getToken, getRecommendations, FALLBACK_TRACKS } from './lib/spotify'
 import type { Track } from './types'
+import InfoPop from './components/InfoPop'
+import { INFO_CONTENT, FEATURE_DETAILS } from './data/infoContent'
 
 function App() {
   const [tracks, setTracks] = useState<Track[]>([])
@@ -727,16 +729,19 @@ function App() {
         }}>
           Algorithmic Curation
         </div>
-        <h1 style={{ 
-          fontSize: '52px',
-          fontWeight: '500',
-          color: '#FFFFFF',
-          letterSpacing: '-0.02em',
-          margin: '0 0 32px 0',
-          lineHeight: '1.1'
-        }}>
-          The Algorithmic Ear
-        </h1>
+        <InfoPop {...INFO_CONTENT.project}>
+          <h1 style={{ 
+            fontSize: '52px',
+            fontWeight: '500',
+            color: '#FFFFFF',
+            letterSpacing: '-0.02em',
+            margin: '0 0 32px 0',
+            lineHeight: '1.1',
+            cursor: 'help'
+          }}>
+            The Algorithmic Ear
+          </h1>
+        </InfoPop>
         <p style={{ 
           fontSize: '18px',
           color: '#B8B8B8',
@@ -778,15 +783,18 @@ function App() {
             }}>
               Step One
             </div>
-            <h2 className="section-title" style={{ 
-              fontSize: '32px',
-              fontWeight: '500',
-              color: '#FFFFFF',
-              lineHeight: '1.3',
-              margin: 0
-            }}>
-              Select Musical Dimension
-            </h2>
+            <InfoPop {...INFO_CONTENT.stepOne}>
+              <h2 className="section-title" style={{ 
+                fontSize: '32px',
+                fontWeight: '500',
+                color: '#FFFFFF',
+                lineHeight: '1.3',
+                margin: 0,
+                cursor: 'help'
+              }}>
+                Select Musical Dimension
+              </h2>
+            </InfoPop>
           </div>
           
           <div className="dimension-grid" style={{ 
@@ -807,67 +815,72 @@ function App() {
               { key: 'acousticness', label: 'Acousticness', description: 'Instrumental purity' },
               { key: 'liveness', label: 'Liveness', description: 'Live performance energy' }
             ].map(metric => (
-              <button
+              <InfoPop 
                 key={metric.key}
-                onClick={() => {
-                  setSelectedFeature(metric.key as keyof Track)
-                  setSliderValue(0)
-                }}
-                className="dimension-card"
-                style={{
-                  width: '240px',
-                  height: '120px',
-                  borderRadius: '12px',
-                  border: selectedFeature === metric.key 
-                    ? '1px solid #E0CDA9' 
-                    : '1px solid rgba(255, 255, 255, 0.05)',
-                  background: selectedFeature === metric.key 
-                    ? 'rgba(224, 205, 169, 0.08)' 
-                    : 'rgba(255, 255, 255, 0.01)',
-                  color: selectedFeature === metric.key ? '#E0CDA9' : '#EAEAEA',
-                  cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  textAlign: 'center',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '8px',
-                  boxSizing: 'border-box'
-                }}
-                onMouseEnter={(e) => {
-                  if (selectedFeature !== metric.key) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)'
-                    e.currentTarget.style.transform = 'translateY(-2px)'
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (selectedFeature !== metric.key) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)'
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'
-                    e.currentTarget.style.transform = 'translateY(0)'
-                  }
-                }}
+                {...FEATURE_DETAILS[metric.key as keyof typeof FEATURE_DETAILS]}
+                position="top"
               >
-                <div style={{
-                  fontSize: '16px',
-                  fontWeight: '500',
-                  color: selectedFeature === metric.key ? '#E0CDA9' : '#EAEAEA',
-                  lineHeight: '1.2',
-                  marginBottom: '4px'
-                }}>
-                  {metric.label}
-                </div>
-                <div style={{
-                  fontSize: '13px',
-                  fontWeight: '400',
-                  lineHeight: '1.3',
-                  color: selectedFeature === metric.key ? 'rgba(224, 205, 169, 0.7)' : '#B8B8B8'
-                }}>
-                  {metric.description}
-                </div>
-              </button>
+                <button
+                  onClick={() => {
+                    setSelectedFeature(metric.key as keyof Track)
+                    setSliderValue(0)
+                  }}
+                  className="dimension-card"
+                  style={{
+                    width: '240px',
+                    height: '120px',
+                    borderRadius: '12px',
+                    border: selectedFeature === metric.key 
+                      ? '1px solid #E0CDA9' 
+                      : '1px solid rgba(255, 255, 255, 0.05)',
+                    background: selectedFeature === metric.key 
+                      ? 'rgba(224, 205, 169, 0.08)' 
+                      : 'rgba(255, 255, 255, 0.01)',
+                    color: selectedFeature === metric.key ? '#E0CDA9' : '#EAEAEA',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    textAlign: 'center',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '8px',
+                    boxSizing: 'border-box'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (selectedFeature !== metric.key) {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)'
+                      e.currentTarget.style.transform = 'translateY(-2px)'
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedFeature !== metric.key) {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)'
+                      e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'
+                      e.currentTarget.style.transform = 'translateY(0)'
+                    }
+                  }}
+                >
+                  <div style={{
+                    fontSize: '16px',
+                    fontWeight: '500',
+                    color: selectedFeature === metric.key ? '#E0CDA9' : '#EAEAEA',
+                    lineHeight: '1.2',
+                    marginBottom: '4px'
+                  }}>
+                    {metric.label}
+                  </div>
+                  <div style={{
+                    fontSize: '13px',
+                    fontWeight: '400',
+                    lineHeight: '1.3',
+                    color: selectedFeature === metric.key ? 'rgba(224, 205, 169, 0.7)' : '#B8B8B8'
+                  }}>
+                    {metric.description}
+                  </div>
+                </button>
+              </InfoPop>
             ))}
           </div>
         </section>
@@ -893,15 +906,18 @@ function App() {
               }}>
                 Step Two
               </div>
-              <h2 className="section-title" style={{ 
-                fontSize: '32px',
-                fontWeight: '500',
-                color: '#FFFFFF',
-                lineHeight: '1.3',
-                margin: 0
-              }}>
-                Navigate by {selectedFeature}
-              </h2>
+              <InfoPop {...INFO_CONTENT.stepTwo}>
+                <h2 className="section-title" style={{ 
+                  fontSize: '32px',
+                  fontWeight: '500',
+                  color: '#FFFFFF',
+                  lineHeight: '1.3',
+                  margin: 0,
+                  cursor: 'help'
+                }}>
+                  Navigate by {selectedFeature}
+                </h2>
+              </InfoPop>
             </div>
             
             <div className="slider-container">
@@ -975,15 +991,18 @@ function App() {
               }}>
                 Step Three
               </div>
-              <h2 style={{ 
-                fontSize: '32px',
-                fontWeight: '500',
-                color: '#FFFFFF',
-                letterSpacing: '-0.01em',
-                margin: 0
-              }}>
-                Algorithmic Recommendation
-              </h2>
+              <InfoPop {...INFO_CONTENT.greedy}>
+                <h2 style={{ 
+                  fontSize: '32px',
+                  fontWeight: '500',
+                  color: '#FFFFFF',
+                  letterSpacing: '-0.01em',
+                  margin: 0,
+                  cursor: 'help'
+                }}>
+                  Algorithmic Recommendation
+                </h2>
+              </InfoPop>
             </div>
             
             <div className="recommendation-grid">
@@ -1147,6 +1166,65 @@ function App() {
             )}
           </section>
         )}
+
+        {/* Theoretical Framing Footer */}
+        <footer style={{
+          textAlign: 'center',
+          padding: '80px 0 40px',
+          borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+          marginTop: '80px'
+        }}>
+          <div style={{
+            fontSize: '14px',
+            color: '#B8B8B8',
+            marginBottom: '16px',
+            fontFamily: 'Fira Code, monospace'
+          }}>
+            Theoretical Framing
+          </div>
+          <div style={{
+            display: 'flex',
+            justifyContent: 'center',
+            gap: '32px',
+            flexWrap: 'wrap',
+            marginBottom: '24px'
+          }}>
+            <InfoPop {...INFO_CONTENT.panos}>
+              <span style={{
+                color: '#E0CDA9',
+                textDecoration: 'underline',
+                textDecorationColor: 'rgba(224, 205, 169, 0.4)',
+                cursor: 'help',
+                fontSize: '13px',
+                fontFamily: 'Fira Code, monospace'
+              }}>
+                Panos — Algorithmic Mediation
+              </span>
+            </InfoPop>
+            <InfoPop {...INFO_CONTENT.serve}>
+              <span style={{
+                color: '#E0CDA9',
+                textDecoration: 'underline',
+                textDecorationColor: 'rgba(224, 205, 169, 0.4)',
+                cursor: 'help',
+                fontSize: '13px',
+                fontFamily: 'Fira Code, monospace'
+              }}>
+                Serve — Culture as System
+              </span>
+            </InfoPop>
+          </div>
+          <div style={{
+            fontSize: '12px',
+            color: 'rgba(184, 184, 184, 0.6)',
+            fontStyle: 'italic',
+            maxWidth: '600px',
+            margin: '0 auto',
+            lineHeight: '1.5'
+          }}>
+            Feature values derived from Spotify's audio analysis pipeline (Digital Signal Processing + machine learning estimation).
+          </div>
+        </footer>
 
         {/* Instructions */}
         {!selectedFeature && (
