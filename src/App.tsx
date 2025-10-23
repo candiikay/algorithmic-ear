@@ -1053,26 +1053,6 @@ function App() {
                 </div>
               </div>
 
-              {/* Divider */}
-              {nextSong && (
-                <div className="divider" style={{ 
-                  width: '1px',
-                  height: '100%',
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  position: 'relative'
-                }}>
-                  <div style={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    width: '6px',
-                    height: '6px',
-                    borderRadius: '50%',
-                    background: '#E0CDA9'
-                  }} />
-                </div>
-              )}
               
               {/* Next Song */}
               {nextSong && (
