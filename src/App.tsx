@@ -326,10 +326,28 @@ function App() {
         maxWidth: '100vw',
         overflowX: 'hidden'
     }}>
+      {/* Progress Bar */}
+      <div style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        right: 0,
+        height: '3px',
+        background: 'rgba(255, 255, 255, 0.1)',
+        zIndex: 1001
+      }}>
+        <div style={{
+          height: '100%',
+          background: '#E0CDA9',
+          width: `${Math.min(100, (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100)}%`,
+          transition: 'width 0.3s ease'
+        }} />
+      </div>
+
       {/* Main Header */}
       <header style={{
         position: 'fixed',
-        top: 0,
+        top: '3px',
         left: 0,
         right: 0,
         background: 'rgba(10, 10, 10, 0.9)',
@@ -355,12 +373,115 @@ function App() {
           }}>
             The Algorithmic Ear
           </div>
-          <div style={{
+          
+          {/* Navigation Menu */}
+          <nav style={{
+            display: window.innerWidth < 768 ? 'none' : 'flex',
+            gap: '24px',
             fontSize: '14px',
-            color: 'rgba(255, 255, 255, 0.7)',
             fontFamily: 'Fira Code, monospace'
           }}>
-            Algorithmic Curation
+            <a 
+              href="#step1" 
+              style={{ 
+                color: 'rgba(255, 255, 255, 0.7)', 
+                textDecoration: 'none',
+                transition: 'color 0.2s ease',
+                padding: '8px 12px',
+                borderRadius: '6px'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#E0CDA9'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'}
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('#step1')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              Algorithm
+            </a>
+            <a 
+              href="#step2" 
+              style={{ 
+                color: 'rgba(255, 255, 255, 0.7)', 
+                textDecoration: 'none',
+                transition: 'color 0.2s ease',
+                padding: '8px 12px',
+                borderRadius: '6px'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#E0CDA9'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'}
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('#step2')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              Features
+            </a>
+            <a 
+              href="#step3" 
+              style={{ 
+                color: 'rgba(255, 255, 255, 0.7)', 
+                textDecoration: 'none',
+                transition: 'color 0.2s ease',
+                padding: '8px 12px',
+                borderRadius: '6px'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#E0CDA9'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'}
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('#step3')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              Explore
+            </a>
+            <a 
+              href="#step4" 
+              style={{ 
+                color: 'rgba(255, 255, 255, 0.7)', 
+                textDecoration: 'none',
+                transition: 'color 0.2s ease',
+                padding: '8px 12px',
+                borderRadius: '6px'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#E0CDA9'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'}
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('#step4')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              Results
+            </a>
+            <a 
+              href="#references" 
+              style={{ 
+                color: 'rgba(255, 255, 255, 0.7)', 
+                textDecoration: 'none',
+                transition: 'color 0.2s ease',
+                padding: '8px 12px',
+                borderRadius: '6px'
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.color = '#E0CDA9'}
+              onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'}
+              onClick={(e) => {
+                e.preventDefault();
+                document.querySelector('#references')?.scrollIntoView({ behavior: 'smooth' });
+              }}
+            >
+              References
+            </a>
+          </nav>
+          
+          {/* Mobile Menu Button */}
+          <div style={{
+            display: window.innerWidth < 768 ? 'block' : 'none',
+            cursor: 'pointer',
+            fontSize: '24px',
+            color: '#E0CDA9',
+            padding: '8px'
+          }}>
+            ☰
           </div>
         </div>
       </header>
@@ -455,10 +576,28 @@ function App() {
           }}>
             Discover the next song through algorithmic precision. Select a musical dimension and explore curated recommendations.
           </p>
+          
+          {/* Scroll Indicator */}
+          <div style={{
+            position: 'absolute',
+            bottom: '40px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            color: '#E0CDA9',
+            fontSize: '12px',
+            fontFamily: 'Fira Code, monospace',
+            animation: 'bounce 2s infinite'
+          }}>
+            <div style={{ marginBottom: '8px' }}>Scroll to explore</div>
+            <div style={{ fontSize: '20px' }}>↓</div>
+          </div>
         </header>
 
         {/* Step 1: Feature Selection */}
-        <section style={{ 
+        <section id="step1" style={{ 
           padding: '80px 0',
           textAlign: 'center',
           borderTop: '1px solid rgba(255, 255, 255, 0.05)',
@@ -587,44 +726,53 @@ function App() {
                     <li style={{
                       fontSize: '12px',
                       color: 'rgba(255, 255, 255, 0.7)',
-                      marginBottom: '4px',
+                      marginBottom: '6px',
                       display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
+                      alignItems: 'flex-start',
+                      gap: '10px',
+                      lineHeight: '1.4'
                     }}>
                       <span style={{
                         color: '#E0CDA9',
-                        fontSize: '14px'
+                        fontSize: '12px',
+                        marginTop: '1px',
+                        flexShrink: 0
                       }}>•</span>
-                      Simple and precise
+                      <span>Simple and precise</span>
                     </li>
                     <li style={{
                       fontSize: '12px',
                       color: 'rgba(255, 255, 255, 0.7)',
-                      marginBottom: '4px',
+                      marginBottom: '6px',
                       display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
+                      alignItems: 'flex-start',
+                      gap: '10px',
+                      lineHeight: '1.4'
                     }}>
                       <span style={{
                         color: '#E0CDA9',
-                        fontSize: '14px'
+                        fontSize: '12px',
+                        marginTop: '1px',
+                        flexShrink: 0
                       }}>•</span>
-                      Fast and explainable
+                      <span>Fast and explainable</span>
                     </li>
                     <li style={{
                       fontSize: '12px',
                       color: 'rgba(255, 255, 255, 0.7)',
-                      marginBottom: '4px',
+                      marginBottom: '6px',
                       display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
+                      alignItems: 'flex-start',
+                      gap: '10px',
+                      lineHeight: '1.4'
                     }}>
                       <span style={{
                         color: '#E0CDA9',
-                        fontSize: '14px'
+                        fontSize: '12px',
+                        marginTop: '1px',
+                        flexShrink: 0
                       }}>•</span>
-                      Good for similarity search
+                      <span>Good for similarity search</span>
                     </li>
                   </ul>
                 </div>
@@ -649,44 +797,53 @@ function App() {
                     <li style={{
                       fontSize: '12px',
                       color: 'rgba(255, 255, 255, 0.7)',
-                      marginBottom: '4px',
+                      marginBottom: '6px',
                       display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
+                      alignItems: 'flex-start',
+                      gap: '10px',
+                      lineHeight: '1.4'
                     }}>
                       <span style={{
                         color: '#E0CDA9',
-                        fontSize: '14px'
+                        fontSize: '12px',
+                        marginTop: '1px',
+                        flexShrink: 0
                       }}>•</span>
-                      Reduces diversity
+                      <span>Reduces diversity</span>
                     </li>
                     <li style={{
                       fontSize: '12px',
                       color: 'rgba(255, 255, 255, 0.7)',
-                      marginBottom: '4px',
+                      marginBottom: '6px',
                       display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
+                      alignItems: 'flex-start',
+                      gap: '10px',
+                      lineHeight: '1.4'
                     }}>
                       <span style={{
                         color: '#E0CDA9',
-                        fontSize: '14px'
+                        fontSize: '12px',
+                        marginTop: '1px',
+                        flexShrink: 0
                       }}>•</span>
-                      Creates echo chambers
+                      <span>Creates echo chambers</span>
                     </li>
                     <li style={{
                       fontSize: '12px',
                       color: 'rgba(255, 255, 255, 0.7)',
-                      marginBottom: '4px',
+                      marginBottom: '6px',
                       display: 'flex',
-                      alignItems: 'center',
-                      gap: '8px'
+                      alignItems: 'flex-start',
+                      gap: '10px',
+                      lineHeight: '1.4'
                     }}>
                       <span style={{
                         color: '#E0CDA9',
-                        fontSize: '14px'
+                        fontSize: '12px',
+                        marginTop: '1px',
+                        flexShrink: 0
                       }}>•</span>
-                      Poor for discovery
+                      <span>Poor for discovery</span>
                     </li>
                   </ul>
                 </div>
@@ -695,11 +852,44 @@ function App() {
             
           </div>
 
+          {/* Continue Button */}
+          <div style={{
+            textAlign: 'center',
+            marginTop: '40px'
+          }}>
+            <button 
+              onClick={() => document.querySelector('#step2')?.scrollIntoView({ behavior: 'smooth' })}
+              style={{
+                background: 'rgba(224, 205, 169, 0.1)',
+                border: '1px solid rgba(224, 205, 169, 0.3)',
+                color: '#E0CDA9',
+                padding: window.innerWidth < 768 ? '16px 32px' : '12px 24px',
+                minHeight: window.innerWidth < 768 ? '48px' : 'auto',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontFamily: 'Fira Code, monospace',
+                cursor: 'pointer',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(224, 205, 169, 0.2)'
+                e.currentTarget.style.borderColor = 'rgba(224, 205, 169, 0.5)'
+                e.currentTarget.style.transform = 'translateY(-2px)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(224, 205, 169, 0.1)'
+                e.currentTarget.style.borderColor = 'rgba(224, 205, 169, 0.3)'
+                e.currentTarget.style.transform = 'translateY(0)'
+              }}
+            >
+              Continue to Features →
+            </button>
+          </div>
           
         </section>
 
         {/* Step 2: Select Musical Dimension */}
-        <section style={{ 
+        <section id="step2" style={{ 
           padding: '80px 0',
           textAlign: 'center',
           borderTop: '1px solid rgba(255, 255, 255, 0.05)',
@@ -782,11 +972,11 @@ function App() {
           {/* Feature Selection Grid */}
           <div style={{ 
             display: 'grid', 
-            gridTemplateColumns: 'repeat(3, 1fr)', 
-            gap: '32px 48px',
+            gridTemplateColumns: window.innerWidth < 768 ? 'repeat(2, 1fr)' : 'repeat(3, 1fr)', 
+            gap: window.innerWidth < 768 ? '16px 24px' : '32px 48px',
             maxWidth: '800px',
             margin: '0 auto',
-            padding: '0 20px'
+            padding: window.innerWidth < 768 ? '0 16px' : '0 20px'
           }}>
             {FEATURE_STATS.map((metric) => (
                 <button
@@ -800,7 +990,8 @@ function App() {
                     ? '2px solid #E0CDA9' 
                     : '1px solid rgba(255, 255, 255, 0.08)',
                   borderRadius: '16px',
-                  padding: '24px 20px',
+                  padding: window.innerWidth < 768 ? '32px 20px' : '24px 20px',
+                  minHeight: window.innerWidth < 768 ? '120px' : '120px',
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
                   backdropFilter: 'blur(20px)',
@@ -812,7 +1003,6 @@ function App() {
                     : '0 4px 16px rgba(0, 0, 0, 0.2)',
                   textAlign: 'left',
                   width: '100%',
-                  minHeight: '120px',
                   display: 'flex',
                   flexDirection: 'column',
                   justifyContent: 'center',
@@ -890,11 +1080,47 @@ function App() {
             </div>
           )}
           
+          {/* Continue Button */}
+          {selectedFeature && (
+            <div style={{
+              textAlign: 'center',
+              marginTop: '40px'
+            }}>
+              <button 
+                onClick={() => document.querySelector('#step3')?.scrollIntoView({ behavior: 'smooth' })}
+                style={{
+                  background: 'rgba(224, 205, 169, 0.1)',
+                  border: '1px solid rgba(224, 205, 169, 0.3)',
+                  color: '#E0CDA9',
+                  padding: window.innerWidth < 768 ? '16px 32px' : '12px 24px',
+                minHeight: window.innerWidth < 768 ? '48px' : 'auto',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontFamily: 'Fira Code, monospace',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(224, 205, 169, 0.2)'
+                  e.currentTarget.style.borderColor = 'rgba(224, 205, 169, 0.5)'
+                  e.currentTarget.style.transform = 'translateY(-2px)'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(224, 205, 169, 0.1)'
+                  e.currentTarget.style.borderColor = 'rgba(224, 205, 169, 0.3)'
+                  e.currentTarget.style.transform = 'translateY(0)'
+                }}
+              >
+                Continue to Explore →
+              </button>
+            </div>
+          )}
+          
         </section>
 
         {/* Step 3: Slider */}
         {selectedFeature && sortedTracks.length > 0 && (
-          <section style={{ 
+          <section id="step3" style={{ 
             padding: '80px 0',
             textAlign: 'center',
             borderTop: '1px solid rgba(255, 255, 255, 0.05)',
@@ -1119,7 +1345,7 @@ function App() {
 
         {/* Step 4: Results */}
         {selectedSong && (
-          <section style={{ 
+          <section id="step4" style={{ 
             padding: '80px 0',
             background: 'radial-gradient(circle at center, rgba(224, 205, 169, 0.02) 0%, transparent 70%)',
             borderTop: '1px solid rgba(255, 255, 255, 0.05)',
