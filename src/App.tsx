@@ -599,75 +599,138 @@ function App() {
             padding: 32px 0;
           }
         }
+
+        .hero {
+          text-align: center;
+          padding: 160px 0 100px;
+          background: radial-gradient(circle at top, rgba(255,255,255,0.05) 0%, transparent 70%);
+          position: relative;
+        }
+
+        .step-section {
+          padding: 100px 0;
+          text-align: center;
+        }
+
+        .results-comparison {
+          display: flex;
+          justify-content: center;
+          align-items: stretch;
+          gap: 40px;
+          max-width: 900px;
+          margin: 0 auto;
+          position: relative;
+        }
+
+        .recommendation-card {
+          background: rgba(255, 255, 255, 0.04);
+          backdrop-filter: blur(20px);
+          padding: 32px 24px;
+          border-radius: 16px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+          position: relative;
+          overflow: hidden;
+          width: 300px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
+        }
+
+        .divider {
+          width: 1px;
+          height: 100%;
+          background: linear-gradient(180deg, transparent 0%, rgba(193, 167, 94, 0.3) 50%, transparent 100%);
+          position: relative;
+        }
+
+        @media (max-width: 1024px) {
+          .results-comparison {
+            flex-direction: column;
+            align-items: center;
+            gap: 32px;
+          }
+          
+          .divider {
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent 0%, rgba(193, 167, 94, 0.3) 50%, transparent 100%);
+          }
+          
+          .divider div {
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+          }
+        }
+
+        @media (max-width: 640px) {
+          .hero {
+            padding: 120px 0 80px;
+          }
+          
+          .step-section {
+            padding: 80px 0;
+          }
+          
+          .recommendation-card {
+            width: 100%;
+            max-width: 400px;
+          }
+        }
       `}</style>
 
-      <header style={{ 
+      <header className="hero" style={{ 
         textAlign: 'center', 
-        marginBottom: '6rem',
-        position: 'relative',
-        zIndex: 1
+        padding: '160px 0 100px',
+        background: 'radial-gradient(circle at top, rgba(255,255,255,0.05) 0%, transparent 70%)',
+        position: 'relative'
       }}>
         <div style={{
-          background: 'rgba(255, 255, 255, 0.02)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '24px',
-          padding: '4rem 3rem',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-          maxWidth: '800px',
-          margin: '0 auto'
+          fontSize: '12px',
+          fontWeight: '600',
+          color: '#C1A75E',
+          letterSpacing: '0.1em',
+          textTransform: 'uppercase',
+          marginBottom: '24px'
         }}>
-          <div style={{
-            fontSize: '0.875rem',
-            fontWeight: '400',
-            color: '#d4af37',
-            letterSpacing: '2px',
-            textTransform: 'uppercase',
-            marginBottom: '1rem'
-          }}>
-            Algorithmic Curation
-          </div>
-          <h1 style={{ 
-            fontSize: '4rem', 
-            marginBottom: '1.5rem',
-            color: '#ffffff',
-            fontWeight: '300',
-            letterSpacing: '-0.02em',
-            lineHeight: '1.1'
-          }}>
-            The Algorithmic Ear
-          </h1>
-          <p style={{ 
-            fontSize: '1.25rem', 
-            color: '#888888',
-            fontWeight: '300',
-            lineHeight: '1.6',
-            maxWidth: '600px',
-            margin: '0 auto'
-          }}>
-            Discover the next song through algorithmic precision. Select a musical dimension and explore curated recommendations.
-          </p>
+          Algorithmic Curation
         </div>
+        <h1 style={{ 
+          fontSize: '48px',
+          fontWeight: '600',
+          color: '#ffffff',
+          letterSpacing: '-0.02em',
+          margin: '0 0 32px 0',
+          lineHeight: '1.1'
+        }}>
+          The Algorithmic Ear
+        </h1>
+        <p style={{ 
+          fontSize: '18px',
+          color: 'rgba(255, 255, 255, 0.7)',
+          fontWeight: '400',
+          lineHeight: '1.6',
+          maxWidth: '600px',
+          margin: '0 auto',
+          letterSpacing: '-0.01em'
+        }}>
+          Discover the next song through algorithmic precision. Select a musical dimension and explore curated recommendations.
+        </p>
       </header>
 
-      <div style={{ maxWidth: '1000px', margin: '0 auto', position: 'relative', zIndex: 1 }}>
+      <div style={{ 
+        maxWidth: '1000px', 
+        margin: '0 auto', 
+        position: 'relative', 
+        zIndex: 1,
+        background: 'radial-gradient(circle at top, #0E0E10, #121214)',
+        minHeight: '100vh'
+      }}>
         {/* Step 1: Choose Feature */}
-        <div className="dimension-section" style={{ 
-          marginBottom: '4rem',
-          background: 'linear-gradient(180deg, #0E0E10 0%, #161618 100%)',
-          backdropFilter: 'blur(20px)',
-          WebkitBackdropFilter: 'blur(20px)',
-          border: '1px solid rgba(255, 255, 255, 0.08)',
-          borderRadius: '20px',
-          padding: '64px 80px',
-          maxWidth: '960px',
-          margin: '0 auto',
-          boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '48px'
+        <section className="step-section" style={{ 
+          padding: '100px 0',
+          textAlign: 'center'
         }}>
           <div style={{
             textAlign: 'center'
@@ -696,10 +759,12 @@ function App() {
           <div className="dimension-grid" style={{ 
             display: 'grid', 
             gridTemplateColumns: 'repeat(3, 1fr)', 
-            gridTemplateRows: 'repeat(2, auto)',
-            gap: '24px',
+            gap: '32px',
             justifyItems: 'center',
-            alignItems: 'center'
+            alignItems: 'center',
+            maxWidth: '800px',
+            margin: '0 auto',
+            paddingTop: '60px'
           }}>
             {[
               { key: 'danceability', label: 'Danceability', description: 'Rhythmic quality' },
@@ -778,25 +843,13 @@ function App() {
               </button>
             ))}
           </div>
-        </div>
+        </section>
 
         {/* Step 2: Slider */}
         {selectedFeature && sortedTracks.length > 0 && (
-          <div className="slider-section" style={{ 
-            marginBottom: '4rem',
-            background: 'linear-gradient(180deg, #0E0E10 0%, #161618 100%)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: '20px',
-            padding: '64px 80px',
-            maxWidth: '960px',
-            margin: '0 auto',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: '48px'
+          <section className="step-section" style={{ 
+            padding: '100px 0',
+            textAlign: 'center'
           }}>
             <div style={{
               textAlign: 'center'
@@ -826,9 +879,10 @@ function App() {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              padding: '48px 0',
+              padding: '60px 0',
               width: '100%',
-              maxWidth: '600px',
+              maxWidth: '700px',
+              margin: '0 auto',
               position: 'relative'
             }}>
               <div className="slider-track" style={{
@@ -907,22 +961,15 @@ function App() {
                 {sortedTracks.length} tracks available • Position {Math.min(sliderValue, sortedTracks.length - 1) + 1}
               </div>
             </div>
-          </div>
+          </section>
         )}
 
         {/* Step 3: Results */}
         {selectedSong && (
-          <div style={{
-            background: 'rgba(255, 255, 255, 0.02)',
-            backdropFilter: 'blur(20px)',
-            WebkitBackdropFilter: 'blur(20px)',
-            border: '1px solid rgba(255, 255, 255, 0.08)',
-            borderRadius: '20px',
-            padding: '4rem',
+          <section className="step-section" style={{ 
+            padding: '100px 0',
             textAlign: 'center',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
-            position: 'relative',
-            overflow: 'hidden'
+            background: 'radial-gradient(circle at center, rgba(193, 167, 94, 0.03) 0%, transparent 70%)'
           }}>
             <div style={{
               textAlign: 'center',
@@ -949,27 +996,27 @@ function App() {
               </h2>
             </div>
             
-            <div className="results-grid" style={{ 
-              display: 'grid', 
-              gridTemplateColumns: nextSong ? '1fr auto 1fr' : '1fr', 
-              gap: '3rem',
+            <div className="results-comparison" style={{ 
+              display: 'flex', 
+              justifyContent: 'center',
               alignItems: 'stretch',
-              marginBottom: '3rem',
-              maxWidth: '1000px',
-              margin: '0 auto 3rem auto'
+              gap: '40px',
+              maxWidth: '900px',
+              margin: '0 auto',
+              position: 'relative'
             }}>
               {/* Selected Song */}
-              <div className="card-padding min-height-mobile" style={{
-                background: 'rgba(255, 255, 255, 0.02)',
-                backdropFilter: 'blur(15px)',
-                WebkitBackdropFilter: 'blur(15px)',
-                padding: '2.5rem 1.5rem',
+              <div className="recommendation-card" style={{
+                background: 'rgba(255, 255, 255, 0.04)',
+                backdropFilter: 'blur(20px)',
+                WebkitBackdropFilter: 'blur(20px)',
+                padding: '32px 24px',
                 borderRadius: '16px',
                 border: '1px solid rgba(255, 255, 255, 0.08)',
-                boxShadow: '0 8px 25px rgba(0, 0, 0, 0.2)',
+                boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
                 position: 'relative',
                 overflow: 'hidden',
-                minHeight: '400px',
+                width: '300px',
                 display: 'flex',
                 flexDirection: 'column',
                 justifyContent: 'space-between'
@@ -987,20 +1034,21 @@ function App() {
                 
                 <div style={{ position: 'relative', zIndex: 1 }}>
                   <div style={{
-                    fontSize: '0.875rem',
-                    fontWeight: '400',
-                    color: '#d4af37',
-                    letterSpacing: '1px',
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    color: '#C1A75E',
+                    letterSpacing: '0.1em',
                     textTransform: 'uppercase',
-                    marginBottom: '1rem'
+                    marginBottom: '16px'
                   }}>
                     Current Selection
                   </div>
                   <div style={{ 
-                    fontSize: '1.25rem', 
-                    marginBottom: '0.5rem', 
+                    fontSize: '22px', 
+                    marginBottom: '8px', 
                     lineHeight: '1.3', 
-                    fontWeight: '400',
+                    fontWeight: '600',
+                    color: '#ffffff',
                     wordWrap: 'break-word',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -1012,11 +1060,10 @@ function App() {
                     {selectedSong.name}
                   </div>
                   <div style={{ 
-                    opacity: 0.6, 
-                    fontSize: '0.9rem', 
-                    fontWeight: '300',
-                    marginBottom: '2rem',
-                    color: '#888888',
+                    fontSize: '14px', 
+                    fontWeight: '400',
+                    marginBottom: '24px',
+                    color: 'rgba(255, 255, 255, 0.6)',
                     wordWrap: 'break-word',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -1031,30 +1078,41 @@ function App() {
                 </div>
               </div>
 
-              {/* Arrow */}
+              {/* Divider */}
               {nextSong && (
-                <>
-                  <div className="arrow" style={{ 
-                    fontSize: '2rem',
-                    color: '#d4af37',
-                    fontWeight: '300',
-                    opacity: 0.6
-                  }}>
-                    →
-                  </div>
-                  
-                  {/* Next Song */}
-                  <div className="card-padding min-height-mobile" style={{
-                    background: 'rgba(255, 255, 255, 0.02)',
-                    backdropFilter: 'blur(15px)',
-                    WebkitBackdropFilter: 'blur(15px)',
-                    padding: '2.5rem 1.5rem',
+                <div className="divider" style={{ 
+                  width: '1px',
+                  height: '100%',
+                  background: 'linear-gradient(180deg, transparent 0%, rgba(193, 167, 94, 0.3) 50%, transparent 100%)',
+                  position: 'relative'
+                }}>
+                  <div style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: '8px',
+                    height: '8px',
+                    borderRadius: '50%',
+                    background: '#C1A75E',
+                    boxShadow: '0 0 12px rgba(193, 167, 94, 0.5)'
+                  }} />
+                </div>
+              )}
+              
+              {/* Next Song */}
+              {nextSong && (
+                  <div className="recommendation-card" style={{
+                    background: 'rgba(255, 255, 255, 0.04)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    padding: '32px 24px',
                     borderRadius: '16px',
                     border: '1px solid rgba(255, 255, 255, 0.08)',
-                    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.2)',
+                    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
                     position: 'relative',
                     overflow: 'hidden',
-                    minHeight: '400px',
+                    width: '300px',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between'
@@ -1072,20 +1130,21 @@ function App() {
                     
                     <div style={{ position: 'relative', zIndex: 1 }}>
                       <div style={{
-                        fontSize: '0.875rem',
-                        fontWeight: '400',
-                        color: '#d4af37',
-                        letterSpacing: '1px',
+                        fontSize: '12px',
+                        fontWeight: '600',
+                        color: '#C1A75E',
+                        letterSpacing: '0.1em',
                         textTransform: 'uppercase',
-                        marginBottom: '1rem'
+                        marginBottom: '16px'
                       }}>
                         Algorithmic Next
                       </div>
                       <div style={{ 
-                        fontSize: '1.25rem', 
-                        marginBottom: '0.5rem', 
+                        fontSize: '22px', 
+                        marginBottom: '8px', 
                         lineHeight: '1.3', 
-                        fontWeight: '400',
+                        fontWeight: '600',
+                        color: '#ffffff',
                         wordWrap: 'break-word',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -1097,11 +1156,10 @@ function App() {
                         {nextSong.name}
                       </div>
                       <div style={{ 
-                        opacity: 0.6, 
-                        fontSize: '0.9rem', 
-                        fontWeight: '300',
-                        marginBottom: '2rem',
-                        color: '#888888',
+                        fontSize: '14px', 
+                        fontWeight: '400',
+                        marginBottom: '24px',
+                        color: 'rgba(255, 255, 255, 0.6)',
                         wordWrap: 'break-word',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -1115,29 +1173,31 @@ function App() {
                       {renderFeatureStats(nextSong)}
                     </div>
                   </div>
-                </>
               )}
             </div>
 
             {nextSong && (
               <div style={{ 
-                fontSize: '0.875rem', 
-                color: '#888888',
-                fontWeight: '300',
-                background: 'rgba(255, 255, 255, 0.02)',
-                padding: '1.5rem 2rem',
-                borderRadius: '12px',
-                backdropFilter: 'blur(10px)',
-                WebkitBackdropFilter: 'blur(10px)',
-                border: '1px solid rgba(255, 255, 255, 0.05)',
-                display: 'inline-block',
-                letterSpacing: '0.3px',
-                lineHeight: '1.5'
+                marginTop: '40px',
+                textAlign: 'center'
               }}>
-                Algorithmic precision found the next track with the closest {selectedFeature} value
+                <div style={{
+                  width: '200px',
+                  height: '2px',
+                  background: 'linear-gradient(90deg, transparent 0%, #C1A75E 50%, transparent 100%)',
+                  margin: '0 auto 16px auto'
+                }} />
+                <div style={{ 
+                  fontSize: '14px', 
+                  color: 'rgba(255, 255, 255, 0.6)',
+                  fontWeight: '400',
+                  letterSpacing: '0.3px'
+                }}>
+                  Algorithmic precision found the next match
+                </div>
               </div>
             )}
-          </div>
+          </section>
         )}
 
         {/* Instructions */}
