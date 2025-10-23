@@ -283,6 +283,13 @@ function App() {
             box-sizing: border-box;
           }
           
+          html {
+            overflow-x: hidden;
+            width: 100vw;
+            max-width: 100vw;
+            scroll-behavior: smooth;
+          }
+          
           body {
             margin: 0;
             padding: 0;
@@ -290,10 +297,8 @@ function App() {
             overflow-x: hidden;
             background: #121212;
             color: #EAEAEA;
-          }
-          
-          html {
-            scroll-behavior: smooth;
+            width: 100vw;
+            max-width: 100vw;
           }
           
           ::-webkit-scrollbar {
@@ -367,14 +372,18 @@ function App() {
       minHeight: '100vh',
       fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
       position: 'relative',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      width: '100vw',
+      maxWidth: '100vw'
     }}>
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
         padding: '0 2rem',
         position: 'relative',
-        zIndex: 1
+        zIndex: 1,
+        width: '100%',
+        overflow: 'hidden'
       }}>
       {/* Subtle editorial background texture */}
       <div style={{
@@ -765,7 +774,8 @@ function App() {
         zIndex: 1,
         background: 'radial-gradient(circle at top, #1A1A1A, #121212)',
         minHeight: '100vh',
-        width: '100%'
+        width: '100%',
+        overflow: 'hidden'
       }}>
         {/* Step 1: Choose Feature */}
         <section className="step-section" style={{ 
