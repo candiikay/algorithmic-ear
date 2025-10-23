@@ -402,17 +402,31 @@ function App() {
             <a 
               href="#step2" 
               style={{ 
-                color: 'rgba(255, 255, 255, 0.7)', 
+                color: selectedAlgorithm === 'greedy' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.4)', 
                 textDecoration: 'none',
                 transition: 'color 0.2s ease',
                 padding: '8px 12px',
-                borderRadius: '6px'
+                borderRadius: '6px',
+                cursor: selectedAlgorithm === 'greedy' ? 'pointer' : 'default'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#E0CDA9'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'}
+              onMouseEnter={(e) => {
+                if (selectedAlgorithm === 'greedy') {
+                  e.currentTarget.style.color = '#E0CDA9'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (selectedAlgorithm === 'greedy') {
+                  e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'
+                }
+              }}
               onClick={(e) => {
                 e.preventDefault();
-                document.querySelector('#step2')?.scrollIntoView({ behavior: 'smooth' });
+                if (selectedAlgorithm === 'greedy') {
+                  document.querySelector('#step2')?.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  // Scroll to step1 to help user select greedy algorithm first
+                  document.querySelector('#step1')?.scrollIntoView({ behavior: 'smooth' });
+                }
               }}
             >
               Features
@@ -420,17 +434,34 @@ function App() {
             <a 
               href="#step3" 
               style={{ 
-                color: 'rgba(255, 255, 255, 0.7)', 
+                color: (selectedFeature && selectedAlgorithm === 'greedy') ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.4)', 
                 textDecoration: 'none',
                 transition: 'color 0.2s ease',
                 padding: '8px 12px',
-                borderRadius: '6px'
+                borderRadius: '6px',
+                cursor: (selectedFeature && selectedAlgorithm === 'greedy') ? 'pointer' : 'default'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#E0CDA9'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'}
+              onMouseEnter={(e) => {
+                if (selectedFeature && selectedAlgorithm === 'greedy') {
+                  e.currentTarget.style.color = '#E0CDA9'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (selectedFeature && selectedAlgorithm === 'greedy') {
+                  e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'
+                }
+              }}
               onClick={(e) => {
                 e.preventDefault();
-                document.querySelector('#step3')?.scrollIntoView({ behavior: 'smooth' });
+                if (selectedFeature && selectedAlgorithm === 'greedy') {
+                  document.querySelector('#step3')?.scrollIntoView({ behavior: 'smooth' });
+                } else if (selectedAlgorithm === 'greedy') {
+                  // Scroll to step2 to help user select a feature first
+                  document.querySelector('#step2')?.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  // Scroll to step1 to help user select greedy algorithm first
+                  document.querySelector('#step1')?.scrollIntoView({ behavior: 'smooth' });
+                }
               }}
             >
               Explore
@@ -438,17 +469,37 @@ function App() {
             <a 
               href="#step4" 
               style={{ 
-                color: 'rgba(255, 255, 255, 0.7)', 
+                color: selectedSong ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.4)', 
                 textDecoration: 'none',
                 transition: 'color 0.2s ease',
                 padding: '8px 12px',
-                borderRadius: '6px'
+                borderRadius: '6px',
+                cursor: selectedSong ? 'pointer' : 'default'
               }}
-              onMouseEnter={(e) => e.currentTarget.style.color = '#E0CDA9'}
-              onMouseLeave={(e) => e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'}
+              onMouseEnter={(e) => {
+                if (selectedSong) {
+                  e.currentTarget.style.color = '#E0CDA9'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (selectedSong) {
+                  e.currentTarget.style.color = 'rgba(255, 255, 255, 0.7)'
+                }
+              }}
               onClick={(e) => {
                 e.preventDefault();
-                document.querySelector('#step4')?.scrollIntoView({ behavior: 'smooth' });
+                if (selectedSong) {
+                  document.querySelector('#step4')?.scrollIntoView({ behavior: 'smooth' });
+                } else if (selectedFeature && selectedAlgorithm === 'greedy') {
+                  // Scroll to step3 to help user select a song first
+                  document.querySelector('#step3')?.scrollIntoView({ behavior: 'smooth' });
+                } else if (selectedAlgorithm === 'greedy') {
+                  // Scroll to step2 to help user select a feature first
+                  document.querySelector('#step2')?.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                  // Scroll to step1 to help user select greedy algorithm first
+                  document.querySelector('#step1')?.scrollIntoView({ behavior: 'smooth' });
+                }
               }}
             >
               Results
