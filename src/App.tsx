@@ -365,11 +365,17 @@ function App() {
       background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%)',
       color: '#ffffff',
       minHeight: '100vh',
-      padding: '4rem 2rem',
       fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
       position: 'relative',
       overflow: 'hidden'
     }}>
+      <div style={{
+        maxWidth: '1200px',
+        margin: '0 auto',
+        padding: '0 2rem',
+        position: 'relative',
+        zIndex: 1
+      }}>
       {/* Subtle editorial background texture */}
       <div style={{
         position: 'absolute',
@@ -761,7 +767,8 @@ function App() {
         position: 'relative', 
         zIndex: 1,
         background: 'radial-gradient(circle at top, #1A1A1A, #121212)',
-        minHeight: '100vh'
+        minHeight: '100vh',
+        width: '100%'
       }}>
         {/* Step 1: Choose Feature */}
         <section className="step-section" style={{ 
@@ -1286,6 +1293,7 @@ function App() {
             </div>
           </div>
         )}
+      </div>
       </div>
     </div>
   )
