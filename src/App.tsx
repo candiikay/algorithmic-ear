@@ -16,6 +16,7 @@ function App() {
   const [sliderValue, setSliderValue] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [selectedAlgorithm, setSelectedAlgorithm] = useState('greedy')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const FEATURE_STATS: Array<{
     key: keyof Pick<Track, 'danceability' | 'energy' | 'valence' | 'tempo' | 'loudness' | 'acousticness'>
@@ -143,18 +144,34 @@ function App() {
   // Sort tracks when the feature selection changes
   const sortedTracks = useMemo(() => {
     if (!selectedFeature) return tracks
-    return [...tracks].sort((a, b) => {
-      const aValue = a[selectedFeature] as number
-      const bValue = b[selectedFeature] as number
-      return Math.abs(aValue - sliderValue) - Math.abs(bValue - sliderValue)
-    })
+    
+    // Convert slider value (0-29) to feature value (0-1) for more realistic recommendations
+    const targetValue = sliderValue / (tracks.length - 1)
+    
+    return [...tracks]
+      .map(track => {
+        const featureValue = track[selectedFeature] as number
+        const distance = Math.abs(featureValue - targetValue)
+        
+        // Add some randomness to make recommendations less predictable
+        const randomness = Math.random() * 0.1 // Small random factor
+        const score = distance + randomness
+        
+        return { track, score, distance }
+      })
+      .sort((a, b) => a.score - b.score)
+      .slice(0, 15) // Show top 15 most similar tracks instead of all
+      .map(item => item.track)
   }, [tracks, selectedFeature, sliderValue])
 
   // Handle slider change
   const handleSliderChange = (value: number) => {
     setSliderValue(value)
-    if (sortedTracks[value]) {
-      setSelectedSong(sortedTracks[value])
+    // Select a track from the sorted recommendations based on slider position
+    if (sortedTracks.length > 0) {
+      const index = Math.floor((value / (tracks.length - 1)) * sortedTracks.length)
+      const clampedIndex = Math.min(index, sortedTracks.length - 1)
+      setSelectedSong(sortedTracks[clampedIndex])
     }
   }
 
@@ -174,17 +191,17 @@ function App() {
 
   // Clamp slider value when the number of tracks changes
   useEffect(() => {
-    if (sortedTracks.length === 0) {
+    if (tracks.length === 0) {
       setSliderValue(0)
       setSelectedSong(null)
       return
     }
 
     setSliderValue(prev => {
-      const maxIndex = sortedTracks.length - 1
+      const maxIndex = tracks.length - 1
       return prev > maxIndex ? maxIndex : prev
     })
-  }, [sortedTracks.length])
+  }, [tracks.length])
 
   // Keep the selected song aligned with the slider position
   useEffect(() => {
@@ -193,9 +210,11 @@ function App() {
       return
     }
 
-    const clampedIndex = Math.min(sliderValue, sortedTracks.length - 1)
+    // Select a track from the sorted recommendations based on slider position
+    const index = Math.floor((sliderValue / (tracks.length - 1)) * sortedTracks.length)
+    const clampedIndex = Math.min(index, sortedTracks.length - 1)
     setSelectedSong(sortedTracks[clampedIndex])
-  }, [selectedFeature, sliderValue, sortedTracks])
+  }, [selectedFeature, sliderValue, sortedTracks, tracks.length])
 
   const renderFeatureStats = (track: Track) => (
     <>
@@ -530,17 +549,154 @@ function App() {
             cursor: 'pointer',
             fontSize: '24px',
             color: '#E0CDA9',
-            padding: '8px'
-          }}>
-            ☰
+            padding: '8px',
+            transition: 'color 0.2s ease'
+          }}
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'rgba(224, 205, 169, 0.8)'}
+          onMouseLeave={(e) => e.currentTarget.style.color = '#E0CDA9'}
+          >
+            {mobileMenuOpen ? '✕' : '☰'}
           </div>
         </div>
+        
+        {/* Mobile Menu Dropdown */}
+        {mobileMenuOpen && (
+          <div style={{
+            position: 'absolute',
+            top: '100%',
+            left: 0,
+            right: 0,
+            background: 'rgba(10, 10, 10, 0.95)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+            padding: '20px',
+            display: window.innerWidth < 768 ? 'block' : 'none',
+            zIndex: 1000
+          }}>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '16px',
+              fontSize: '16px',
+              fontFamily: 'Fira Code, monospace'
+            }}>
+              <a 
+                href="#step1" 
+                style={{ 
+                  color: 'rgba(255, 255, 255, 0.7)', 
+                  textDecoration: 'none',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  transition: 'all 0.2s ease'
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.querySelector('#step1')?.scrollIntoView({ behavior: 'smooth' });
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Algorithm
+              </a>
+              <a 
+                href="#step2" 
+                style={{ 
+                  color: selectedAlgorithm === 'greedy' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.4)', 
+                  textDecoration: 'none',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  transition: 'all 0.2s ease',
+                  cursor: selectedAlgorithm === 'greedy' ? 'pointer' : 'default'
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (selectedAlgorithm === 'greedy') {
+                    document.querySelector('#step2')?.scrollIntoView({ behavior: 'smooth' });
+                  } else {
+                    document.querySelector('#step1')?.scrollIntoView({ behavior: 'smooth' });
+                  }
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Features
+              </a>
+              <a 
+                href="#step3" 
+                style={{ 
+                  color: (selectedFeature && selectedAlgorithm === 'greedy') ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.4)', 
+                  textDecoration: 'none',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  transition: 'all 0.2s ease',
+                  cursor: (selectedFeature && selectedAlgorithm === 'greedy') ? 'pointer' : 'default'
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (selectedFeature && selectedAlgorithm === 'greedy') {
+                    document.querySelector('#step3')?.scrollIntoView({ behavior: 'smooth' });
+                  } else if (selectedAlgorithm === 'greedy') {
+                    document.querySelector('#step2')?.scrollIntoView({ behavior: 'smooth' });
+                  } else {
+                    document.querySelector('#step1')?.scrollIntoView({ behavior: 'smooth' });
+                  }
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Explore
+              </a>
+              <a 
+                href="#step4" 
+                style={{ 
+                  color: selectedSong ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.4)', 
+                  textDecoration: 'none',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  transition: 'all 0.2s ease',
+                  cursor: selectedSong ? 'pointer' : 'default'
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (selectedSong) {
+                    document.querySelector('#step4')?.scrollIntoView({ behavior: 'smooth' });
+                  } else if (selectedFeature && selectedAlgorithm === 'greedy') {
+                    document.querySelector('#step3')?.scrollIntoView({ behavior: 'smooth' });
+                  } else if (selectedAlgorithm === 'greedy') {
+                    document.querySelector('#step2')?.scrollIntoView({ behavior: 'smooth' });
+                  } else {
+                    document.querySelector('#step1')?.scrollIntoView({ behavior: 'smooth' });
+                  }
+                  setMobileMenuOpen(false);
+                }}
+              >
+                Results
+              </a>
+              <a 
+                href="#references" 
+                style={{ 
+                  color: 'rgba(255, 255, 255, 0.7)', 
+                  textDecoration: 'none',
+                  padding: '12px 16px',
+                  borderRadius: '8px',
+                  transition: 'all 0.2s ease'
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  document.querySelector('#references')?.scrollIntoView({ behavior: 'smooth' });
+                  setMobileMenuOpen(false);
+                }}
+              >
+                References
+              </a>
+            </div>
+          </div>
+        )}
       </header>
 
       <div style={{
         maxWidth: '1200px',
         margin: '0 auto',
-        padding: '0 2rem',
+        padding: window.innerWidth < 768 ? '0 1rem' : '0 2rem',
         position: 'relative',
         zIndex: 1,
         width: '100%',
@@ -550,11 +706,11 @@ function App() {
         {/* Header */}
         <header style={{ 
           textAlign: 'center', 
-          padding: '120px 0 100px',
+          padding: window.innerWidth < 768 ? '80px 0 60px' : '120px 0 100px',
           background: 'radial-gradient(circle at top, rgba(255,255,255,0.03) 0%, transparent 60%)',
           position: 'relative',
           borderBottom: '1px solid rgba(255, 255, 255, 0.05)',
-          marginBottom: '40px'
+          marginBottom: window.innerWidth < 768 ? '20px' : '40px'
         }}>
           <div style={{
             fontSize: '11px',
@@ -568,7 +724,7 @@ function App() {
             Algorithmic Curation
           </div>
             <h1 style={{ 
-              fontSize: '52px',
+              fontSize: window.innerWidth < 768 ? '36px' : '52px',
               fontWeight: '500',
               color: '#FFFFFF',
               letterSpacing: '-0.02em',
@@ -678,8 +834,8 @@ function App() {
             }}>
               Step One
             </div>
-              <h2 style={{ 
-                fontSize: '32px',
+            <h2 style={{
+                fontSize: window.innerWidth < 768 ? '24px' : '32px',
                 fontWeight: '500',
                 color: '#FFFFFF',
                 lineHeight: '1.3',
@@ -688,11 +844,11 @@ function App() {
               Select Algorithm Type
             </h2>
             <p style={{
-              fontSize: '16px',
+              fontSize: window.innerWidth < 768 ? '14px' : '16px',
               color: '#B8B8B8',
               fontWeight: '400',
               lineHeight: '1.5',
-              maxWidth: '600px',
+              maxWidth: window.innerWidth < 768 ? '90vw' : '600px',
               margin: '0 auto 32px',
               letterSpacing: '-0.01em'
             }}>
@@ -727,9 +883,9 @@ function App() {
             
             {/* Algorithm Explanation Box */}
             <div style={{
-              maxWidth: '600px',
+              maxWidth: window.innerWidth < 768 ? '90vw' : '600px',
               margin: '32px auto 0 auto',
-              padding: '20px 24px',
+              padding: window.innerWidth < 768 ? '16px 20px' : '20px 24px',
               borderRadius: '16px',
               background: 'rgba(255, 255, 255, 0.02)',
               backdropFilter: 'blur(20px)',
@@ -849,7 +1005,7 @@ function App() {
             {/* Coming Soon Message for Non-Greedy Algorithms */}
             {selectedAlgorithm !== 'greedy' && (
               <div style={{
-                maxWidth: '600px',
+                maxWidth: window.innerWidth < 768 ? '90vw' : '600px',
                 margin: '24px auto 0 auto',
                 padding: '20px 24px',
                 borderRadius: '16px',
@@ -964,7 +1120,7 @@ function App() {
               color: '#B8B8B8',
               fontWeight: '400',
               lineHeight: '1.5',
-              maxWidth: '600px',
+              maxWidth: window.innerWidth < 768 ? '90vw' : '600px',
               margin: '0 auto 32px',
               letterSpacing: '-0.01em'
             }}>
@@ -1081,9 +1237,9 @@ function App() {
           {/* Feature Explanation Box */}
           {selectedFeature && (
             <div style={{
-              maxWidth: '600px',
+              maxWidth: window.innerWidth < 768 ? '90vw' : '600px',
               margin: '32px auto 0 auto',
-              padding: '20px 24px',
+              padding: window.innerWidth < 768 ? '16px 20px' : '20px 24px',
               borderRadius: '16px',
               background: 'rgba(25, 25, 25, 0.9)',
               backdropFilter: 'blur(20px)',
@@ -1158,7 +1314,7 @@ function App() {
         {/* Step 3: Slider */}
         {selectedFeature && sortedTracks.length > 0 && (
           <section id="step3" style={{ 
-            padding: '80px 0',
+            padding: window.innerWidth < 768 ? '60px 0' : '80px 0',
             textAlign: 'center',
             borderTop: '1px solid rgba(255, 255, 255, 0.05)',
             borderBottom: '1px solid rgba(255, 255, 255, 0.03)',
@@ -1196,11 +1352,11 @@ function App() {
                 color: '#B8B8B8',
                 fontWeight: '400',
                 lineHeight: '1.5',
-                maxWidth: '600px',
+                maxWidth: window.innerWidth < 768 ? '90vw' : '600px',
                 margin: '0 auto',
                 letterSpacing: '-0.01em'
               }}>
-                The slider defines your preferred range; below are {sortedTracks.length} tracks that fit this profile. Drag the slider or click any track to explore.
+                The slider controls your preferred {selectedFeature} level; below are the {sortedTracks.length} most similar tracks. Drag the slider or click any track to explore.
               </p>
             </div>
             
@@ -1263,15 +1419,15 @@ function App() {
                 <input
                   type="range"
                   min="0"
-                  max={sortedTracks.length - 1}
+                  max={tracks.length - 1}
                   step="1"
                   value={sliderValue}
                   onChange={(e) => handleSliderChange(Number(e.target.value))}
                   style={{
                     width: '100%',
-                    height: '6px',
+                    height: window.innerWidth < 768 ? '10px' : '6px',
                     background: 'rgba(255, 255, 255, 0.1)',
-                    borderRadius: '3px',
+                    borderRadius: '5px',
                     outline: 'none',
                     cursor: 'pointer',
                     WebkitAppearance: 'none',
@@ -1282,7 +1438,7 @@ function App() {
                 <div style={{
                   position: 'absolute',
                   top: '-8px',
-                  left: `${(sliderValue / (sortedTracks.length - 1)) * 100}%`,
+                  left: `${(sliderValue / (tracks.length - 1)) * 100}%`,
                   transform: 'translateX(-50%)',
                   fontSize: '12px',
                   color: '#E0CDA9',
@@ -1292,7 +1448,7 @@ function App() {
                   borderRadius: '4px',
                   whiteSpace: 'nowrap'
                 }}>
-                  {sliderValue + 1} of {sortedTracks.length}
+                  {(sliderValue / (tracks.length - 1)).toFixed(1)}
                 </div>
               </div>
               
@@ -1322,22 +1478,28 @@ function App() {
             }}>
               <div style={{
                 display: 'flex',
-                gap: '16px',
+                gap: window.innerWidth < 768 ? '12px' : '16px',
                 overflowX: 'auto',
-                padding: '16px 0',
+                padding: window.innerWidth < 768 ? '20px 0' : '16px 0',
                 scrollbarWidth: 'thin',
-                scrollbarColor: 'rgba(193, 167, 94, 0.3) transparent'
+                scrollbarColor: 'rgba(193, 167, 94, 0.3) transparent',
+                WebkitOverflowScrolling: 'touch'
               }}>
                 {sortedTracks.map((track, index) => (
                   <div
                     key={track.id}
                     onClick={() => {
                       const trackIndex = sortedTracks.findIndex(t => t.id === track.id)
-                      setSliderValue(trackIndex)
+                      if (trackIndex !== -1) {
+                        // Convert the track's feature value back to slider position
+                        const featureValue = track[selectedFeature as keyof Track] as number
+                        const sliderPos = Math.floor(featureValue * (tracks.length - 1))
+                        setSliderValue(sliderPos)
+                      }
                     }}
                     style={{
-                      minWidth: '200px',
-                      padding: '16px',
+                      minWidth: window.innerWidth < 768 ? '180px' : '200px',
+                      padding: window.innerWidth < 768 ? '20px 16px' : '16px',
                       borderRadius: '12px',
                       border: selectedSong?.id === track.id 
                         ? '1px solid #E0CDA9' 
@@ -1401,7 +1563,7 @@ function App() {
         {/* Step 4: Results */}
         {selectedSong && (
           <section id="step4" style={{ 
-            padding: '80px 0',
+            padding: window.innerWidth < 768 ? '60px 0' : '80px 0',
             background: 'radial-gradient(circle at center, rgba(224, 205, 169, 0.02) 0%, transparent 70%)',
             borderTop: '1px solid rgba(255, 255, 255, 0.05)',
             borderBottom: '1px solid rgba(255, 255, 255, 0.03)',
@@ -1438,7 +1600,7 @@ function App() {
                 color: '#B8B8B8',
                 fontWeight: '400',
                 lineHeight: '1.5',
-                maxWidth: '600px',
+                maxWidth: window.innerWidth < 768 ? '90vw' : '600px',
                 margin: '0 auto',
                 letterSpacing: '-0.01em'
               }}>
