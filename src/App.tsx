@@ -32,8 +32,8 @@ function App() {
     try {
       const tokenData = await getToken()
       const recommendations = await getRecommendations(tokenData.access_token, {
-        genres: ['pop', 'electronic', 'indie'],
-        limit: 50
+        genres: ['pop', 'electronic', 'indie', 'rock', 'hip-hop', 'jazz', 'classical', 'country', 'reggae', 'blues'],
+        limit: 100
       })
       
       const tracksAsTrackType = recommendations.tracks.map(track => ({

@@ -44,14 +44,14 @@ export async function getRecommendations(
     const targetDanceability = params.danceability ?? 0.5
     
     // Step 1: Search for tracks by genre
-    const searchQueries = params.genres || ['pop', 'electronic', 'indie']
+    const searchQueries = params.genres || ['pop', 'electronic', 'indie', 'rock', 'hip-hop', 'jazz', 'classical', 'country', 'reggae', 'blues']
     const allTracks: any[] = []
     
     console.log('🔍 Searching for tracks with genres:', searchQueries)
     
-    for (const genre of searchQueries.slice(0, 3)) {
+    for (const genre of searchQueries.slice(0, 10)) {
       try {
-        const searchUrl = `https://api.spotify.com/v1/search?q=genre:${genre}&type=track&limit=20`
+        const searchUrl = `https://api.spotify.com/v1/search?q=genre:${genre}&type=track&limit=10`
         console.log(`Searching ${genre}:`, searchUrl)
         
         const searchResponse = await fetch(searchUrl, {
@@ -91,13 +91,21 @@ export async function getRecommendations(
       
       // Create realistic variation based on genre patterns
       const genrePatterns = {
-        pop: { energy: 0.7, valence: 0.6, danceability: 0.8 },
-        electronic: { energy: 0.8, valence: 0.5, danceability: 0.9 },
-        indie: { energy: 0.5, valence: 0.4, danceability: 0.6 }
+        pop: { energy: 0.7, valence: 0.6, danceability: 0.8, acousticness: 0.2 },
+        electronic: { energy: 0.8, valence: 0.5, danceability: 0.9, acousticness: 0.1 },
+        indie: { energy: 0.5, valence: 0.4, danceability: 0.6, acousticness: 0.6 },
+        rock: { energy: 0.7, valence: 0.5, danceability: 0.6, acousticness: 0.3 },
+        'hip-hop': { energy: 0.6, valence: 0.5, danceability: 0.8, acousticness: 0.1 },
+        jazz: { energy: 0.4, valence: 0.5, danceability: 0.5, acousticness: 0.8 },
+        classical: { energy: 0.3, valence: 0.4, danceability: 0.3, acousticness: 0.9 },
+        country: { energy: 0.6, valence: 0.6, danceability: 0.7, acousticness: 0.7 },
+        reggae: { energy: 0.6, valence: 0.7, danceability: 0.8, acousticness: 0.4 },
+        blues: { energy: 0.5, valence: 0.3, danceability: 0.6, acousticness: 0.8 }
       }
       
-      // Determine genre based on search order
-      const genre = ['pop', 'electronic', 'indie'][Math.floor(index / 20)] || 'pop'
+      // Determine genre based on search order (10 genres, 10 tracks each)
+      const genreList = ['pop', 'electronic', 'indie', 'rock', 'hip-hop', 'jazz', 'classical', 'country', 'reggae', 'blues']
+      const genre = genreList[Math.floor(index / 10)] || 'pop'
       const pattern = genrePatterns[genre as keyof typeof genrePatterns] || genrePatterns.pop
       
       // Add variation
