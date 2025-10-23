@@ -518,6 +518,87 @@ function App() {
             height: 100px;
           }
         }
+
+        .slider-section {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 48px;
+        }
+
+        .slider-container {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          padding: 48px 0;
+          width: 100%;
+          position: relative;
+        }
+
+        .slider-track {
+          position: relative;
+          width: 100%;
+          height: 4px;
+          background: linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.1) 100%);
+          border-radius: 4px;
+          overflow: hidden;
+        }
+
+        .slider-fill {
+          position: absolute;
+          height: 100%;
+          left: 0;
+          top: 0;
+          border-radius: 4px;
+          background: linear-gradient(90deg, #c1a75e, #f8e39e);
+          box-shadow: 0 0 20px rgba(193, 167, 94, 0.3);
+          transition: width 0.3s ease;
+        }
+
+        .slider-handle {
+          position: absolute;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          width: 20px;
+          height: 20px;
+          background: radial-gradient(circle, #f3d177 0%, #c1a75e 70%);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: 50%;
+          box-shadow: 0 0 20px rgba(193, 167, 94, 0.4);
+          cursor: pointer;
+          transition: all 0.2s ease;
+        }
+
+        .slider-handle:hover {
+          transform: translate(-50%, -50%) scale(1.2);
+          box-shadow: 0 0 28px rgba(193, 167, 94, 0.6);
+        }
+
+        .slider-label {
+          margin-top: 24px;
+          color: rgba(255, 255, 255, 0.6);
+          font-size: 14px;
+          transition: all 0.3s ease;
+          text-align: center;
+        }
+
+        @media (max-width: 1024px) {
+          .slider-section {
+            padding: 48px 60px;
+            gap: 40px;
+          }
+        }
+
+        @media (max-width: 640px) {
+          .slider-section {
+            padding: 32px 24px;
+            gap: 32px;
+          }
+          
+          .slider-container {
+            padding: 32px 0;
+          }
+        }
       `}</style>
 
       <header style={{ 
@@ -701,46 +782,105 @@ function App() {
 
         {/* Step 2: Slider */}
         {selectedFeature && sortedTracks.length > 0 && (
-          <div style={{ 
+          <div className="slider-section" style={{ 
             marginBottom: '4rem',
-            background: 'rgba(255, 255, 255, 0.02)',
+            background: 'linear-gradient(180deg, #0E0E10 0%, #161618 100%)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             border: '1px solid rgba(255, 255, 255, 0.08)',
             borderRadius: '20px',
-            padding: '3rem',
-            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
+            padding: '64px 80px',
+            maxWidth: '960px',
+            margin: '0 auto',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '48px'
           }}>
             <div style={{
-              textAlign: 'center',
-              marginBottom: '3rem'
+              textAlign: 'center'
             }}>
-              <div style={{
-                fontSize: '0.875rem',
-                fontWeight: '400',
-                color: '#d4af37',
-                letterSpacing: '1.5px',
+              <div className="step-label" style={{
+                fontSize: '12px',
+                fontWeight: '500',
+                color: '#C1A75E',
+                letterSpacing: '0.1em',
                 textTransform: 'uppercase',
-                marginBottom: '0.5rem'
+                marginBottom: '12px'
               }}>
                 Step Two
               </div>
-              <h2 style={{ 
-                fontSize: '2rem',
-                fontWeight: '300',
+              <h2 className="section-title" style={{ 
+                fontSize: '28px',
+                fontWeight: '600',
                 color: '#ffffff',
-                letterSpacing: '-0.01em',
+                lineHeight: '1.3',
                 margin: 0
               }}>
                 Navigate by {selectedFeature}
               </h2>
             </div>
             
-            <div style={{
+            <div className="slider-container" style={{ 
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              padding: '48px 0',
               width: '100%',
-              margin: '3rem 0',
+              maxWidth: '600px',
               position: 'relative'
             }}>
+              <div className="slider-track" style={{
+                position: 'relative',
+                width: '100%',
+                height: '4px',
+                background: 'linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.1) 100%)',
+                borderRadius: '4px',
+                overflow: 'hidden',
+                marginBottom: '24px'
+              }}>
+                <div 
+                  className="slider-fill"
+                  style={{
+                    position: 'absolute',
+                    height: '100%',
+                    left: 0,
+                    top: 0,
+                    borderRadius: '4px',
+                    background: 'linear-gradient(90deg, #c1a75e, #f8e39e)',
+                    boxShadow: '0 0 20px rgba(193, 167, 94, 0.3)',
+                    width: `${(Math.min(sliderValue, sortedTracks.length - 1) / (sortedTracks.length - 1)) * 100}%`,
+                    transition: 'width 0.3s ease'
+                  }}
+                />
+                <div 
+                  className="slider-handle"
+                  style={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: `${(Math.min(sliderValue, sortedTracks.length - 1) / (sortedTracks.length - 1)) * 100}%`,
+                    transform: 'translate(-50%, -50%)',
+                    width: '20px',
+                    height: '20px',
+                    background: 'radial-gradient(circle, #f3d177 0%, #c1a75e 70%)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    borderRadius: '50%',
+                    boxShadow: '0 0 20px rgba(193, 167, 94, 0.4)',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease'
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.2)'
+                    e.currentTarget.style.boxShadow = '0 0 28px rgba(193, 167, 94, 0.6)'
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1)'
+                    e.currentTarget.style.boxShadow = '0 0 20px rgba(193, 167, 94, 0.4)'
+                  }}
+                />
+              </div>
+              
               <input
                 type="range"
                 min="0"
@@ -748,65 +888,24 @@ function App() {
                 value={Math.min(sliderValue, sortedTracks.length - 1)}
                 onChange={(e) => handleSliderChange(parseInt(e.target.value))}
                 style={{
+                  position: 'absolute',
                   width: '100%',
-                  height: '2px',
+                  height: '20px',
+                  opacity: 0,
                   cursor: 'pointer',
-                  background: 'rgba(255, 255, 255, 0.1)',
-                  borderRadius: '1px',
-                  outline: 'none',
-                  appearance: 'none',
-                  WebkitAppearance: 'none',
-                  MozAppearance: 'none'
+                  zIndex: 2
                 }}
               />
-              <style>{`
-                input[type="range"]::-webkit-slider-thumb {
-                  appearance: none;
-                  width: 20px;
-                  height: 20px;
-                  border-radius: 50%;
-                  background: #d4af37;
-                  cursor: pointer;
-                  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-                  border: 2px solid rgba(255, 255, 255, 0.1);
-                  transition: all 0.2s ease;
-                }
-                input[type="range"]::-webkit-slider-thumb:hover {
-                  transform: scale(1.1);
-                  box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4);
-                }
-                input[type="range"]::-moz-range-thumb {
-                  width: 20px;
-                  height: 20px;
-                  border-radius: 50%;
-                  background: #d4af37;
-                  cursor: pointer;
-                  box-shadow: 0 4px 12px rgba(212, 175, 55, 0.3);
-                  border: 2px solid rgba(255, 255, 255, 0.1);
-                  transition: all 0.2s ease;
-                }
-                input[type="range"]::-moz-range-thumb:hover {
-                  transform: scale(1.1);
-                  box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4);
-                }
-              `}</style>
-            </div>
-            
-            <div style={{ 
-              textAlign: 'center', 
-              fontSize: '0.875rem', 
-              color: '#888888',
-              fontWeight: '300',
-              background: 'rgba(255, 255, 255, 0.02)',
-              padding: '1rem 2rem',
-              borderRadius: '12px',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-              border: '1px solid rgba(255, 255, 255, 0.05)',
-              display: 'inline-block',
-              letterSpacing: '0.5px'
-            }}>
-              {sortedTracks.length} tracks available • Position {Math.min(sliderValue, sortedTracks.length - 1) + 1}
+              
+              <div className="slider-label" style={{
+                marginTop: '24px',
+                color: 'rgba(255, 255, 255, 0.6)',
+                fontSize: '14px',
+                transition: 'all 0.3s ease',
+                textAlign: 'center'
+              }}>
+                {sortedTracks.length} tracks available • Position {Math.min(sliderValue, sortedTracks.length - 1) + 1}
+              </div>
             </div>
           </div>
         )}
