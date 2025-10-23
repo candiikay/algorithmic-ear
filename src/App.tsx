@@ -180,36 +180,18 @@ function App() {
   }, [selectedFeature, sliderValue, sortedTracks])
 
   const renderFeatureStats = (track: Track) => (
-    <div className="stats-grid">
-      {FEATURE_STATS.map((stat) => {
-        const value = track[stat.key] as number
-        return (
-          <div
-            key={stat.key}
-            className="stat-card"
-             style={{
-               background: 'linear-gradient(160deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%)',
-               border: '1px solid rgba(255, 255, 255, 0.06)',
-               borderRadius: '12px',
-               padding: '1rem',
-               display: 'flex',
-               flexDirection: 'column',
-               gap: '0.5rem',
-               boxShadow: '0 8px 20px rgba(0, 0, 0, 0.15)'
-             }}
-          >
-            <div style={{ fontSize: '0.65rem', letterSpacing: '0.3em', color: '#b8b8b8', textTransform: 'uppercase' }}>
-              {stat.label}
+    <div className="metrics-container">
+      <div className="metrics-grid">
+        {FEATURE_STATS.map((stat) => {
+          const value = track[stat.key] as number
+          return (
+            <div key={stat.key} className="metric-item">
+              <div className="metric-label">{stat.label}</div>
+              <div className="metric-value">{stat.format(value)}</div>
             </div>
-            <div style={{ fontSize: '1.4rem', fontWeight: 600, color: '#ffffff', letterSpacing: '-0.02em' }}>
-              {stat.format(value)}
-            </div>
-            <div style={{ fontSize: '0.75rem', color: '#8a8a8a', lineHeight: 1.4 }}>
-              {stat.description}
-            </div>
-          </div>
-        )
-      })}
+          )
+        })}
+      </div>
     </div>
   )
 
@@ -366,9 +348,9 @@ function App() {
               min-height: 100px !important;
             }
             
-             .stats-grid {
+             .metrics-grid {
                grid-template-columns: 1fr !important;
-               gap: 0.5rem !important;
+               gap: 12px !important;
              }
           }
         `}</style>
@@ -397,31 +379,72 @@ function App() {
         zIndex: 0
       }} />
       <style>{`
-         .stats-grid {
-           display: grid;
-           grid-template-columns: repeat(3, minmax(0, 1fr));
-           gap: 0.75rem;
-           width: 100%;
-         }
-
-        .stat-card {
-          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        .metrics-container {
+          background: rgba(255, 255, 255, 0.04);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 16px;
+          padding: 24px;
+          box-shadow: 0 0 40px rgba(0, 0, 0, 0.25);
         }
 
-         .stat-card:hover {
-           transform: translateY(-2px);
-           box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-         }
+        .metrics-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 20px;
+          width: 100%;
+        }
+
+        .metric-item {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          padding: 12px 0;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+          transition: all 0.2s ease;
+        }
+
+        .metric-item:last-child {
+          border-bottom: none;
+        }
+
+        .metric-item:hover {
+          background: rgba(255, 255, 255, 0.02);
+          border-radius: 8px;
+          padding: 12px 8px;
+        }
+
+        .metric-label {
+          font-size: 11px;
+          font-weight: 500;
+          letter-spacing: 0.5px;
+          color: #888888;
+          text-transform: uppercase;
+          margin-bottom: 2px;
+        }
+
+        .metric-value {
+          font-size: 18px;
+          font-weight: 600;
+          color: #ffffff;
+          letter-spacing: -0.01em;
+        }
 
         @media (max-width: 1024px) {
-          .stats-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+          .metrics-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
           }
         }
 
         @media (max-width: 640px) {
-          .stats-grid {
-            grid-template-columns: minmax(0, 1fr);
+          .metrics-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+          }
+          
+          .metrics-container {
+            padding: 20px;
           }
         }
       `}</style>
