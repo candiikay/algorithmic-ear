@@ -10,6 +10,8 @@ interface AppState {
   selectedFeature: 'danceability' | 'energy' | 'valence' | 'tempo' | 'acousticness'
   greedyPlaylist: Track[]
   error: string | null
+  searchQuery: string
+  genreFilter: string
 }
 
 function App() {
@@ -19,7 +21,9 @@ function App() {
     selectedSong: null,
     selectedFeature: 'danceability',
     greedyPlaylist: [],
-    error: null
+    error: null,
+    searchQuery: '',
+    genreFilter: 'all'
   })
 
   useEffect(() => {
@@ -114,6 +118,52 @@ function App() {
     setState(prev => ({ ...prev, selectedFeature: feature as any, greedyPlaylist: [] }))
   }
 
+  const getFilteredTracks = () => {
+    let filtered = state.tracks
+
+    // Filter by search query
+    if (state.searchQuery) {
+      const query = state.searchQuery.toLowerCase()
+      filtered = filtered.filter(track => 
+        track.name.toLowerCase().includes(query) || 
+        track.artist.toLowerCase().includes(query)
+      )
+    }
+
+    // Filter by genre (this is a simplified genre detection based on track position)
+    if (state.genreFilter !== 'all') {
+      // Since we don't have explicit genre data, we'll use the track order
+      // This is a simplified approach - in a real app you'd have genre metadata
+      const genreRanges = {
+        'pop': [0, 9],
+        'electronic': [10, 19],
+        'indie': [20, 29],
+        'rock': [30, 39],
+        'hip-hop': [40, 49],
+        'jazz': [50, 59],
+        'classical': [60, 69],
+        'country': [70, 79],
+        'reggae': [80, 89],
+        'blues': [90, 99]
+      }
+      
+      const range = genreRanges[state.genreFilter as keyof typeof genreRanges]
+      if (range) {
+        filtered = filtered.slice(range[0], range[1] + 1)
+      }
+    }
+
+    return filtered
+  }
+
+  const selectRandomSong = () => {
+    const filteredTracks = getFilteredTracks()
+    if (filteredTracks.length > 0) {
+      const randomIndex = Math.floor(Math.random() * filteredTracks.length)
+      handleSongSelect(filteredTracks[randomIndex])
+    }
+  }
+
   if (state.isLoading) {
     return (
       <div style={{ 
@@ -169,27 +219,109 @@ function App() {
           borderRadius: '10px'
         }}>
           <h2 style={{ marginBottom: '1rem' }}>1. Choose Your Starting Song</h2>
+          
+          {/* Search and Filter Controls */}
+          <div style={{ marginBottom: '1rem' }}>
+            <input
+              type="text"
+              placeholder="🔍 Search songs or artists..."
+              value={state.searchQuery || ''}
+              onChange={(e) => setState(prev => ({ ...prev, searchQuery: e.target.value }))}
+              style={{
+                width: '100%',
+                padding: '10px',
+                borderRadius: '5px',
+                border: '1px solid rgba(255,255,255,0.2)',
+                backgroundColor: 'rgba(255,255,255,0.1)',
+                color: 'white',
+                fontSize: '14px',
+                marginBottom: '10px'
+              }}
+            />
+            
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <select
+                value={state.genreFilter || 'all'}
+                onChange={(e) => setState(prev => ({ ...prev, genreFilter: e.target.value }))}
+                style={{
+                  padding: '8px',
+                  borderRadius: '5px',
+                  border: '1px solid rgba(255,255,255,0.2)',
+                  backgroundColor: 'rgba(255,255,255,0.1)',
+                  color: 'white',
+                  fontSize: '12px'
+                }}
+              >
+                <option value="all">All Genres</option>
+                <option value="pop">Pop</option>
+                <option value="electronic">Electronic</option>
+                <option value="indie">Indie</option>
+                <option value="rock">Rock</option>
+                <option value="hip-hop">Hip-Hop</option>
+                <option value="jazz">Jazz</option>
+                <option value="classical">Classical</option>
+                <option value="country">Country</option>
+                <option value="reggae">Reggae</option>
+                <option value="blues">Blues</option>
+              </select>
+              
+              <button
+                onClick={selectRandomSong}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: '5px',
+                  border: '1px solid #ff6b6b',
+                  backgroundColor: 'rgba(255, 107, 107, 0.2)',
+                  color: '#ff6b6b',
+                  cursor: 'pointer',
+                  fontSize: '12px'
+                }}
+              >
+                🎲 Random Song
+              </button>
+            </div>
+          </div>
+          
           <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
-            {state.tracks.slice(0, 20).map((track, index) => (
+            {getFilteredTracks().slice(0, 30).map((track, index) => (
               <div 
                 key={track.id}
                 onClick={() => handleSongSelect(track)}
                 style={{ 
-                  padding: '10px', 
+                  padding: '12px', 
                   margin: '5px 0', 
                   backgroundColor: track.id === state.selectedSong?.id ? 'rgba(102, 126, 234, 0.3)' : 'rgba(255,255,255,0.05)',
-                  borderRadius: '5px',
+                  borderRadius: '8px',
                   cursor: 'pointer',
-                  border: track.id === state.selectedSong?.id ? '2px solid #667eea' : '1px solid rgba(255,255,255,0.1)'
+                  border: track.id === state.selectedSong?.id ? '2px solid #667eea' : '1px solid rgba(255,255,255,0.1)',
+                  transition: 'all 0.2s ease',
+                  transform: track.id === state.selectedSong?.id ? 'scale(1.02)' : 'scale(1)'
+                }}
+                onMouseEnter={(e) => {
+                  if (track.id !== state.selectedSong?.id) {
+                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'
+                    e.currentTarget.style.transform = 'scale(1.01)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (track.id !== state.selectedSong?.id) {
+                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'
+                    e.currentTarget.style.transform = 'scale(1)'
+                  }
                 }}
               >
-                <strong>{index + 1}.</strong> {track.name} - {track.artist}
-                <br />
-                <small style={{ opacity: 0.7 }}>
-                  Danceability: {(track.danceability * 100).toFixed(0)}% | 
-                  Energy: {(track.energy * 100).toFixed(0)}% | 
-                  Valence: {(track.valence * 100).toFixed(0)}%
-                </small>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <strong style={{ fontSize: '14px' }}>{track.name}</strong>
+                    <br />
+                    <em style={{ fontSize: '12px', opacity: 0.8 }}>{track.artist}</em>
+                  </div>
+                  <div style={{ textAlign: 'right', fontSize: '11px', opacity: 0.7 }}>
+                    <div>💃 {(track.danceability * 100).toFixed(0)}%</div>
+                    <div>⚡ {(track.energy * 100).toFixed(0)}%</div>
+                    <div>😊 {(track.valence * 100).toFixed(0)}%</div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
@@ -202,35 +334,56 @@ function App() {
           borderRadius: '10px'
         }}>
           <h2 style={{ marginBottom: '1rem' }}>2. Choose What Makes Songs "Similar"</h2>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <p style={{ fontSize: '14px', opacity: 0.8, marginBottom: '1rem' }}>
+            The algorithm will find the song with the closest value for this feature.
+          </p>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
             {[
-              { key: 'danceability', label: 'Danceability', desc: 'How suitable a track is for dancing' },
-              { key: 'energy', label: 'Energy', desc: 'Perceptual measure of intensity and power' },
-              { key: 'valence', label: 'Valence', desc: 'Musical positivity (happy vs sad)' },
-              { key: 'tempo', label: 'Tempo', desc: 'Overall estimated tempo in BPM' },
-              { key: 'acousticness', label: 'Acousticness', desc: 'Confidence measure of acoustic recording' }
+              { key: 'danceability', label: '💃 Danceability', desc: 'How danceable', emoji: '💃' },
+              { key: 'energy', label: '⚡ Energy', desc: 'How energetic', emoji: '⚡' },
+              { key: 'valence', label: '😊 Valence', desc: 'How happy/sad', emoji: '😊' },
+              { key: 'tempo', label: '🎵 Tempo', desc: 'How fast', emoji: '🎵' },
+              { key: 'acousticness', label: '🎸 Acousticness', desc: 'How acoustic', emoji: '🎸' }
             ].map(feature => (
               <label key={feature.key} style={{ 
                 display: 'flex', 
                 alignItems: 'center', 
-                padding: '10px',
-                backgroundColor: state.selectedFeature === feature.key ? 'rgba(102, 126, 234, 0.2)' : 'rgba(255,255,255,0.05)',
-                borderRadius: '5px',
+                padding: '15px',
+                backgroundColor: state.selectedFeature === feature.key ? 'rgba(102, 126, 234, 0.3)' : 'rgba(255,255,255,0.05)',
+                borderRadius: '10px',
                 cursor: 'pointer',
-                border: state.selectedFeature === feature.key ? '2px solid #667eea' : '1px solid rgba(255,255,255,0.1)'
-              }}>
+                border: state.selectedFeature === feature.key ? '2px solid #667eea' : '1px solid rgba(255,255,255,0.1)',
+                transition: 'all 0.2s ease',
+                transform: state.selectedFeature === feature.key ? 'scale(1.02)' : 'scale(1)'
+              }}
+              onMouseEnter={(e) => {
+                if (state.selectedFeature !== feature.key) {
+                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.1)'
+                  e.currentTarget.style.transform = 'scale(1.01)'
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (state.selectedFeature !== feature.key) {
+                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)'
+                  e.currentTarget.style.transform = 'scale(1)'
+                }
+              }}
+              >
                 <input
                   type="radio"
                   name="feature"
                   value={feature.key}
                   checked={state.selectedFeature === feature.key}
                   onChange={() => handleFeatureChange(feature.key as any)}
-                  style={{ marginRight: '10px' }}
+                  style={{ marginRight: '12px', transform: 'scale(1.2)' }}
                 />
                 <div>
-                  <strong>{feature.label}</strong>
-                  <br />
-                  <small style={{ opacity: 0.7 }}>{feature.desc}</small>
+                  <div style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '4px' }}>
+                    {feature.label}
+                  </div>
+                  <div style={{ fontSize: '12px', opacity: 0.7 }}>
+                    {feature.desc}
+                  </div>
                 </div>
               </label>
             ))}
