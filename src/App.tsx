@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import { getToken, getRecommendations, FALLBACK_TRACKS } from './lib/spotify'
 import type { Track } from './types'
-import InfoPop from './components/InfoPop'
-import { INFO_CONTENT, FEATURE_DETAILS } from './data/infoContent'
+// import InfoPop from './components/InfoPop'
+// import { INFO_CONTENT, FEATURE_DETAILS } from './data/infoContent'
 
 function App() {
   const [tracks, setTracks] = useState<Track[]>([])
@@ -735,19 +735,16 @@ function App() {
         }}>
           Algorithmic Curation
         </div>
-        <InfoPop {...INFO_CONTENT.project}>
-          <h1 style={{ 
-            fontSize: '52px',
-            fontWeight: '500',
-            color: '#FFFFFF',
-            letterSpacing: '-0.02em',
-            margin: '0 0 32px 0',
-            lineHeight: '1.1',
-            cursor: 'help'
-          }}>
-            The Algorithmic Ear
-          </h1>
-        </InfoPop>
+        <h1 style={{ 
+          fontSize: '52px',
+          fontWeight: '500',
+          color: '#FFFFFF',
+          letterSpacing: '-0.02em',
+          margin: '0 0 32px 0',
+          lineHeight: '1.1'
+        }}>
+          The Algorithmic Ear
+        </h1>
         <p style={{ 
           fontSize: '18px',
           color: '#B8B8B8',
@@ -790,18 +787,15 @@ function App() {
             }}>
               Step One
             </div>
-            <InfoPop {...INFO_CONTENT.stepOne}>
-              <h2 className="section-title" style={{ 
-                fontSize: '32px',
-                fontWeight: '500',
-                color: '#FFFFFF',
-                lineHeight: '1.3',
-                margin: 0,
-                cursor: 'help'
-              }}>
-                Select Musical Dimension
-              </h2>
-            </InfoPop>
+            <h2 className="section-title" style={{ 
+              fontSize: '32px',
+              fontWeight: '500',
+              color: '#FFFFFF',
+              lineHeight: '1.3',
+              margin: 0
+            }}>
+              Select Musical Dimension
+            </h2>
           </div>
           
           <div className="dimension-grid" style={{ 
@@ -822,12 +816,8 @@ function App() {
               { key: 'acousticness', label: 'Acousticness', description: 'Instrumental purity' },
               { key: 'liveness', label: 'Liveness', description: 'Live performance energy' }
             ].map(metric => (
-              <InfoPop 
-                key={metric.key}
-                {...FEATURE_DETAILS[metric.key as keyof typeof FEATURE_DETAILS]}
-                position="top"
-              >
                 <button
+                  key={metric.key}
                   onClick={() => {
                     setSelectedFeature(metric.key as keyof Track)
                     setSliderValue(0)
@@ -887,7 +877,6 @@ function App() {
                     {metric.description}
                   </div>
                 </button>
-              </InfoPop>
             ))}
           </div>
         </section>
@@ -913,18 +902,15 @@ function App() {
               }}>
                 Step Two
               </div>
-              <InfoPop {...INFO_CONTENT.stepTwo}>
-                <h2 className="section-title" style={{ 
-                  fontSize: '32px',
-                  fontWeight: '500',
-                  color: '#FFFFFF',
-                  lineHeight: '1.3',
-                  margin: 0,
-                  cursor: 'help'
-                }}>
-                  Navigate by {selectedFeature}
-                </h2>
-              </InfoPop>
+              <h2 className="section-title" style={{ 
+                fontSize: '32px',
+                fontWeight: '500',
+                color: '#FFFFFF',
+                lineHeight: '1.3',
+                margin: 0
+              }}>
+                Navigate by {selectedFeature}
+              </h2>
             </div>
             
             <div className="slider-container">
@@ -998,18 +984,15 @@ function App() {
               }}>
                 Step Three
               </div>
-              <InfoPop {...INFO_CONTENT.greedy}>
-                <h2 style={{ 
-                  fontSize: '32px',
-                  fontWeight: '500',
-                  color: '#FFFFFF',
-                  letterSpacing: '-0.01em',
-                  margin: 0,
-                  cursor: 'help'
-                }}>
-                  Algorithmic Recommendation
-                </h2>
-              </InfoPop>
+              <h2 style={{ 
+                fontSize: '32px',
+                fontWeight: '500',
+                color: '#FFFFFF',
+                letterSpacing: '-0.01em',
+                margin: 0
+              }}>
+                Algorithmic Recommendation
+              </h2>
             </div>
             
             <div className="recommendation-grid">
@@ -1196,30 +1179,20 @@ function App() {
             flexWrap: 'wrap',
             marginBottom: '24px'
           }}>
-            <InfoPop {...INFO_CONTENT.panos}>
-              <span style={{
-                color: '#E0CDA9',
-                textDecoration: 'underline',
-                textDecorationColor: 'rgba(224, 205, 169, 0.4)',
-                cursor: 'help',
-                fontSize: '13px',
-                fontFamily: 'Fira Code, monospace'
-              }}>
-                Panos — Algorithmic Mediation
-              </span>
-            </InfoPop>
-            <InfoPop {...INFO_CONTENT.serve}>
-              <span style={{
-                color: '#E0CDA9',
-                textDecoration: 'underline',
-                textDecorationColor: 'rgba(224, 205, 169, 0.4)',
-                cursor: 'help',
-                fontSize: '13px',
-                fontFamily: 'Fira Code, monospace'
-              }}>
-                Serve — Culture as System
-              </span>
-            </InfoPop>
+            <span style={{
+              color: '#E0CDA9',
+              fontSize: '13px',
+              fontFamily: 'Fira Code, monospace'
+            }}>
+              Panos — Algorithmic Mediation
+            </span>
+            <span style={{
+              color: '#E0CDA9',
+              fontSize: '13px',
+              fontFamily: 'Fira Code, monospace'
+            }}>
+              Serve — Culture as System
+            </span>
           </div>
           <div style={{
             fontSize: '12px',
