@@ -123,17 +123,20 @@ export async function getRecommendations(
     console.log('🔍 Searching for popular tracks from well-known artists')
     
     // Search for tracks by popular artists - OPTIMIZED FOR SPEED
-    const topArtists = popularArtists.slice(0, 50) // Only search top 50 artists for speed
+    const topArtists = popularArtists.slice(0, 20) // Reduced to 20 artists for faster loading
     console.log(`🎵 Searching ${topArtists.length} top artists for fast loading!`)
     
-    // Search in parallel batches for maximum speed
-    const batchSize = 10
+    // Search in smaller batches with throttling for better performance
+    const batchSize = 5 // Reduced batch size
     for (let i = 0; i < topArtists.length; i += batchSize) {
       const batch = topArtists.slice(i, i + batchSize)
       
-      const batchPromises = batch.map(async (artist) => {
+      const batchPromises = batch.map(async (artist, index) => {
+        // Add small delay to prevent overwhelming the API
+        await new Promise(resolve => setTimeout(resolve, index * 100))
+        
         try {
-          const searchUrl = `https://api.spotify.com/v1/search?q=artist:"${artist}"&type=track&limit=3`
+          const searchUrl = `https://api.spotify.com/v1/search?q=artist:"${artist}"&type=track&limit=5`
           const searchResponse = await fetch(searchUrl, {
             headers: { 
               'Authorization': `Bearer ${token}`,
@@ -157,6 +160,11 @@ export async function getRecommendations(
       allTracks.push(...batchTracks)
       
       console.log(`✅ Batch ${Math.floor(i/batchSize) + 1} complete: ${batchTracks.length} tracks`)
+      
+      // Add delay between batches to be nice to the API
+      if (i + batchSize < topArtists.length) {
+        await new Promise(resolve => setTimeout(resolve, 200))
+      }
     }
     
     console.log('Total tracks found:', allTracks.length)
@@ -407,17 +415,55 @@ export async function getAudioFeatures(
 export const FALLBACK_TRACKS = [
   {
     id: 'fallback-1',
-    name: 'Sample Track 1',
-    artist: 'Sample Artist',
+    name: 'Dancing Queen',
+    artist: 'ABBA',
     preview: null,
-    popularity: 80,
-    danceability: 0.7,
+    popularity: 85,
+    danceability: 0.9,
     energy: 0.8,
+    valence: 0.8,
+    tempo: 101,
+    acousticness: 0.1,
+    instrumentalness: 0.0,
+    liveness: 0.3,
+    speechiness: 0.1,
+    loudness: -4.0,
+    mode: 1,
+    key: 0,
+    time_signature: 4
+  },
+  {
+    id: 'fallback-2',
+    name: 'Bohemian Rhapsody',
+    artist: 'Queen',
+    preview: null,
+    popularity: 95,
+    danceability: 0.4,
+    energy: 0.7,
+    valence: 0.3,
+    tempo: 72,
+    acousticness: 0.2,
+    instrumentalness: 0.0,
+    liveness: 0.8,
+    speechiness: 0.1,
+    loudness: -6.0,
+    mode: 1,
+    key: 0,
+    time_signature: 4
+  },
+  {
+    id: 'fallback-3',
+    name: 'Billie Jean',
+    artist: 'Michael Jackson',
+    preview: null,
+    popularity: 90,
+    danceability: 0.8,
+    energy: 0.7,
     valence: 0.6,
-    tempo: 120,
-    acousticness: 0.3,
-    instrumentalness: 0.1,
-    liveness: 0.2,
+    tempo: 117,
+    acousticness: 0.1,
+    instrumentalness: 0.0,
+    liveness: 0.1,
     speechiness: 0.1,
     loudness: -5.0,
     mode: 1,
@@ -425,22 +471,136 @@ export const FALLBACK_TRACKS = [
     time_signature: 4
   },
   {
-    id: 'fallback-2',
-    name: 'Sample Track 2',
-    artist: 'Sample Artist',
+    id: 'fallback-4',
+    name: 'Hotel California',
+    artist: 'Eagles',
     preview: null,
-    popularity: 75,
+    popularity: 88,
     danceability: 0.5,
     energy: 0.6,
     valence: 0.4,
-    tempo: 100,
-    acousticness: 0.8,
-    instrumentalness: 0.2,
-    liveness: 0.3,
-    speechiness: 0.05,
+    tempo: 75,
+    acousticness: 0.7,
+    instrumentalness: 0.0,
+    liveness: 0.1,
+    speechiness: 0.1,
+    loudness: -7.0,
+    mode: 1,
+    key: 0,
+    time_signature: 4
+  },
+  {
+    id: 'fallback-5',
+    name: 'Sweet Child O\' Mine',
+    artist: 'Guns N\' Roses',
+    preview: null,
+    popularity: 87,
+    danceability: 0.6,
+    energy: 0.9,
+    valence: 0.7,
+    tempo: 125,
+    acousticness: 0.1,
+    instrumentalness: 0.0,
+    liveness: 0.2,
+    speechiness: 0.1,
+    loudness: -3.0,
+    mode: 1,
+    key: 0,
+    time_signature: 4
+  },
+  {
+    id: 'fallback-6',
+    name: 'Imagine',
+    artist: 'John Lennon',
+    preview: null,
+    popularity: 92,
+    danceability: 0.3,
+    energy: 0.3,
+    valence: 0.2,
+    tempo: 76,
+    acousticness: 0.9,
+    instrumentalness: 0.0,
+    liveness: 0.1,
+    speechiness: 0.1,
+    loudness: -10.0,
+    mode: 1,
+    key: 0,
+    time_signature: 4
+  },
+  {
+    id: 'fallback-7',
+    name: 'Uptown Funk',
+    artist: 'Mark Ronson ft. Bruno Mars',
+    preview: null,
+    popularity: 89,
+    danceability: 0.9,
+    energy: 0.8,
+    valence: 0.9,
+    tempo: 115,
+    acousticness: 0.1,
+    instrumentalness: 0.0,
+    liveness: 0.1,
+    speechiness: 0.1,
+    loudness: -4.0,
+    mode: 1,
+    key: 0,
+    time_signature: 4
+  },
+  {
+    id: 'fallback-8',
+    name: 'Shape of You',
+    artist: 'Ed Sheeran',
+    preview: null,
+    popularity: 86,
+    danceability: 0.8,
+    energy: 0.7,
+    valence: 0.7,
+    tempo: 96,
+    acousticness: 0.2,
+    instrumentalness: 0.0,
+    liveness: 0.1,
+    speechiness: 0.1,
+    loudness: -5.0,
+    mode: 1,
+    key: 0,
+    time_signature: 4
+  },
+  {
+    id: 'fallback-9',
+    name: 'Stairway to Heaven',
+    artist: 'Led Zeppelin',
+    preview: null,
+    popularity: 91,
+    danceability: 0.3,
+    energy: 0.5,
+    valence: 0.3,
+    tempo: 82,
+    acousticness: 0.6,
+    instrumentalness: 0.0,
+    liveness: 0.1,
+    speechiness: 0.1,
     loudness: -8.0,
-    mode: 0,
-    key: 3,
+    mode: 1,
+    key: 0,
+    time_signature: 4
+  },
+  {
+    id: 'fallback-10',
+    name: 'Despacito',
+    artist: 'Luis Fonsi ft. Daddy Yankee',
+    preview: null,
+    popularity: 88,
+    danceability: 0.8,
+    energy: 0.7,
+    valence: 0.8,
+    tempo: 89,
+    acousticness: 0.1,
+    instrumentalness: 0.0,
+    liveness: 0.1,
+    speechiness: 0.1,
+    loudness: -4.0,
+    mode: 1,
+    key: 0,
     time_signature: 4
   }
 ] as const

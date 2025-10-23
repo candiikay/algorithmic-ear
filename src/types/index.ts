@@ -46,7 +46,7 @@ export interface SpotifyTrack {
 }
 
 export interface SpotifyRecommendationsResponse {
-  tracks: SpotifyTrack[]
+  tracks: any[] // Using any[] since we add audio features in the normalization step
 }
 
 export interface SpotifyAudioFeaturesResponse {
