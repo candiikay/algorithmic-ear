@@ -1,7 +1,7 @@
 export const INFO_CONTENT = {
   project: {
-    label: "The Greedy Algorithm: A Study in Computational Curation",
-    description: "This interface demonstrates Spotify's recommendation system at its most basic level: the greedy algorithm. By always choosing the 'nearest neighbor' based on a single feature, it reveals a fundamental limitation of algorithmic curation—you cannot quantify feeling. As Panos argues, algorithms don't just describe music; they create perceptual frameworks that reshape how we understand it."
+    label: "The Algorithmic Ear: Can Taste Be Quantified?",
+    description: "The Algorithmic Ear explores a fundamental question: can algorithms truly 'hear' better than humans? From platform to platform, music curation varies dramatically—different algorithms, different human curators, different approaches to taste. Spotify attempts to quantify and qualify taste through audio features, but as Panos argues, algorithms don't just describe music; they create perceptual frameworks that reshape how we understand it. This interface asks: when platforms try to measure the unmeasurable, what gets lost in translation? The greedy algorithm demonstrates this tension—it optimizes for data proximity but fails to capture the contextual, emotional, and cultural dimensions that make music meaningful. As Serve's work reveals, there are no features that could be combined to produce what you actually need. Human curation understands context, surprise, and the ineffable quality of 'rightness.' Algorithmic curation can only approximate—it cannot feel. This is why algorithmic playlists often feel 'off'—they optimize for data, not feeling. The question remains: can taste be quantified, or is it fundamentally unmeasurable?"
   },
 
   stepOne: {

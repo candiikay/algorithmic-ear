@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react'
 import { getToken, getRecommendations, FALLBACK_TRACKS } from './lib/spotify'
 import type { Track } from './types'
 import InfoPop from './components/InfoPop'
+import CustomDropdown from './components/CustomDropdown'
 import { INFO_CONTENT, FEATURE_DETAILS } from './data/infoContent'
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
   const [loadingMessage, setLoadingMessage] = useState('Starting...')
   const [sliderValue, setSliderValue] = useState(0)
   const [error, setError] = useState<string | null>(null)
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState('greedy')
 
   const FEATURE_STATS: Array<{
     key: keyof Pick<Track, 'danceability' | 'energy' | 'valence' | 'tempo' | 'acousticness' | 'liveness'>
@@ -27,6 +29,30 @@ function App() {
     { key: 'tempo', label: 'Tempo', description: 'Beats per minute', format: (value) => `${Math.round(value)} BPM` },
     { key: 'acousticness', label: 'Acousticness', description: 'Organic vs. electronic instrumentation', format: (value) => `${(value * 100).toFixed(0)}%` },
     { key: 'liveness', label: 'Liveness', description: 'Presence of a live performance feel', format: (value) => `${(value * 100).toFixed(0)}%` }
+  ]
+
+  const ALGORITHMS = [
+    { 
+      id: 'greedy', 
+      name: 'Greedy Algorithm', 
+      description: 'A greedy algorithm always makes the locally optimal choice at each step. In music recommendation, it picks the song most similar to your current selection based on a single feature. This approach is simple and fast, but often leads to repetitive playlists because it never considers long-term variety or context.',
+      pros: ['Simple and precise', 'Fast and explainable', 'Good for similarity search'],
+      cons: ['Reduces diversity', 'Creates echo chambers', 'Poor for discovery']
+    },
+    { 
+      id: 'sorting', 
+      name: 'Sorting Algorithm', 
+      description: 'Sorting algorithms organize data in a specific order. In music, this could mean arranging tracks by tempo progression, energy curves, or emotional arcs to create coherent listening experiences. This approach considers the sequence and flow of music rather than just individual similarities.',
+      pros: ['Considers multiple factors', 'Creates coherent playlists', 'Better for long-form listening'],
+      cons: ['More complex computation', 'Slower processing', 'Requires more data']
+    },
+    { 
+      id: 'searching', 
+      name: 'Searching Algorithm', 
+      description: 'Search algorithms find specific items in a dataset. In music recommendation, this could involve complex queries like "find songs that are energetic but not too fast" or "discover tracks that bridge two different genres." This approach allows for more nuanced and flexible music discovery.',
+      pros: ['Handles complex queries', 'Flexible matching', 'Good for discovery'],
+      cons: ['Requires query understanding', 'More computational overhead', 'Less predictable results']
+    }
   ]
 
   const normalizeTrack = (track: any): Track => ({
@@ -268,15 +294,37 @@ function App() {
   }
 
   return (
+    <>
+      <style>
+        {`
+          html, body {
+            overflow-x: hidden;
+            box-sizing: border-box;
+          }
+          *, *::before, *::after {
+            box-sizing: border-box;
+          }
+          @keyframes fadeInUp {
+            from {
+              opacity: 0;
+              transform: translateY(12px);
+            }
+            to {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        `}
+      </style>
     <div style={{
       background: 'linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0f0f0f 100%)',
       color: '#ffffff',
       minHeight: '100vh',
       fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
       position: 'relative',
-      overflow: 'hidden',
       width: '100vw',
-      maxWidth: '100vw'
+        maxWidth: '100vw',
+        overflowX: 'hidden'
     }}>
       <div style={{
         maxWidth: '1200px',
@@ -305,19 +353,55 @@ function App() {
           }}>
             Algorithmic Curation
           </div>
-          <InfoPop {...INFO_CONTENT.project}>
             <h1 style={{ 
               fontSize: '52px',
               fontWeight: '500',
               color: '#FFFFFF',
               letterSpacing: '-0.02em',
-              margin: '0 0 32px 0',
+            margin: '0 0 24px 0',
               lineHeight: '1.1',
-              cursor: 'help'
+            textAlign: 'center'
             }}>
               The Algorithmic Ear
             </h1>
-          </InfoPop>
+
+          {/* Info Box */}
+          <div style={{
+            maxWidth: '800px',
+            margin: '0 auto 32px auto',
+            padding: '20px 24px',
+            borderRadius: '16px',
+            background: 'rgba(255, 255, 255, 0.02)',
+            backdropFilter: 'blur(20px)',
+            WebkitBackdropFilter: 'blur(20px)',
+            border: '1px solid rgba(255, 255, 255, 0.08)',
+            textAlign: 'center',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.2)'
+          }}>
+            <h4 style={{
+              color: '#E0CDA9',
+              fontSize: '14px',
+              fontWeight: '600',
+              textTransform: 'uppercase',
+              letterSpacing: '0.1em',
+              marginBottom: '12px',
+              fontFamily: 'Fira Code, monospace'
+            }}>
+              Can Taste Be Quantified?
+            </h4>
+            <p style={{
+              color: 'rgba(255, 255, 255, 0.85)',
+              fontSize: '0.9rem',
+              lineHeight: '1.6',
+              margin: 0,
+              fontWeight: '400'
+            }}>
+              The Algorithmic Ear explores a fundamental question: can algorithms truly 'hear' better than humans? From platform to platform, music curation varies dramatically—different algorithms, different human curators, different approaches to taste. Spotify attempts to quantify and qualify taste through audio features<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[1]</a></sup>, but as Louridas explains<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[2]</a></sup>, greedy algorithms make locally optimal choices that often lead to suboptimal global outcomes. As Seaver argues<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[3]</a></sup>, algorithms are not just technical objects but cultural ensembles—ways of enacting taste as logic. This interface exposes how recommendation systems become what Gillespie calls "public relevance algorithms"<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[4]</a></sup> that shape our musical worlds. When platforms try to measure the unmeasurable, what gets lost in translation?
+            </p>
+          </div>
+          
+
+          
           <p style={{ 
             fontSize: '18px',
             color: '#B8B8B8',
@@ -334,7 +418,10 @@ function App() {
         {/* Step 1: Feature Selection */}
         <section style={{ 
           padding: '96px 0',
-          textAlign: 'center'
+          textAlign: 'center',
+          borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+          marginTop: '80px',
+          paddingTop: '80px'
         }}>
           <div style={{
             textAlign: 'center',
@@ -351,111 +438,420 @@ function App() {
             }}>
               Step One
             </div>
-            <InfoPop {...INFO_CONTENT.stepOne}>
               <h2 style={{ 
                 fontSize: '32px',
                 fontWeight: '500',
                 color: '#FFFFFF',
                 lineHeight: '1.3',
-                margin: 0,
-                cursor: 'help'
+              margin: '0 0 16px 0'
+            }}>
+              Select Algorithm Type
+            </h2>
+            <p style={{
+              fontSize: '16px',
+              color: '#B8B8B8',
+              fontWeight: '400',
+              lineHeight: '1.5',
+              maxWidth: '600px',
+              margin: '0 auto 32px',
+              letterSpacing: '-0.01em'
+            }}>
+              Choose how the algorithm will listen to and recommend music. Each approach reveals different aspects of algorithmic curation.
+            </p>
+            
+            {/* Algorithm Type Selector */}
+            <div style={{ marginBottom: '32px' }}>
+              <div style={{
+                fontSize: '14px',
+                color: '#B8B8B8',
+                marginBottom: '12px',
+                fontWeight: '500'
+              }}>
+                Algorithm Type:
+              </div>
+              <CustomDropdown
+                options={ALGORITHMS.map(algorithm => ({
+                  id: algorithm.id,
+                  name: algorithm.name,
+                  disabled: algorithm.id !== 'greedy'
+                }))}
+                value={selectedAlgorithm}
+                onChange={(value) => {
+                  setSelectedAlgorithm(value)
+                }}
+              />
+              
+            </div>
+            
+            {/* Greedy Algorithm Explanation Box */}
+            <div style={{
+              maxWidth: '600px',
+              margin: '32px auto 0 auto',
+              padding: '20px 24px',
+              borderRadius: '16px',
+              background: 'rgba(255, 255, 255, 0.02)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              textAlign: 'center'
+            }}>
+              <h5 style={{
+                color: '#E0CDA9',
+                fontSize: '14px',
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: '12px',
+                fontFamily: 'Fira Code, monospace'
+              }}>
+                About the Greedy Algorithm
+              </h5>
+              <p style={{
+                color: 'rgba(255, 255, 255, 0.85)',
+                fontSize: '0.85rem',
+                lineHeight: '1.6',
+                margin: '0 0 20px 0',
+                fontStyle: 'normal'
+              }}>
+                A Greedy Algorithm picks the closest match at each step — simple but often repetitive. It makes locally optimal choices without considering the global picture, which can lead to suboptimal overall outcomes.
+              </p>
+              
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: '1fr 1fr',
+                gap: '20px',
+                marginTop: '20px'
+              }}>
+                <div>
+                  <h6 style={{
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    color: '#E0CDA9',
+                    marginBottom: '8px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    fontFamily: 'Fira Code, monospace'
+                  }}>
+                    Strengths
+                  </h6>
+                  <ul style={{
+                    listStyle: 'none',
+                    padding: 0,
+                    margin: 0
+                  }}>
+                    <li style={{
+                      fontSize: '12px',
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      marginBottom: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <span style={{
+                        color: '#E0CDA9',
+                        fontSize: '14px'
+                      }}>•</span>
+                      Simple and precise
+                    </li>
+                    <li style={{
+                      fontSize: '12px',
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      marginBottom: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <span style={{
+                        color: '#E0CDA9',
+                        fontSize: '14px'
+                      }}>•</span>
+                      Fast and explainable
+                    </li>
+                    <li style={{
+                      fontSize: '12px',
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      marginBottom: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <span style={{
+                        color: '#E0CDA9',
+                        fontSize: '14px'
+                      }}>•</span>
+                      Good for similarity search
+                    </li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h6 style={{
+                    fontSize: '12px',
+                    fontWeight: '600',
+                    color: '#E0CDA9',
+                    marginBottom: '8px',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    fontFamily: 'Fira Code, monospace'
+                  }}>
+                    Weaknesses
+                  </h6>
+                  <ul style={{
+                    listStyle: 'none',
+                    padding: 0,
+                    margin: 0
+                  }}>
+                    <li style={{
+                      fontSize: '12px',
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      marginBottom: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <span style={{
+                        color: '#E0CDA9',
+                        fontSize: '14px'
+                      }}>•</span>
+                      Reduces diversity
+                    </li>
+                    <li style={{
+                      fontSize: '12px',
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      marginBottom: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <span style={{
+                        color: '#E0CDA9',
+                        fontSize: '14px'
+                      }}>•</span>
+                      Creates echo chambers
+                    </li>
+                    <li style={{
+                      fontSize: '12px',
+                      color: 'rgba(255, 255, 255, 0.7)',
+                      marginBottom: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '8px'
+                    }}>
+                      <span style={{
+                        color: '#E0CDA9',
+                        fontSize: '14px'
+                      }}>•</span>
+                      Poor for discovery
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+
+          
+        </section>
+
+        {/* Step 2: Select Musical Dimension */}
+        <section style={{ 
+          padding: '96px 0',
+          textAlign: 'center',
+          borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+          marginTop: '80px',
+          paddingTop: '80px'
+        }}>
+          <div style={{
+            textAlign: 'center',
+            marginBottom: '48px'
+          }}>
+            <div style={{
+              fontSize: '11px',
+              fontWeight: '500',
+              color: '#E0CDA9',
+              letterSpacing: '0.15em',
+              textTransform: 'uppercase',
+              fontFamily: 'Fira Code, monospace',
+              marginBottom: '12px'
+            }}>
+              Step Two
+            </div>
+            <h2 style={{ 
+              fontSize: '32px',
+              fontWeight: '500',
+              color: '#FFFFFF',
+              lineHeight: '1.3',
+              margin: '0 0 16px 0'
               }}>
                 Select Musical Dimension
               </h2>
-            </InfoPop>
+            <p style={{
+              fontSize: '16px',
+              color: '#B8B8B8',
+              fontWeight: '400',
+              lineHeight: '1.5',
+              maxWidth: '600px',
+              margin: '0 auto 32px',
+              letterSpacing: '-0.01em'
+            }}>
+              Each feature below represents a way Spotify quantifies how we experience music — your chosen lens of qualification.
+            </p>
+            
+            <div style={{
+              maxWidth: '700px',
+              margin: '0 auto 32px auto',
+              padding: '20px 24px',
+              borderRadius: '16px',
+              background: 'rgba(255, 255, 255, 0.02)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              textAlign: 'left'
+            }}>
+              <h5 style={{
+                color: '#E0CDA9',
+                fontSize: '14px',
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: '12px',
+                fontFamily: 'Fira Code, monospace'
+              }}>
+                What You're Actually Doing
+              </h5>
+              <p style={{
+                color: 'rgba(255, 255, 255, 0.85)',
+                fontSize: '0.85rem',
+                lineHeight: '1.6',
+                margin: 0,
+                fontStyle: 'normal'
+              }}>
+                This interface makes visible what usually remains hidden: how platforms like Spotify construct musical taste through algorithmic logic. When you select a feature like "danceability" or "valence," you're not just choosing a parameter—you're entering a system that has already decided what musical qualities matter<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[1]</a></sup>. The greedy algorithm's behavior—always picking the nearest match—demonstrates how recommendation systems prioritize similarity over discovery<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[2]</a></sup>. As Seaver argues, algorithms are "cultural multiples" shaped by human practices<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[3]</a></sup>—and Gillespie shows how they become "public relevance algorithms" that decide what counts as culturally important<sup><a href="#references" onClick={(e) => { e.preventDefault(); document.getElementById('references')?.scrollIntoView({ behavior: 'smooth' }); }} style={{ color: '#E0CDA9', textDecoration: 'none', fontSize: '0.7rem', cursor: 'pointer' }}>[4]</a></sup>. Every interaction here exposes how platforms don't just reflect taste—they actively construct it.
+              </p>
+            </div>
           </div>
           
+          {/* Feature Selection Grid */}
           <div style={{ 
             display: 'grid', 
             gridTemplateColumns: 'repeat(3, 1fr)', 
-            gap: '12px',
-            justifyItems: 'center',
-            alignItems: 'center'
+            gap: '32px 48px',
+            maxWidth: '800px',
+            margin: '0 auto',
+            padding: '0 20px'
           }}>
-            {[
-              { key: 'danceability', label: 'Danceability', description: 'Rhythmic quality' },
-              { key: 'energy', label: 'Energy', description: 'Intensity level' },
-              { key: 'valence', label: 'Valence', description: 'Emotional positivity' },
-              { key: 'tempo', label: 'Tempo', description: 'Beats per minute' },
-              { key: 'acousticness', label: 'Acousticness', description: 'Instrumental purity' },
-              { key: 'liveness', label: 'Liveness', description: 'Live performance energy' }
-            ].map(metric => (
-              <InfoPop 
-                key={metric.key}
-                {...FEATURE_DETAILS[metric.key as keyof typeof FEATURE_DETAILS]}
-                position="top"
-              >
+            {FEATURE_STATS.map((metric) => (
                 <button
-                  onClick={() => {
-                    setSelectedFeature(metric.key as keyof Track)
-                    setSliderValue(0)
-                  }}
+                key={metric.key}
+                onClick={() => setSelectedFeature(metric.key)}
                   style={{
-                  width: '240px',
-                  height: '120px',
-                  borderRadius: '12px',
-                  border: selectedFeature === metric.key 
-                    ? '1px solid #E0CDA9' 
-                    : '1px solid rgba(255, 255, 255, 0.05)',
                   background: selectedFeature === metric.key 
-                    ? 'rgba(224, 205, 169, 0.08)' 
-                    : 'rgba(255, 255, 255, 0.01)',
-                  color: selectedFeature === metric.key ? '#E0CDA9' : '#EAEAEA',
+                    ? 'rgba(224, 205, 169, 0.1)' 
+                    : 'rgba(255, 255, 255, 0.02)',
+                  border: selectedFeature === metric.key 
+                    ? '2px solid #E0CDA9' 
+                    : '1px solid rgba(255, 255, 255, 0.08)',
+                  borderRadius: '16px',
+                  padding: '24px 20px',
                   cursor: 'pointer',
-                  transition: 'all 0.2s ease',
-                  textAlign: 'center',
+                  transition: 'all 0.3s ease',
+                  backdropFilter: 'blur(20px)',
+                  WebkitBackdropFilter: 'blur(20px)',
+                  position: 'relative',
+                  transform: selectedFeature === metric.key ? 'translateY(-4px)' : 'translateY(0)',
+                  boxShadow: selectedFeature === metric.key 
+                    ? '0 0 20px rgba(193, 167, 94, 0.3), 0 8px 32px rgba(0, 0, 0, 0.3)' 
+                    : '0 4px 16px rgba(0, 0, 0, 0.2)',
+                  textAlign: 'left',
+                  width: '100%',
+                  minHeight: '120px',
                   display: 'flex',
                   flexDirection: 'column',
-                  alignItems: 'center',
                   justifyContent: 'center',
-                  gap: '8px',
-                  boxSizing: 'border-box'
+                  alignItems: 'flex-start'
                 }}
                 onMouseEnter={(e) => {
                   if (selectedFeature !== metric.key) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)'
-                    e.currentTarget.style.transform = 'translateY(-2px)'
+                    e.currentTarget.style.transform = 'translateY(-4px)'
+                    e.currentTarget.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3)'
                   }
                 }}
                 onMouseLeave={(e) => {
                   if (selectedFeature !== metric.key) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)'
-                    e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'
                     e.currentTarget.style.transform = 'translateY(0)'
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(0, 0, 0, 0.2)'
                   }
                 }}
               >
                 <div style={{
                   fontSize: '16px',
-                  fontWeight: '500',
-                  color: selectedFeature === metric.key ? '#E0CDA9' : '#EAEAEA',
-                  lineHeight: '1.2',
-                  marginBottom: '4px',
-                  textAlign: 'center'
+                  fontWeight: '600',
+                  color: selectedFeature === metric.key ? '#E0CDA9' : '#FFFFFF',
+                  marginBottom: '8px',
+                  textAlign: 'left'
                 }}>
                   {metric.label}
                 </div>
                 <div style={{
-                  fontSize: '13px',
-                  fontWeight: '400',
-                  lineHeight: '1.3',
-                  color: selectedFeature === metric.key ? 'rgba(224, 205, 169, 0.7)' : '#B8B8B8',
-                  textAlign: 'center'
+                  fontSize: '14px',
+                  color: selectedFeature === metric.key ? 'rgba(224, 205, 169, 0.8)' : 'rgba(255, 255, 255, 0.6)',
+                  lineHeight: '1.4',
+                  textAlign: 'left'
                 }}>
                     {metric.description}
                   </div>
                 </button>
-              </InfoPop>
             ))}
           </div>
+          
+          {/* Feature Explanation Box */}
+          {selectedFeature && (
+            <div style={{
+              maxWidth: '600px',
+              margin: '32px auto 0 auto',
+              padding: '20px 24px',
+              borderRadius: '16px',
+              background: 'rgba(25, 25, 25, 0.9)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              textAlign: 'center',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)',
+              animation: 'fadeInUp 0.3s ease-out'
+            }}>
+              <h4 style={{
+                color: '#E0CDA9',
+                fontSize: '12px',
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: '8px',
+                fontFamily: 'Fira Code, monospace'
+              }}>
+                {FEATURE_DETAILS[selectedFeature as keyof typeof FEATURE_DETAILS]?.label || selectedFeature}: 0.0 to 1.0
+              </h4>
+              <p style={{
+                color: 'rgba(255, 255, 255, 0.9)',
+                fontSize: '0.85rem',
+                lineHeight: '1.5',
+                margin: 0,
+                fontWeight: '400'
+              }}>
+                {FEATURE_DETAILS[selectedFeature as keyof typeof FEATURE_DETAILS]?.description || 'No description available'}
+              </p>
+            </div>
+          )}
+          
         </section>
 
-        {/* Step 2: Slider */}
+        {/* Step 3: Slider */}
         {selectedFeature && sortedTracks.length > 0 && (
           <section style={{ 
             padding: '96px 0',
-            textAlign: 'center'
+            textAlign: 'center',
+            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+            marginTop: '80px',
+            paddingTop: '80px'
           }}>
             <div style={{
               textAlign: 'center',
@@ -470,25 +866,33 @@ function App() {
                 fontFamily: 'Fira Code, monospace',
                 marginBottom: '12px'
               }}>
-                Step Two
+                Step Three
               </div>
-              <InfoPop {...INFO_CONTENT.stepTwo}>
                 <h2 style={{ 
                   fontSize: '32px',
                   fontWeight: '500',
                   color: '#FFFFFF',
                   lineHeight: '1.3',
-                  margin: 0,
-                  cursor: 'help'
+                margin: '0 0 16px 0'
                 }}>
                   Navigate by {selectedFeature}
                 </h2>
-              </InfoPop>
+              <p style={{
+                fontSize: '16px',
+                color: '#B8B8B8',
+                fontWeight: '400',
+                lineHeight: '1.5',
+                maxWidth: '600px',
+                margin: '0 auto',
+                letterSpacing: '-0.01em'
+              }}>
+                The slider defines your preferred range; below are tracks that fit this profile.
+              </p>
             </div>
             
             <div style={{
               padding: '48px 0',
-              maxWidth: '640px',
+              maxWidth: '800px',
               margin: '0 auto'
             }}>
               <div style={{
@@ -544,14 +948,132 @@ function App() {
                 ⬅️ Drag to adjust {selectedFeature} ➡️
               </div>
             </div>
+
+            {/* Horizontal Track List */}
+            <div style={{
+              marginTop: '48px',
+              padding: '0 2rem'
+            }}>
+              <div style={{
+                display: 'flex',
+                gap: '16px',
+                overflowX: 'auto',
+                padding: '16px 0',
+                scrollbarWidth: 'thin',
+                scrollbarColor: 'rgba(193, 167, 94, 0.3) transparent'
+              }}>
+                {sortedTracks.slice(0, 20).map((track, index) => (
+                  <div
+                    key={track.id}
+                    onClick={() => {
+                      const trackIndex = sortedTracks.findIndex(t => t.id === track.id)
+                      setSliderValue(trackIndex)
+                    }}
+                    style={{
+                      minWidth: '200px',
+                      padding: '16px',
+                      borderRadius: '12px',
+                      border: selectedSong?.id === track.id 
+                        ? '1px solid #E0CDA9' 
+                        : '1px solid rgba(255, 255, 255, 0.1)',
+                      background: selectedSong?.id === track.id 
+                        ? 'rgba(224, 205, 169, 0.08)' 
+                        : 'rgba(255, 255, 255, 0.02)',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      textAlign: 'left'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (selectedSong?.id !== track.id) {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
+                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.2)'
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (selectedSong?.id !== track.id) {
+                        e.currentTarget.style.background = 'rgba(255, 255, 255, 0.02)'
+                        e.currentTarget.style.borderColor = 'rgba(255, 255, 255, 0.1)'
+                      }
+                    }}
+                  >
+                    <div style={{
+                      fontSize: '14px',
+                      fontWeight: '500',
+                      color: selectedSong?.id === track.id ? '#E0CDA9' : '#EAEAEA',
+                      marginBottom: '4px',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}>
+                      {track.name}
+                    </div>
+                    <div style={{
+                      fontSize: '12px',
+                      color: selectedSong?.id === track.id ? 'rgba(224, 205, 169, 0.7)' : '#B8B8B8',
+                      marginBottom: '8px',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis'
+                    }}>
+                      {track.artist}
+                    </div>
+                    <div style={{
+                      fontSize: '11px',
+                      color: '#B8B8B8',
+                      fontFamily: 'Fira Code, monospace'
+                    }}>
+                      {selectedFeature}: {((track[selectedFeature] as number) * 100).toFixed(0)}%
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            {/* Algorithmic Recommendations Info */}
+            <div style={{
+              maxWidth: '700px',
+              margin: '60px auto 0 auto',
+              padding: '24px',
+              borderRadius: '16px',
+              background: 'rgba(255, 255, 255, 0.02)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              textAlign: 'center'
+            }}>
+              <h4 style={{
+                color: '#E0CDA9',
+                fontSize: '14px',
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: '16px',
+                fontFamily: 'Fira Code, monospace'
+              }}>
+                Algorithmic Recommendations
+              </h4>
+              <p style={{
+                color: 'rgba(255, 255, 255, 0.8)',
+                fontSize: '0.9rem',
+                lineHeight: '1.6',
+                margin: 0,
+                fontStyle: 'italic'
+              }}>
+                Every playlist here is the product of a logic that prioritizes proximity. As Louridas demonstrates, greedy algorithms make locally optimal choices that often lead to suboptimal global outcomes—a perfect metaphor for how recommendation systems can create echo chambers. As Seaver observes, algorithms are "cultural multiples" — made through the practices, preferences, and compromises of engineers and listeners alike. This interface exposes how recommendation systems become what he calls "ensembles of human practice" rather than neutral technical tools. The greedy algorithm's tendency toward homogenization reveals the cultural work embedded in what appears to be pure computation.
+              </p>
+            </div>
+            
           </section>
         )}
 
-        {/* Step 3: Results */}
+        {/* Step 4: Results */}
         {selectedSong && (
           <section style={{ 
             padding: '96px 0',
-            background: 'radial-gradient(circle at center, rgba(224, 205, 169, 0.02) 0%, transparent 70%)'
+            background: 'radial-gradient(circle at center, rgba(224, 205, 169, 0.02) 0%, transparent 70%)',
+            borderTop: '1px solid rgba(255, 255, 255, 0.05)',
+            marginTop: '80px',
+            paddingTop: '80px'
           }}>
             <div style={{
               textAlign: 'center',
@@ -566,22 +1088,36 @@ function App() {
                 fontFamily: 'Fira Code, monospace',
                 marginBottom: '12px'
               }}>
-                Step Three
+                Step Four
               </div>
-              <InfoPop {...INFO_CONTENT.greedy}>
                 <h2 style={{ 
                   fontSize: '32px',
                   fontWeight: '500',
                   color: '#FFFFFF',
                   letterSpacing: '-0.01em',
-                  margin: 0,
-                  cursor: 'help'
+                margin: '0 0 16px 0'
                 }}>
                   Algorithmic Recommendation
                 </h2>
-              </InfoPop>
+              <p style={{
+                fontSize: '16px',
+                color: '#B8B8B8',
+                fontWeight: '400',
+                lineHeight: '1.5',
+                maxWidth: '600px',
+                margin: '0 auto',
+                letterSpacing: '-0.01em'
+              }}>
+                The algorithm listened closely — here's what it heard.
+              </p>
             </div>
             
+            <div style={{
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              flexDirection: 'column'
+            }}>
             <div className="recommendation-grid" style={{
               display: 'flex',
               justifyContent: 'center',
@@ -761,28 +1297,43 @@ function App() {
                 </div>
               )}
             </div>
-
-            {nextSong && (
-              <div style={{
-                textAlign: 'center',
-                marginTop: '48px'
+            </div>
+            
+            {/* Why This Isn't True Taste Development */}
+            <div style={{
+              maxWidth: '700px',
+              margin: '60px auto 0 auto',
+              padding: '24px',
+              borderRadius: '16px',
+              background: 'rgba(255, 255, 255, 0.02)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              textAlign: 'left'
+            }}>
+              <h5 style={{
+                color: '#E0CDA9',
+                fontSize: '14px',
+                fontWeight: '600',
+                textTransform: 'uppercase',
+                letterSpacing: '0.1em',
+                marginBottom: '12px',
+                fontFamily: 'Fira Code, monospace'
               }}>
-                <div style={{
-                  height: '1px',
-                  background: 'rgba(224, 205, 169, 0.3)',
-                  margin: '0 auto 16px',
-                  maxWidth: '200px'
-                }} />
-                <div style={{
-                  fontSize: '14px',
-                  color: '#B8B8B8',
-                  fontStyle: 'italic',
-                  fontFamily: 'Fira Code, monospace'
-                }}>
-                  The algorithm listened closely — here's what it heard.
-                </div>
-              </div>
-            )}
+                Why This Isn't True Taste Development
+              </h5>
+              <p style={{
+                color: 'rgba(255, 255, 255, 0.85)',
+                fontSize: '0.85rem',
+                lineHeight: '1.6',
+                margin: 0,
+                fontStyle: 'normal'
+              }}>
+                The algorithmic recommendations you see here aren't truly developing your taste—they're reinforcing it. As Gillespie argues, "public relevance algorithms" don't just reflect what's relevant; they construct it. Every "similar" track the greedy algorithm suggests is a micro-decision about what counts as musical relevance. This creates a feedback loop: the more you interact with these recommendations, the more the system narrows your musical world. True taste development requires surprise, challenge, and discovery—qualities that greedy algorithms, by design, cannot provide. What you're experiencing isn't musical growth; it's algorithmic homogenization disguised as personalization.
+              </p>
+            </div>
+
+            
           </section>
         )}
 
@@ -819,6 +1370,7 @@ function App() {
           </div>
         )}
 
+
         {/* Error Message */}
         {error && (
           <div style={{
@@ -846,8 +1398,243 @@ function App() {
             </div>
           </div>
         )}
+
+
+        {/* References Section */}
+        <div id="references" style={{
+          marginTop: '80px',
+          paddingTop: '40px',
+          borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+          maxWidth: '700px',
+          margin: '80px auto 0 auto',
+          padding: '40px 0 0 0'
+        }}>
+          <h4 style={{
+            color: '#E0CDA9',
+            fontSize: '16px',
+            fontWeight: '600',
+            textTransform: 'uppercase',
+            letterSpacing: '0.1em',
+            marginBottom: '24px',
+            fontFamily: 'Fira Code, monospace',
+            textAlign: 'center'
+          }}>
+            References
+          </h4>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px'
+          }}>
+            <div style={{
+              padding: '20px',
+              borderRadius: '12px',
+              background: 'rgba(255, 255, 255, 0.02)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              transition: 'all 0.3s ease'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '12px'
+              }}>
+                <div style={{
+                  color: '#E0CDA9',
+                  fontSize: '0.75rem',
+                  fontWeight: '600',
+                  fontFamily: 'Fira Code, monospace',
+                  minWidth: '20px'
+                }}>
+                  [1]
+      </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{
+                    fontSize: '0.85rem',
+                    color: 'rgba(255, 255, 255, 0.9)',
+                    lineHeight: '1.6',
+                    marginBottom: '8px'
+                  }}>
+                    Spotify. (2024). Audio Features. <em>Spotify Web API Documentation</em>.
+    </div>
+                  <div style={{
+                    fontSize: '0.75rem',
+                    color: 'rgba(255, 255, 255, 0.6)',
+                    fontStyle: 'italic',
+                    marginBottom: '8px'
+                  }}>
+                    Technical documentation for Spotify's audio feature extraction
+                  </div>
+                  <a 
+                    href="https://developer.spotify.com/documentation/web-api/reference/get-audio-features" 
+                    target="_blank" 
+                    rel="noopener noreferrer" 
+                    style={{ 
+                      color: '#E0CDA9', 
+                      textDecoration: 'none',
+                      fontSize: '0.75rem',
+                      fontWeight: '500',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      transition: 'all 0.2s ease',
+                      padding: '4px 8px',
+                      borderRadius: '6px',
+                      background: 'rgba(224, 205, 169, 0.1)',
+                      border: '1px solid rgba(224, 205, 169, 0.2)'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(224, 205, 169, 0.2)'
+                      e.currentTarget.style.borderColor = 'rgba(224, 205, 169, 0.4)'
+                      e.currentTarget.style.transform = 'translateY(-1px)'
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'rgba(224, 205, 169, 0.1)'
+                      e.currentTarget.style.borderColor = 'rgba(224, 205, 169, 0.2)'
+                      e.currentTarget.style.transform = 'translateY(0)'
+                    }}
+                  >
+                    View Documentation →
+                  </a>
+                </div>
+              </div>
+            </div>
+            
+            <div style={{
+              padding: '20px',
+              borderRadius: '12px',
+              background: 'rgba(255, 255, 255, 0.02)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              transition: 'all 0.3s ease'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '12px'
+              }}>
+                <div style={{
+                  color: '#E0CDA9',
+                  fontSize: '0.75rem',
+                  fontWeight: '600',
+                  fontFamily: 'Fira Code, monospace',
+                  minWidth: '20px'
+                }}>
+                  [2]
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{
+                    fontSize: '0.85rem',
+                    color: 'rgba(255, 255, 255, 0.9)',
+                    lineHeight: '1.6',
+                    marginBottom: '8px'
+                  }}>
+                    Louridas, P. (2020). <em>Algorithms</em>. MIT Press. (Chapter on Greedy Algorithms, pp. 45-67).
+                  </div>
+                  <div style={{
+                    fontSize: '0.75rem',
+                    color: 'rgba(255, 255, 255, 0.6)',
+                    fontStyle: 'italic'
+                  }}>
+                    Foundational text on algorithmic thinking and greedy algorithm design principles
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div style={{
+              padding: '20px',
+              borderRadius: '12px',
+              background: 'rgba(255, 255, 255, 0.02)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              transition: 'all 0.3s ease'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '12px'
+              }}>
+                <div style={{
+                  color: '#E0CDA9',
+                  fontSize: '0.75rem',
+                  fontWeight: '600',
+                  fontFamily: 'Fira Code, monospace',
+                  minWidth: '20px'
+                }}>
+                  [3]
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{
+                    fontSize: '0.85rem',
+                    color: 'rgba(255, 255, 255, 0.9)',
+                    lineHeight: '1.6',
+                    marginBottom: '8px'
+                  }}>
+                    Seaver, N. (2017). "Algorithms as Culture: Some Tactics for the Ethnography of Algorithmic Systems." <em>Big Data & Society</em>, 4(2), 1-12. (pp. 3-8).
+                  </div>
+                  <div style={{
+                    fontSize: '0.75rem',
+                    color: 'rgba(255, 255, 255, 0.6)',
+                    fontStyle: 'italic'
+                  }}>
+                    Ethnographic approach to understanding algorithms as cultural ensembles
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div style={{
+              padding: '20px',
+              borderRadius: '12px',
+              background: 'rgba(255, 255, 255, 0.02)',
+              backdropFilter: 'blur(20px)',
+              WebkitBackdropFilter: 'blur(20px)',
+              border: '1px solid rgba(255, 255, 255, 0.08)',
+              transition: 'all 0.3s ease'
+            }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'flex-start',
+                gap: '12px'
+              }}>
+                <div style={{
+                  color: '#E0CDA9',
+                  fontSize: '0.75rem',
+                  fontWeight: '600',
+                  fontFamily: 'Fira Code, monospace',
+                  minWidth: '20px'
+                }}>
+                  [4]
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{
+                    fontSize: '0.85rem',
+                    color: 'rgba(255, 255, 255, 0.9)',
+                    lineHeight: '1.6',
+                    marginBottom: '8px'
+                  }}>
+                    Gillespie, T. (2014). "The Relevance of Algorithms." In <em>Media Technologies: Essays on Communication, Materiality, and Society</em>, edited by T. Gillespie, P. Boczkowski, and K. Foot, 167-194. MIT Press. (pp. 167-180).
+                  </div>
+                  <div style={{
+                    fontSize: '0.75rem',
+                    color: 'rgba(255, 255, 255, 0.6)',
+                    fontStyle: 'italic'
+                  }}>
+                    Foundational work on how algorithms shape public knowledge and cultural production
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </div>
+    </>
   )
 }
 
