@@ -277,6 +277,7 @@ function App() {
         
         <style>{`
           @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+          @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600&display=swap');
           
           * {
             box-sizing: border-box;
@@ -287,7 +288,8 @@ function App() {
             padding: 0;
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
             overflow-x: hidden;
-            background: #000000;
+            background: #121212;
+            color: #EAEAEA;
           }
           
           html {
@@ -608,7 +610,7 @@ function App() {
         }
 
         .step-section {
-          padding: 100px 0;
+          padding: 96px 0;
           text-align: center;
         }
 
@@ -683,23 +685,24 @@ function App() {
       <header className="hero" style={{ 
         textAlign: 'center', 
         padding: '160px 0 100px',
-        background: 'radial-gradient(circle at top, rgba(255,255,255,0.05) 0%, transparent 70%)',
+        background: 'radial-gradient(circle at top, rgba(255,255,255,0.02) 0%, transparent 70%)',
         position: 'relative'
       }}>
         <div style={{
-          fontSize: '12px',
-          fontWeight: '600',
-          color: '#C1A75E',
-          letterSpacing: '0.1em',
+          fontSize: '11px',
+          fontWeight: '500',
+          color: '#E0CDA9',
+          letterSpacing: '0.15em',
           textTransform: 'uppercase',
+          fontFamily: 'Fira Code, monospace',
           marginBottom: '24px'
         }}>
           Algorithmic Curation
         </div>
         <h1 style={{ 
-          fontSize: '48px',
-          fontWeight: '600',
-          color: '#ffffff',
+          fontSize: '52px',
+          fontWeight: '500',
+          color: '#FFFFFF',
           letterSpacing: '-0.02em',
           margin: '0 0 32px 0',
           lineHeight: '1.1'
@@ -708,14 +711,14 @@ function App() {
         </h1>
         <p style={{ 
           fontSize: '18px',
-          color: 'rgba(255, 255, 255, 0.7)',
+          color: '#B8B8B8',
           fontWeight: '400',
           lineHeight: '1.6',
-          maxWidth: '600px',
+          maxWidth: '640px',
           margin: '0 auto',
           letterSpacing: '-0.01em'
         }}>
-          Discover the next song through algorithmic precision. Select a musical dimension and explore curated recommendations.
+          Discover your next track through quiet precision. Select a musical dimension and explore curated recommendations.
         </p>
       </header>
 
@@ -724,31 +727,33 @@ function App() {
         margin: '0 auto', 
         position: 'relative', 
         zIndex: 1,
-        background: 'radial-gradient(circle at top, #0E0E10, #121214)',
+        background: 'radial-gradient(circle at top, #1A1A1A, #121212)',
         minHeight: '100vh'
       }}>
         {/* Step 1: Choose Feature */}
         <section className="step-section" style={{ 
-          padding: '100px 0',
+          padding: '96px 0',
           textAlign: 'center'
         }}>
           <div style={{
-            textAlign: 'center'
+            textAlign: 'center',
+            marginBottom: '48px'
           }}>
             <div className="step-label" style={{
-              fontSize: '12px',
+              fontSize: '11px',
               fontWeight: '500',
-              color: '#C1A75E',
-              letterSpacing: '0.1em',
+              color: '#E0CDA9',
+              letterSpacing: '0.15em',
               textTransform: 'uppercase',
+              fontFamily: 'Fira Code, monospace',
               marginBottom: '12px'
             }}>
               Step One
             </div>
             <h2 className="section-title" style={{ 
-              fontSize: '28px',
-              fontWeight: '600',
-              color: '#ffffff',
+              fontSize: '32px',
+              fontWeight: '500',
+              color: '#FFFFFF',
               lineHeight: '1.3',
               margin: 0
             }}>
@@ -784,28 +789,23 @@ function App() {
                 style={{
                   width: '240px',
                   height: '120px',
-                  borderRadius: '16px',
+                  borderRadius: '12px',
                   border: selectedFeature === metric.key 
-                    ? '1px solid #C1A75E' 
-                    : '1px solid rgba(255, 255, 255, 0.06)',
+                    ? '1px solid #E0CDA9' 
+                    : '1px solid rgba(255, 255, 255, 0.05)',
                   background: selectedFeature === metric.key 
-                    ? 'rgba(193, 167, 94, 0.1)' 
-                    : 'rgba(255, 255, 255, 0.04)',
-                  backdropFilter: 'blur(12px)',
-                  WebkitBackdropFilter: 'blur(12px)',
-                  color: selectedFeature === metric.key ? '#C1A75E' : '#ffffff',
+                    ? 'rgba(224, 205, 169, 0.08)' 
+                    : 'rgba(255, 255, 255, 0.01)',
+                  color: selectedFeature === metric.key ? '#E0CDA9' : '#EAEAEA',
                   cursor: 'pointer',
-                  transition: 'all 0.3s ease',
+                  transition: 'all 0.2s ease',
                   textAlign: 'center',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '8px',
-                  boxSizing: 'border-box',
-                  boxShadow: selectedFeature === metric.key 
-                    ? '0 0 12px rgba(193, 167, 94, 0.3)' 
-                    : '0 0 20px rgba(0, 0, 0, 0.15)'
+                  boxSizing: 'border-box'
                 }}
                 onMouseEnter={(e) => {
                   if (selectedFeature !== metric.key) {
@@ -825,7 +825,7 @@ function App() {
                 <div style={{
                   fontSize: '16px',
                   fontWeight: '500',
-                  color: selectedFeature === metric.key ? '#C1A75E' : '#ffffff',
+                  color: selectedFeature === metric.key ? '#E0CDA9' : '#EAEAEA',
                   lineHeight: '1.2',
                   marginBottom: '4px'
                 }}>
@@ -833,10 +833,9 @@ function App() {
                 </div>
                 <div style={{
                   fontSize: '13px',
-                  opacity: 0.6,
                   fontWeight: '400',
                   lineHeight: '1.3',
-                  color: selectedFeature === metric.key ? 'rgba(193, 167, 94, 0.8)' : 'rgba(255, 255, 255, 0.6)'
+                  color: selectedFeature === metric.key ? 'rgba(224, 205, 169, 0.7)' : '#B8B8B8'
                 }}>
                   {metric.description}
                 </div>
@@ -848,26 +847,28 @@ function App() {
         {/* Step 2: Slider */}
         {selectedFeature && sortedTracks.length > 0 && (
           <section className="step-section" style={{ 
-            padding: '100px 0',
+            padding: '96px 0',
             textAlign: 'center'
           }}>
             <div style={{
-              textAlign: 'center'
+              textAlign: 'center',
+              marginBottom: '48px'
             }}>
               <div className="step-label" style={{
-                fontSize: '12px',
+                fontSize: '11px',
                 fontWeight: '500',
-                color: '#C1A75E',
-                letterSpacing: '0.1em',
+                color: '#E0CDA9',
+                letterSpacing: '0.15em',
                 textTransform: 'uppercase',
+                fontFamily: 'Fira Code, monospace',
                 marginBottom: '12px'
               }}>
                 Step Two
               </div>
               <h2 className="section-title" style={{ 
-                fontSize: '28px',
-                fontWeight: '600',
-                color: '#ffffff',
+                fontSize: '32px',
+                fontWeight: '500',
+                color: '#FFFFFF',
                 lineHeight: '1.3',
                 margin: 0
               }}>
@@ -879,20 +880,34 @@ function App() {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              padding: '60px 0',
+              padding: '48px 0',
               width: '100%',
-              maxWidth: '700px',
+              maxWidth: '640px',
               margin: '0 auto',
               position: 'relative'
             }}>
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '16px',
+                marginBottom: '24px',
+                fontFamily: 'Fira Code, monospace',
+                fontSize: '14px',
+                color: '#B8B8B8'
+              }}>
+                <span>{selectedFeature}:</span>
+                <span style={{ color: '#E0CDA9' }}>
+                  {((sortedTracks[Math.min(sliderValue, sortedTracks.length - 1)]?.[selectedFeature] as number) || 0).toFixed(2)}
+                </span>
+              </div>
+              
               <div className="slider-track" style={{
                 position: 'relative',
                 width: '100%',
-                height: '4px',
-                background: 'linear-gradient(90deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.1) 100%)',
-                borderRadius: '4px',
-                overflow: 'hidden',
-                marginBottom: '24px'
+                height: '2px',
+                background: 'rgba(255, 255, 255, 0.1)',
+                borderRadius: '1px',
+                overflow: 'hidden'
               }}>
                 <div 
                   className="slider-fill"
@@ -901,11 +916,10 @@ function App() {
                     height: '100%',
                     left: 0,
                     top: 0,
-                    borderRadius: '4px',
-                    background: 'linear-gradient(90deg, #c1a75e, #f8e39e)',
-                    boxShadow: '0 0 20px rgba(193, 167, 94, 0.3)',
+                    borderRadius: '1px',
+                    background: '#E0CDA9',
                     width: `${(Math.min(sliderValue, sortedTracks.length - 1) / (sortedTracks.length - 1)) * 100}%`,
-                    transition: 'width 0.3s ease'
+                    transition: 'width 0.2s ease'
                   }}
                 />
                 <div 
@@ -915,22 +929,19 @@ function App() {
                     top: '50%',
                     left: `${(Math.min(sliderValue, sortedTracks.length - 1) / (sortedTracks.length - 1)) * 100}%`,
                     transform: 'translate(-50%, -50%)',
-                    width: '20px',
-                    height: '20px',
-                    background: 'radial-gradient(circle, #f3d177 0%, #c1a75e 70%)',
-                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                    width: '12px',
+                    height: '12px',
+                    background: '#E0CDA9',
+                    border: '2px solid #121212',
                     borderRadius: '50%',
-                    boxShadow: '0 0 20px rgba(193, 167, 94, 0.4)',
                     cursor: 'pointer',
                     transition: 'all 0.2s ease'
                   }}
                   onMouseEnter={(e) => {
                     e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1.2)'
-                    e.currentTarget.style.boxShadow = '0 0 28px rgba(193, 167, 94, 0.6)'
                   }}
                   onMouseLeave={(e) => {
                     e.currentTarget.style.transform = 'translate(-50%, -50%) scale(1)'
-                    e.currentTarget.style.boxShadow = '0 0 20px rgba(193, 167, 94, 0.4)'
                   }}
                 />
               </div>
@@ -953,12 +964,13 @@ function App() {
               
               <div className="slider-label" style={{
                 marginTop: '24px',
-                color: 'rgba(255, 255, 255, 0.6)',
-                fontSize: '14px',
-                transition: 'all 0.3s ease',
+                color: '#B8B8B8',
+                fontSize: '13px',
+                fontFamily: 'Fira Code, monospace',
+                transition: 'all 0.2s ease',
                 textAlign: 'center'
               }}>
-                {sortedTracks.length} tracks available • Position {Math.min(sliderValue, sortedTracks.length - 1) + 1}
+                Track {Math.min(sliderValue, sortedTracks.length - 1) + 1} of {sortedTracks.length}
               </div>
             </div>
           </section>
@@ -967,28 +979,29 @@ function App() {
         {/* Step 3: Results */}
         {selectedSong && (
           <section className="step-section" style={{ 
-            padding: '100px 0',
+            padding: '96px 0',
             textAlign: 'center',
-            background: 'radial-gradient(circle at center, rgba(193, 167, 94, 0.03) 0%, transparent 70%)'
+            background: 'radial-gradient(circle at center, rgba(224, 205, 169, 0.02) 0%, transparent 70%)'
           }}>
             <div style={{
               textAlign: 'center',
-              marginBottom: '4rem'
+              marginBottom: '48px'
             }}>
               <div style={{
-                fontSize: '0.875rem',
-                fontWeight: '400',
-                color: '#d4af37',
-                letterSpacing: '1.5px',
+                fontSize: '11px',
+                fontWeight: '500',
+                color: '#E0CDA9',
+                letterSpacing: '0.15em',
                 textTransform: 'uppercase',
-                marginBottom: '0.5rem'
+                fontFamily: 'Fira Code, monospace',
+                marginBottom: '12px'
               }}>
                 Step Three
               </div>
               <h2 style={{ 
-                fontSize: '2rem',
-                fontWeight: '300',
-                color: '#ffffff',
+                fontSize: '32px',
+                fontWeight: '500',
+                color: '#FFFFFF',
                 letterSpacing: '-0.01em',
                 margin: 0
               }}>
@@ -1007,19 +1020,17 @@ function App() {
             }}>
               {/* Selected Song */}
               <div className="recommendation-card" style={{
-                background: 'rgba(255, 255, 255, 0.04)',
-                backdropFilter: 'blur(20px)',
-                WebkitBackdropFilter: 'blur(20px)',
-                padding: '32px 24px',
-                borderRadius: '16px',
-                border: '1px solid rgba(255, 255, 255, 0.08)',
-                boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
+                background: 'rgba(255, 255, 255, 0.01)',
+                padding: '24px',
+                borderRadius: '12px',
+                border: '1px solid rgba(255, 255, 255, 0.05)',
                 position: 'relative',
                 overflow: 'hidden',
                 width: '300px',
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'space-between'
+                justifyContent: 'space-between',
+                transition: 'all 0.2s ease'
               }}>
                 <div style={{
                   position: 'absolute',
@@ -1034,21 +1045,22 @@ function App() {
                 
                 <div style={{ position: 'relative', zIndex: 1 }}>
                   <div style={{
-                    fontSize: '12px',
-                    fontWeight: '600',
-                    color: '#C1A75E',
-                    letterSpacing: '0.1em',
+                    fontSize: '11px',
+                    fontWeight: '500',
+                    color: '#E0CDA9',
+                    letterSpacing: '0.15em',
                     textTransform: 'uppercase',
+                    fontFamily: 'Fira Code, monospace',
                     marginBottom: '16px'
                   }}>
                     Current Selection
                   </div>
                   <div style={{ 
-                    fontSize: '22px', 
+                    fontSize: '20px', 
                     marginBottom: '8px', 
                     lineHeight: '1.3', 
-                    fontWeight: '600',
-                    color: '#ffffff',
+                    fontWeight: '500',
+                    color: '#EAEAEA',
                     wordWrap: 'break-word',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -1063,7 +1075,7 @@ function App() {
                     fontSize: '14px', 
                     fontWeight: '400',
                     marginBottom: '24px',
-                    color: 'rgba(255, 255, 255, 0.6)',
+                    color: '#B8B8B8',
                     wordWrap: 'break-word',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
@@ -1083,7 +1095,7 @@ function App() {
                 <div className="divider" style={{ 
                   width: '1px',
                   height: '100%',
-                  background: 'linear-gradient(180deg, transparent 0%, rgba(193, 167, 94, 0.3) 50%, transparent 100%)',
+                  background: 'rgba(255, 255, 255, 0.1)',
                   position: 'relative'
                 }}>
                   <div style={{
@@ -1091,11 +1103,10 @@ function App() {
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    width: '8px',
-                    height: '8px',
+                    width: '6px',
+                    height: '6px',
                     borderRadius: '50%',
-                    background: '#C1A75E',
-                    boxShadow: '0 0 12px rgba(193, 167, 94, 0.5)'
+                    background: '#E0CDA9'
                   }} />
                 </div>
               )}
@@ -1103,19 +1114,17 @@ function App() {
               {/* Next Song */}
               {nextSong && (
                   <div className="recommendation-card" style={{
-                    background: 'rgba(255, 255, 255, 0.04)',
-                    backdropFilter: 'blur(20px)',
-                    WebkitBackdropFilter: 'blur(20px)',
-                    padding: '32px 24px',
-                    borderRadius: '16px',
-                    border: '1px solid rgba(255, 255, 255, 0.08)',
-                    boxShadow: '0 8px 25px rgba(0, 0, 0, 0.15)',
+                    background: 'rgba(255, 255, 255, 0.01)',
+                    padding: '24px',
+                    borderRadius: '12px',
+                    border: '1px solid rgba(255, 255, 255, 0.05)',
                     position: 'relative',
                     overflow: 'hidden',
                     width: '300px',
                     display: 'flex',
                     flexDirection: 'column',
-                    justifyContent: 'space-between'
+                    justifyContent: 'space-between',
+                    transition: 'all 0.2s ease'
                   }}>
                     <div style={{
                       position: 'absolute',
@@ -1130,21 +1139,22 @@ function App() {
                     
                     <div style={{ position: 'relative', zIndex: 1 }}>
                       <div style={{
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        color: '#C1A75E',
-                        letterSpacing: '0.1em',
+                        fontSize: '11px',
+                        fontWeight: '500',
+                        color: '#E0CDA9',
+                        letterSpacing: '0.15em',
                         textTransform: 'uppercase',
+                        fontFamily: 'Fira Code, monospace',
                         marginBottom: '16px'
                       }}>
                         Algorithmic Next
                       </div>
                       <div style={{ 
-                        fontSize: '22px', 
+                        fontSize: '20px', 
                         marginBottom: '8px', 
                         lineHeight: '1.3', 
-                        fontWeight: '600',
-                        color: '#ffffff',
+                        fontWeight: '500',
+                        color: '#EAEAEA',
                         wordWrap: 'break-word',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -1159,7 +1169,7 @@ function App() {
                         fontSize: '14px', 
                         fontWeight: '400',
                         marginBottom: '24px',
-                        color: 'rgba(255, 255, 255, 0.6)',
+                        color: '#B8B8B8',
                         wordWrap: 'break-word',
                         overflow: 'hidden',
                         textOverflow: 'ellipsis',
@@ -1183,17 +1193,18 @@ function App() {
               }}>
                 <div style={{
                   width: '200px',
-                  height: '2px',
-                  background: 'linear-gradient(90deg, transparent 0%, #C1A75E 50%, transparent 100%)',
+                  height: '1px',
+                  background: 'rgba(224, 205, 169, 0.3)',
                   margin: '0 auto 16px auto'
                 }} />
                 <div style={{ 
-                  fontSize: '14px', 
-                  color: 'rgba(255, 255, 255, 0.6)',
+                  fontSize: '13px', 
+                  color: '#B8B8B8',
                   fontWeight: '400',
+                  fontFamily: 'Fira Code, monospace',
                   letterSpacing: '0.3px'
                 }}>
-                  Algorithmic precision found the next match
+                  The algorithm listened closely — here's what it heard.
                 </div>
               </div>
             )}
