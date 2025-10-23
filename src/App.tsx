@@ -138,19 +138,80 @@ function App() {
       })
     }
 
-    // Filter by genre using artist-based detection
+    // Filter by genre using artist-based detection - MASSIVE MAPPING
     if (state.genreFilter !== 'all') {
       const artistToGenre: { [key: string]: string } = {
+        // Pop (20 artists)
         'Taylor Swift': 'pop', 'Ariana Grande': 'pop', 'Billie Eilish': 'pop', 'Olivia Rodrigo': 'pop', 'Dua Lipa': 'pop',
+        'Ed Sheeran': 'pop', 'Harry Styles': 'pop', 'Justin Bieber': 'pop', 'Selena Gomez': 'pop', 'Miley Cyrus': 'pop',
+        'Lady Gaga': 'pop', 'Katy Perry': 'pop', 'Rihanna': 'pop', 'Beyoncé': 'pop', 'Adele': 'pop',
+        'Bruno Mars': 'pop', 'The Weeknd': 'pop', 'Justin Timberlake': 'pop', 'P!nk': 'pop', 'Maroon 5': 'pop',
+        
+        // Electronic/Dance (20 artists)
         'Calvin Harris': 'electronic', 'The Chainsmokers': 'electronic', 'Marshmello': 'electronic', 'Skrillex': 'electronic', 'Deadmau5': 'electronic',
+        'David Guetta': 'electronic', 'Martin Garrix': 'electronic', 'Avicii': 'electronic', 'Swedish House Mafia': 'electronic', 'Tiësto': 'electronic',
+        'Armin van Buuren': 'electronic', 'Hardwell': 'electronic', 'Afrojack': 'electronic', 'Steve Aoki': 'electronic', 'Diplo': 'electronic',
+        'Flume': 'electronic', 'Odesza': 'electronic', 'Porter Robinson': 'electronic', 'Madeon': 'electronic', 'Zedd': 'electronic',
+        
+        // Rock (25 artists)
         'The Beatles': 'rock', 'Queen': 'rock', 'Led Zeppelin': 'rock', 'Pink Floyd': 'rock', 'AC/DC': 'rock',
+        'Rolling Stones': 'rock', 'The Who': 'rock', 'Nirvana': 'rock', 'Guns N Roses': 'rock', 'Metallica': 'rock',
+        'U2': 'rock', 'Coldplay': 'rock', 'Radiohead': 'rock', 'Foo Fighters': 'rock', 'Red Hot Chili Peppers': 'rock',
+        'Green Day': 'rock', 'Linkin Park': 'rock', 'Pearl Jam': 'rock', 'Soundgarden': 'rock', 'Alice in Chains': 'rock',
+        'The Clash': 'rock', 'The Ramones': 'rock', 'Black Sabbath': 'rock', 'Deep Purple': 'rock', 'Jimi Hendrix': 'rock',
+        
+        // Hip-Hop/Rap (25 artists)
         'Drake': 'hip-hop', 'Kendrick Lamar': 'hip-hop', 'Travis Scott': 'hip-hop', 'Post Malone': 'hip-hop', 'Kanye West': 'hip-hop',
+        'J. Cole': 'hip-hop', 'Eminem': 'hip-hop', 'Jay-Z': 'hip-hop', 'Nas': 'hip-hop', 'Tupac': 'hip-hop',
+        'Biggie': 'hip-hop', 'Snoop Dogg': 'hip-hop', 'Dr. Dre': 'hip-hop', '50 Cent': 'hip-hop', 'Lil Wayne': 'hip-hop',
+        'Future': 'hip-hop', 'Migos': 'hip-hop', 'Cardi B': 'hip-hop', 'Nicki Minaj': 'hip-hop', 'Lil Nas X': 'hip-hop',
+        'Tyler, The Creator': 'hip-hop', 'A$AP Rocky': 'hip-hop', 'JID': 'hip-hop', 'Vince Staples': 'hip-hop', 'Anderson .Paak': 'hip-hop',
+        
+        // Indie/Alternative (20 artists)
         'Arctic Monkeys': 'indie', 'The 1975': 'indie', 'Tame Impala': 'indie', 'Lorde': 'indie', 'Phoebe Bridgers': 'indie',
+        'Vampire Weekend': 'indie', 'Arcade Fire': 'indie', 'The Strokes': 'indie', 'Interpol': 'indie', 'Modest Mouse': 'indie',
+        'Death Cab for Cutie': 'indie', 'Bon Iver': 'indie', 'Sufjan Stevens': 'indie', 'Fleet Foxes': 'indie', 'Beach House': 'indie',
+        'Mac DeMarco': 'indie', 'King Gizzard': 'indie', 'Glass Animals': 'indie', 'Alt-J': 'indie',
+        
+        // Jazz (15 artists)
         'Miles Davis': 'jazz', 'John Coltrane': 'jazz', 'Ella Fitzgerald': 'jazz', 'Billie Holiday': 'jazz', 'Duke Ellington': 'jazz',
+        'Louis Armstrong': 'jazz', 'Charlie Parker': 'jazz', 'Thelonious Monk': 'jazz', 'Dave Brubeck': 'jazz', 'Herbie Hancock': 'jazz',
+        'Chick Corea': 'jazz', 'Pat Metheny': 'jazz', 'Wynton Marsalis': 'jazz', 'Diana Krall': 'jazz', 'Norah Jones': 'jazz',
+        
+        // Classical (15 artists)
         'Ludwig van Beethoven': 'classical', 'Wolfgang Amadeus Mozart': 'classical', 'Johann Sebastian Bach': 'classical', 'Pyotr Ilyich Tchaikovsky': 'classical', 'Frédéric Chopin': 'classical',
-        'Johnny Cash': 'country', 'Dolly Parton': 'country', 'Willie Nelson': 'country', 'Luke Combs': 'country',
+        'Franz Schubert': 'classical', 'Franz Liszt': 'classical', 'Richard Wagner': 'classical', 'Giuseppe Verdi': 'classical', 'Giacomo Puccini': 'classical',
+        'Claude Debussy': 'classical', 'Maurice Ravel': 'classical', 'Igor Stravinsky': 'classical', 'Antonín Dvořák': 'classical', 'Gustav Mahler': 'classical',
+        
+        // Country (15 artists)
+        'Johnny Cash': 'country', 'Dolly Parton': 'country', 'Willie Nelson': 'country', 'Luke Combs': 'country', 'Chris Stapleton': 'country',
+        'Carrie Underwood': 'country', 'Miranda Lambert': 'country', 'Kacey Musgraves': 'country', 'Zac Brown Band': 'country', 'Florida Georgia Line': 'country',
+        'Tim McGraw': 'country', 'Faith Hill': 'country', 'George Strait': 'country', 'Alan Jackson': 'country', 'Garth Brooks': 'country',
+        
+        // Reggae (10 artists)
         'Bob Marley': 'reggae', 'Peter Tosh': 'reggae', 'Jimmy Cliff': 'reggae', 'UB40': 'reggae', 'Sean Paul': 'reggae',
-        'B.B. King': 'blues', 'Muddy Waters': 'blues', 'Howlin Wolf': 'blues', 'John Lee Hooker': 'blues', 'Etta James': 'blues'
+        'Shaggy': 'reggae', 'Damian Marley': 'reggae', 'Ziggy Marley': 'reggae', 'Burning Spear': 'reggae', 'Toots and the Maytals': 'reggae',
+        
+        // Blues (10 artists)
+        'B.B. King': 'blues', 'Muddy Waters': 'blues', 'Howlin Wolf': 'blues', 'John Lee Hooker': 'blues', 'Etta James': 'blues',
+        'Robert Johnson': 'blues', 'Albert King': 'blues', 'Freddie King': 'blues', 'Stevie Ray Vaughan': 'blues', 'Buddy Guy': 'blues',
+        
+        // R&B/Soul (15 artists)
+        'Marvin Gaye': 'r&b', 'Stevie Wonder': 'r&b', 'Aretha Franklin': 'r&b', 'Ray Charles': 'r&b', 'Sam Cooke': 'r&b',
+        'Otis Redding': 'r&b', 'Al Green': 'r&b', 'Curtis Mayfield': 'r&b', 'James Brown': 'r&b', 'Prince': 'r&b',
+        'Michael Jackson': 'r&b', 'Whitney Houston': 'r&b', 'Luther Vandross': 'r&b', 'Anita Baker': 'r&b', 'Sade': 'r&b',
+        
+        // Latin (10 artists)
+        'Shakira': 'latin', 'Ricky Martin': 'latin', 'Enrique Iglesias': 'latin', 'J Balvin': 'latin', 'Bad Bunny': 'latin',
+        'Maluma': 'latin', 'Ozuna': 'latin', 'Daddy Yankee': 'latin', 'Wisin': 'latin', 'Yandel': 'latin',
+        
+        // K-Pop (10 artists)
+        'BTS': 'k-pop', 'BLACKPINK': 'k-pop', 'TWICE': 'k-pop', 'Red Velvet': 'k-pop', 'EXO': 'k-pop',
+        'NCT': 'k-pop', 'Stray Kids': 'k-pop', 'ITZY': 'k-pop', 'aespa': 'k-pop', 'NewJeans': 'k-pop',
+        
+        // World Music (10 artists)
+        'Youssou N\'Dour': 'world', 'Salif Keita': 'world', 'Fela Kuti': 'world', 'Buena Vista Social Club': 'world', 'Ravi Shankar': 'world',
+        'Ali Farka Touré': 'world', 'Amadou & Mariam': 'world', 'Tinariwen': 'world', 'Seun Kuti': 'world', 'Bombino': 'world'
       }
       
       filtered = filtered.filter(track => {
@@ -274,7 +335,7 @@ function App() {
                     💡 Try searching for:
                   </div>
                   <div style={{ display: 'flex', flexWrap: 'wrap', gap: '5px' }}>
-                    {['Taylor', 'Drake', 'Beatles', 'jazz', 'classical', 'rock', 'pop', 'electronic'].map(suggestion => (
+                    {['Taylor', 'Drake', 'Beatles', 'BTS', 'Miles', 'Bach', 'Marley', 'Hendrix', 'jazz', 'k-pop', 'classical', 'rock', 'pop', 'electronic'].map(suggestion => (
                       <button
                         key={suggestion}
                         onClick={() => setState(prev => ({ ...prev, searchQuery: suggestion }))}
@@ -309,17 +370,21 @@ function App() {
                   fontSize: '12px'
                 }}
               >
-                <option value="all">All Genres</option>
-                <option value="pop">Pop</option>
-                <option value="electronic">Electronic</option>
-                <option value="indie">Indie</option>
-                <option value="rock">Rock</option>
-                <option value="hip-hop">Hip-Hop</option>
-                <option value="jazz">Jazz</option>
-                <option value="classical">Classical</option>
-                <option value="country">Country</option>
-                <option value="reggae">Reggae</option>
-                <option value="blues">Blues</option>
+                  <option value="all">All Genres</option>
+                  <option value="pop">Pop</option>
+                  <option value="electronic">Electronic</option>
+                  <option value="rock">Rock</option>
+                  <option value="hip-hop">Hip-Hop</option>
+                  <option value="indie">Indie</option>
+                  <option value="jazz">Jazz</option>
+                  <option value="classical">Classical</option>
+                  <option value="country">Country</option>
+                  <option value="reggae">Reggae</option>
+                  <option value="blues">Blues</option>
+                  <option value="r&b">R&B/Soul</option>
+                  <option value="latin">Latin</option>
+                  <option value="k-pop">K-Pop</option>
+                  <option value="world">World Music</option>
               </select>
               
               <button

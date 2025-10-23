@@ -43,38 +43,91 @@ export async function getRecommendations(
     const targetValence = params.valence ?? 0.5
     const targetDanceability = params.danceability ?? 0.5
     
-    // Step 1: Search for popular tracks using well-known artists
+    // Step 1: Search for popular tracks using well-known artists - MASSIVE DATABASE
     const popularArtists = [
-      // Pop
+      // Pop (20 artists)
       'Taylor Swift', 'Ariana Grande', 'Billie Eilish', 'Olivia Rodrigo', 'Dua Lipa',
-      // Electronic
+      'Ed Sheeran', 'Harry Styles', 'Justin Bieber', 'Selena Gomez', 'Miley Cyrus',
+      'Lady Gaga', 'Katy Perry', 'Rihanna', 'Beyoncé', 'Adele',
+      'Bruno Mars', 'The Weeknd', 'Justin Timberlake', 'P!nk', 'Maroon 5',
+      
+      // Electronic/Dance (20 artists)
       'Calvin Harris', 'The Chainsmokers', 'Marshmello', 'Skrillex', 'Deadmau5',
-      // Rock
+      'David Guetta', 'Martin Garrix', 'Avicii', 'Swedish House Mafia', 'Tiësto',
+      'Armin van Buuren', 'Hardwell', 'Afrojack', 'Steve Aoki', 'Diplo',
+      'Flume', 'Odesza', 'Porter Robinson', 'Madeon', 'Zedd',
+      
+      // Rock (25 artists)
       'The Beatles', 'Queen', 'Led Zeppelin', 'Pink Floyd', 'AC/DC',
-      // Hip-Hop
+      'Rolling Stones', 'The Who', 'Nirvana', 'Guns N Roses', 'Metallica',
+      'U2', 'Coldplay', 'Radiohead', 'Foo Fighters', 'Red Hot Chili Peppers',
+      'Green Day', 'Linkin Park', 'Pearl Jam', 'Soundgarden', 'Alice in Chains',
+      'The Clash', 'The Ramones', 'Black Sabbath', 'Deep Purple', 'Jimi Hendrix',
+      
+      // Hip-Hop/Rap (25 artists)
       'Drake', 'Kendrick Lamar', 'Travis Scott', 'Post Malone', 'Kanye West',
-      // Indie
+      'J. Cole', 'Eminem', 'Jay-Z', 'Nas', 'Tupac',
+      'Biggie', 'Snoop Dogg', 'Dr. Dre', '50 Cent', 'Lil Wayne',
+      'Future', 'Migos', 'Cardi B', 'Nicki Minaj', 'Lil Nas X',
+      'Tyler, The Creator', 'A$AP Rocky', 'JID', 'Vince Staples', 'Anderson .Paak',
+      
+      // Indie/Alternative (20 artists)
       'Arctic Monkeys', 'The 1975', 'Tame Impala', 'Lorde', 'Phoebe Bridgers',
-      // Jazz
+      'Vampire Weekend', 'Arcade Fire', 'The Strokes', 'Interpol', 'Modest Mouse',
+      'Death Cab for Cutie', 'Bon Iver', 'Sufjan Stevens', 'Fleet Foxes', 'Beach House',
+      'Mac DeMarco', 'King Gizzard', 'Tame Impala', 'Glass Animals', 'Alt-J',
+      
+      // Jazz (15 artists)
       'Miles Davis', 'John Coltrane', 'Ella Fitzgerald', 'Billie Holiday', 'Duke Ellington',
-      // Classical
+      'Louis Armstrong', 'Charlie Parker', 'Thelonious Monk', 'Dave Brubeck', 'Herbie Hancock',
+      'Chick Corea', 'Pat Metheny', 'Wynton Marsalis', 'Diana Krall', 'Norah Jones',
+      
+      // Classical (15 artists)
       'Ludwig van Beethoven', 'Wolfgang Amadeus Mozart', 'Johann Sebastian Bach', 'Pyotr Ilyich Tchaikovsky', 'Frédéric Chopin',
-      // Country
-      'Johnny Cash', 'Dolly Parton', 'Willie Nelson', 'Taylor Swift', 'Luke Combs',
-      // Reggae
+      'Franz Schubert', 'Franz Liszt', 'Richard Wagner', 'Giuseppe Verdi', 'Giacomo Puccini',
+      'Claude Debussy', 'Maurice Ravel', 'Igor Stravinsky', 'Antonín Dvořák', 'Gustav Mahler',
+      
+      // Country (15 artists)
+      'Johnny Cash', 'Dolly Parton', 'Willie Nelson', 'Luke Combs', 'Chris Stapleton',
+      'Carrie Underwood', 'Miranda Lambert', 'Kacey Musgraves', 'Zac Brown Band', 'Florida Georgia Line',
+      'Tim McGraw', 'Faith Hill', 'George Strait', 'Alan Jackson', 'Garth Brooks',
+      
+      // Reggae (10 artists)
       'Bob Marley', 'Peter Tosh', 'Jimmy Cliff', 'UB40', 'Sean Paul',
-      // Blues
-      'B.B. King', 'Muddy Waters', 'Howlin Wolf', 'John Lee Hooker', 'Etta James'
+      'Shaggy', 'Damian Marley', 'Ziggy Marley', 'Burning Spear', 'Toots and the Maytals',
+      
+      // Blues (10 artists)
+      'B.B. King', 'Muddy Waters', 'Howlin Wolf', 'John Lee Hooker', 'Etta James',
+      'Robert Johnson', 'Albert King', 'Freddie King', 'Stevie Ray Vaughan', 'Buddy Guy',
+      
+      // R&B/Soul (15 artists)
+      'Marvin Gaye', 'Stevie Wonder', 'Aretha Franklin', 'Ray Charles', 'Sam Cooke',
+      'Otis Redding', 'Al Green', 'Curtis Mayfield', 'James Brown', 'Prince',
+      'Michael Jackson', 'Whitney Houston', 'Luther Vandross', 'Anita Baker', 'Sade',
+      
+      // Latin (10 artists)
+      'Shakira', 'Ricky Martin', 'Enrique Iglesias', 'J Balvin', 'Bad Bunny',
+      'Maluma', 'Ozuna', 'Daddy Yankee', 'Wisin', 'Yandel',
+      
+      // K-Pop (10 artists)
+      'BTS', 'BLACKPINK', 'TWICE', 'Red Velvet', 'EXO',
+      'NCT', 'Stray Kids', 'ITZY', 'aespa', 'NewJeans',
+      
+      // World Music (10 artists)
+      'Youssou N\'Dour', 'Salif Keita', 'Fela Kuti', 'Buena Vista Social Club', 'Ravi Shankar',
+      'Ali Farka Touré', 'Amadou & Mariam', 'Tinariwen', 'Seun Kuti', 'Bombino'
     ]
     
     const allTracks: any[] = []
     
     console.log('🔍 Searching for popular tracks from well-known artists')
     
-    // Search for tracks by popular artists
-    for (const artist of popularArtists.slice(0, 20)) {
+    // Search for tracks by popular artists - MASSIVE SEARCH
+    console.log(`🎵 Searching ${popularArtists.length} artists for maximum music diversity!`)
+    
+    for (const artist of popularArtists) {
       try {
-        const searchUrl = `https://api.spotify.com/v1/search?q=artist:"${artist}"&type=track&limit=3`
+        const searchUrl = `https://api.spotify.com/v1/search?q=artist:"${artist}"&type=track&limit=2`
         console.log(`Searching ${artist}:`, searchUrl)
         
         const searchResponse = await fetch(searchUrl, {
@@ -126,18 +179,79 @@ export async function getRecommendations(
         blues: { energy: 0.5, valence: 0.3, danceability: 0.6, acousticness: 0.8 }
       }
       
-      // Determine genre based on artist (simplified mapping)
+      // Determine genre based on artist - MASSIVE MAPPING
       const artistToGenre: { [key: string]: string } = {
+        // Pop (20 artists)
         'Taylor Swift': 'pop', 'Ariana Grande': 'pop', 'Billie Eilish': 'pop', 'Olivia Rodrigo': 'pop', 'Dua Lipa': 'pop',
+        'Ed Sheeran': 'pop', 'Harry Styles': 'pop', 'Justin Bieber': 'pop', 'Selena Gomez': 'pop', 'Miley Cyrus': 'pop',
+        'Lady Gaga': 'pop', 'Katy Perry': 'pop', 'Rihanna': 'pop', 'Beyoncé': 'pop', 'Adele': 'pop',
+        'Bruno Mars': 'pop', 'The Weeknd': 'pop', 'Justin Timberlake': 'pop', 'P!nk': 'pop', 'Maroon 5': 'pop',
+        
+        // Electronic/Dance (20 artists)
         'Calvin Harris': 'electronic', 'The Chainsmokers': 'electronic', 'Marshmello': 'electronic', 'Skrillex': 'electronic', 'Deadmau5': 'electronic',
+        'David Guetta': 'electronic', 'Martin Garrix': 'electronic', 'Avicii': 'electronic', 'Swedish House Mafia': 'electronic', 'Tiësto': 'electronic',
+        'Armin van Buuren': 'electronic', 'Hardwell': 'electronic', 'Afrojack': 'electronic', 'Steve Aoki': 'electronic', 'Diplo': 'electronic',
+        'Flume': 'electronic', 'Odesza': 'electronic', 'Porter Robinson': 'electronic', 'Madeon': 'electronic', 'Zedd': 'electronic',
+        
+        // Rock (25 artists)
         'The Beatles': 'rock', 'Queen': 'rock', 'Led Zeppelin': 'rock', 'Pink Floyd': 'rock', 'AC/DC': 'rock',
+        'Rolling Stones': 'rock', 'The Who': 'rock', 'Nirvana': 'rock', 'Guns N Roses': 'rock', 'Metallica': 'rock',
+        'U2': 'rock', 'Coldplay': 'rock', 'Radiohead': 'rock', 'Foo Fighters': 'rock', 'Red Hot Chili Peppers': 'rock',
+        'Green Day': 'rock', 'Linkin Park': 'rock', 'Pearl Jam': 'rock', 'Soundgarden': 'rock', 'Alice in Chains': 'rock',
+        'The Clash': 'rock', 'The Ramones': 'rock', 'Black Sabbath': 'rock', 'Deep Purple': 'rock', 'Jimi Hendrix': 'rock',
+        
+        // Hip-Hop/Rap (25 artists)
         'Drake': 'hip-hop', 'Kendrick Lamar': 'hip-hop', 'Travis Scott': 'hip-hop', 'Post Malone': 'hip-hop', 'Kanye West': 'hip-hop',
+        'J. Cole': 'hip-hop', 'Eminem': 'hip-hop', 'Jay-Z': 'hip-hop', 'Nas': 'hip-hop', 'Tupac': 'hip-hop',
+        'Biggie': 'hip-hop', 'Snoop Dogg': 'hip-hop', 'Dr. Dre': 'hip-hop', '50 Cent': 'hip-hop', 'Lil Wayne': 'hip-hop',
+        'Future': 'hip-hop', 'Migos': 'hip-hop', 'Cardi B': 'hip-hop', 'Nicki Minaj': 'hip-hop', 'Lil Nas X': 'hip-hop',
+        'Tyler, The Creator': 'hip-hop', 'A$AP Rocky': 'hip-hop', 'JID': 'hip-hop', 'Vince Staples': 'hip-hop', 'Anderson .Paak': 'hip-hop',
+        
+        // Indie/Alternative (20 artists)
         'Arctic Monkeys': 'indie', 'The 1975': 'indie', 'Tame Impala': 'indie', 'Lorde': 'indie', 'Phoebe Bridgers': 'indie',
+        'Vampire Weekend': 'indie', 'Arcade Fire': 'indie', 'The Strokes': 'indie', 'Interpol': 'indie', 'Modest Mouse': 'indie',
+        'Death Cab for Cutie': 'indie', 'Bon Iver': 'indie', 'Sufjan Stevens': 'indie', 'Fleet Foxes': 'indie', 'Beach House': 'indie',
+        'Mac DeMarco': 'indie', 'King Gizzard': 'indie', 'Glass Animals': 'indie', 'Alt-J': 'indie',
+        
+        // Jazz (15 artists)
         'Miles Davis': 'jazz', 'John Coltrane': 'jazz', 'Ella Fitzgerald': 'jazz', 'Billie Holiday': 'jazz', 'Duke Ellington': 'jazz',
+        'Louis Armstrong': 'jazz', 'Charlie Parker': 'jazz', 'Thelonious Monk': 'jazz', 'Dave Brubeck': 'jazz', 'Herbie Hancock': 'jazz',
+        'Chick Corea': 'jazz', 'Pat Metheny': 'jazz', 'Wynton Marsalis': 'jazz', 'Diana Krall': 'jazz', 'Norah Jones': 'jazz',
+        
+        // Classical (15 artists)
         'Ludwig van Beethoven': 'classical', 'Wolfgang Amadeus Mozart': 'classical', 'Johann Sebastian Bach': 'classical', 'Pyotr Ilyich Tchaikovsky': 'classical', 'Frédéric Chopin': 'classical',
-        'Johnny Cash': 'country', 'Dolly Parton': 'country', 'Willie Nelson': 'country', 'Luke Combs': 'country',
+        'Franz Schubert': 'classical', 'Franz Liszt': 'classical', 'Richard Wagner': 'classical', 'Giuseppe Verdi': 'classical', 'Giacomo Puccini': 'classical',
+        'Claude Debussy': 'classical', 'Maurice Ravel': 'classical', 'Igor Stravinsky': 'classical', 'Antonín Dvořák': 'classical', 'Gustav Mahler': 'classical',
+        
+        // Country (15 artists)
+        'Johnny Cash': 'country', 'Dolly Parton': 'country', 'Willie Nelson': 'country', 'Luke Combs': 'country', 'Chris Stapleton': 'country',
+        'Carrie Underwood': 'country', 'Miranda Lambert': 'country', 'Kacey Musgraves': 'country', 'Zac Brown Band': 'country', 'Florida Georgia Line': 'country',
+        'Tim McGraw': 'country', 'Faith Hill': 'country', 'George Strait': 'country', 'Alan Jackson': 'country', 'Garth Brooks': 'country',
+        
+        // Reggae (10 artists)
         'Bob Marley': 'reggae', 'Peter Tosh': 'reggae', 'Jimmy Cliff': 'reggae', 'UB40': 'reggae', 'Sean Paul': 'reggae',
-        'B.B. King': 'blues', 'Muddy Waters': 'blues', 'Howlin Wolf': 'blues', 'John Lee Hooker': 'blues', 'Etta James': 'blues'
+        'Shaggy': 'reggae', 'Damian Marley': 'reggae', 'Ziggy Marley': 'reggae', 'Burning Spear': 'reggae', 'Toots and the Maytals': 'reggae',
+        
+        // Blues (10 artists)
+        'B.B. King': 'blues', 'Muddy Waters': 'blues', 'Howlin Wolf': 'blues', 'John Lee Hooker': 'blues', 'Etta James': 'blues',
+        'Robert Johnson': 'blues', 'Albert King': 'blues', 'Freddie King': 'blues', 'Stevie Ray Vaughan': 'blues', 'Buddy Guy': 'blues',
+        
+        // R&B/Soul (15 artists)
+        'Marvin Gaye': 'r&b', 'Stevie Wonder': 'r&b', 'Aretha Franklin': 'r&b', 'Ray Charles': 'r&b', 'Sam Cooke': 'r&b',
+        'Otis Redding': 'r&b', 'Al Green': 'r&b', 'Curtis Mayfield': 'r&b', 'James Brown': 'r&b', 'Prince': 'r&b',
+        'Michael Jackson': 'r&b', 'Whitney Houston': 'r&b', 'Luther Vandross': 'r&b', 'Anita Baker': 'r&b', 'Sade': 'r&b',
+        
+        // Latin (10 artists)
+        'Shakira': 'latin', 'Ricky Martin': 'latin', 'Enrique Iglesias': 'latin', 'J Balvin': 'latin', 'Bad Bunny': 'latin',
+        'Maluma': 'latin', 'Ozuna': 'latin', 'Daddy Yankee': 'latin', 'Wisin': 'latin', 'Yandel': 'latin',
+        
+        // K-Pop (10 artists)
+        'BTS': 'k-pop', 'BLACKPINK': 'k-pop', 'TWICE': 'k-pop', 'Red Velvet': 'k-pop', 'EXO': 'k-pop',
+        'NCT': 'k-pop', 'Stray Kids': 'k-pop', 'ITZY': 'k-pop', 'aespa': 'k-pop', 'NewJeans': 'k-pop',
+        
+        // World Music (10 artists)
+        'Youssou N\'Dour': 'world', 'Salif Keita': 'world', 'Fela Kuti': 'world', 'Buena Vista Social Club': 'world', 'Ravi Shankar': 'world',
+        'Ali Farka Touré': 'world', 'Amadou & Mariam': 'world', 'Tinariwen': 'world', 'Seun Kuti': 'world', 'Bombino': 'world'
       }
       
       const artistName = track.artists?.[0]?.name || ''
