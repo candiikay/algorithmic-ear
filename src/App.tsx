@@ -400,8 +400,14 @@ function App() {
               )}
             </div>
             
-            {/* All Features Display with Single Slider */}
-            <div style={{ marginBottom: '1rem' }}>
+            {/* METRIC SLIDER - MOVED TO TOP FOR VISIBILITY */}
+            <div style={{ 
+              marginBottom: '1.5rem', 
+              padding: '15px', 
+              backgroundColor: 'rgba(102, 126, 234, 0.1)', 
+              borderRadius: '10px',
+              border: '1px solid rgba(102, 126, 234, 0.3)'
+            }}>
               <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem', color: '#667eea' }}>
                 🎯 Pick a Feature & Value
               </h3>
@@ -522,6 +528,7 @@ function App() {
                   ✕ Clear Filter
                 </button>
               )}
+            </div>
             </div>
               
               <button
