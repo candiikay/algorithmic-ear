@@ -1,23 +1,65 @@
+/**
+ * The Algorithmic Ear - Interactive Music Recommendation System
+ * 
+ * This React application demonstrates how algorithmic music recommendation systems work
+ * by allowing users to interact with a simplified greedy algorithm. The app explores
+ * the relationship between measurable audio features and subjective musical experience.
+ * 
+ * Key Features:
+ * - Interactive feature selection (danceability, energy, valence, etc.)
+ * - Real-time slider-based track exploration
+ * - Greedy algorithm demonstration with 30 diverse tracks
+ * - Mobile-responsive design with touch-friendly interactions
+ * - Academic framework integrating cultural theory and algorithmic critique
+ * 
+ * Architecture:
+ * - Main App component handles all state and UI logic
+ * - CustomDropdown for algorithm selection
+ * - Spotify API integration with fallback data
+ * - Responsive design with mobile optimization
+ * 
+ * @author Candace Stewart
+ * @version 2.0
+ * @created 2024
+ */
+
 import React, { useState, useEffect, useMemo } from 'react'
 import { getToken, getRecommendations, FALLBACK_TRACKS } from './lib/spotify'
 import type { Track } from './types'
-import InfoPop from './components/InfoPop'
 import CustomDropdown from './components/CustomDropdown'
 import { INFO_CONTENT, FEATURE_DETAILS } from './data/infoContent'
 
 function App() {
-  const [tracks, setTracks] = useState<Track[]>([])
-  const [selectedSong, setSelectedSong] = useState<Track | null>(null)
-  const [nextSong, setNextSong] = useState<Track | null>(null)
-  const [selectedFeature, setSelectedFeature] = useState<keyof Track | null>(null)
-  const [isLoading, setIsLoading] = useState(true)
-  const [loadingProgress, setLoadingProgress] = useState(0)
-  const [loadingMessage, setLoadingMessage] = useState('Starting...')
-  const [sliderValue, setSliderValue] = useState(0)
-  const [error, setError] = useState<string | null>(null)
-  const [selectedAlgorithm, setSelectedAlgorithm] = useState('greedy')
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  // ============================================================================
+  // STATE MANAGEMENT
+  // ============================================================================
+  
+  // Core data state
+  const [tracks, setTracks] = useState<Track[]>([])                    // All available tracks (30 tracks)
+  const [selectedSong, setSelectedSong] = useState<Track | null>(null) // Currently selected track
+  const [nextSong, setNextSong] = useState<Track | null>(null)         // Algorithm's next recommendation
+  
+  // User interaction state
+  const [selectedFeature, setSelectedFeature] = useState<keyof Track | null>(null) // Selected audio feature
+  const [selectedAlgorithm, setSelectedAlgorithm] = useState('greedy')             // Algorithm type (only greedy works)
+  const [sliderValue, setSliderValue] = useState(0)                               // Slider position (0-29)
+  
+  // UI state
+  const [isLoading, setIsLoading] = useState(true)           // Loading state for initial data fetch
+  const [loadingProgress, setLoadingProgress] = useState(0)  // Loading progress percentage
+  const [loadingMessage, setLoadingMessage] = useState('Starting...') // Loading status message
+  const [error, setError] = useState<string | null>(null)    // Error state
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false) // Mobile navigation menu state
 
+  // ============================================================================
+  // CONSTANTS & CONFIGURATION
+  // ============================================================================
+  
+  /**
+   * Audio features available for selection
+   * These correspond to Spotify's audio analysis features
+   * Each feature has a key (property name), label (display name), description, and format function
+   */
   const FEATURE_STATS: Array<{
     key: keyof Pick<Track, 'danceability' | 'energy' | 'valence' | 'tempo' | 'loudness' | 'acousticness'>
     label: string
@@ -32,6 +74,11 @@ function App() {
     { key: 'acousticness', label: 'Acousticness', description: 'Likelihood of being acoustic vs. electronic', format: (value) => `${(value * 100).toFixed(0)}%` }
   ]
 
+  /**
+   * Available algorithms for demonstration
+   * Currently only 'greedy' is functional
+   * Other algorithms are placeholders for future implementation
+   */
   const ALGORITHMS = [
     { 
       id: 'greedy', 
@@ -76,7 +123,15 @@ function App() {
     time_signature: track.time_signature ?? 4
   })
 
-  // Load tracks on component mount
+  // ============================================================================
+  // EFFECTS & DATA LOADING
+  // ============================================================================
+  
+  /**
+   * Load tracks on component mount
+   * Attempts to fetch from Spotify API, falls back to FALLBACK_TRACKS
+   * Simulates loading progress for better UX
+   */
   useEffect(() => {
     const loadTracks = async () => {
       try {
@@ -141,7 +196,16 @@ function App() {
     loadTracks()
   }, [])
 
-  // Sort tracks when the feature selection changes
+  // ============================================================================
+  // COMPUTED VALUES & ALGORITHM LOGIC
+  // ============================================================================
+  
+  /**
+   * Sort tracks based on selected feature and slider value
+   * Implements greedy algorithm: finds tracks most similar to slider position
+   * Adds randomness factor to make recommendations less predictable
+   * Returns top 15 most similar tracks
+   */
   const sortedTracks = useMemo(() => {
     if (!selectedFeature) return tracks
     
@@ -164,7 +228,15 @@ function App() {
       .map(item => item.track)
   }, [tracks, selectedFeature, sliderValue])
 
-  // Handle slider change
+  // ============================================================================
+  // EVENT HANDLERS
+  // ============================================================================
+  
+  /**
+   * Handle slider value change
+   * Updates slider position and selects corresponding track from sorted recommendations
+   * @param value - New slider value (0-29)
+   */
   const handleSliderChange = (value: number) => {
     setSliderValue(value)
     // Select a track from the sorted recommendations based on slider position
@@ -220,6 +292,16 @@ function App() {
     }
   }, [selectedFeature, sliderValue, sortedTracks, tracks.length])
 
+  // ============================================================================
+  // RENDER HELPERS
+  // ============================================================================
+  
+  /**
+   * Render feature statistics for a track
+   * Displays all audio features with formatted values
+   * @param track - Track object to render stats for
+   * @returns JSX element with feature statistics
+   */
   const renderFeatureStats = (track: Track) => (
     <>
       {FEATURE_STATS.map((stat) => {
@@ -248,6 +330,11 @@ function App() {
     </>
   )
 
+  // ============================================================================
+  // RENDER CONDITIONS
+  // ============================================================================
+  
+  // Show loading screen while tracks are being fetched
   if (isLoading) {
     return (
       <div style={{
@@ -316,8 +403,13 @@ function App() {
     )
   }
 
+  // ============================================================================
+  // MAIN RENDER
+  // ============================================================================
+  
   return (
     <>
+      {/* Global styles for animations and responsive design */}
       <style>
         {`
           html, body {
@@ -367,7 +459,9 @@ function App() {
         }} />
       </div>
 
-      {/* Main Header */}
+      {/* ========================================================================
+           MAIN HEADER - Fixed navigation and branding
+           ======================================================================== */}
       <header style={{
         position: 'fixed',
         top: '3px',
@@ -707,7 +801,9 @@ function App() {
         overflow: 'hidden',
         paddingTop: '80px' // Add space for fixed header
       }}>
-        {/* Header */}
+        {/* ========================================================================
+             HERO SECTION - Main title and introduction
+             ======================================================================== */}
         <header style={{ 
           textAlign: 'center', 
           padding: window.innerWidth < 768 ? '80px 0 60px' : '120px 0 100px',
@@ -836,6 +932,9 @@ function App() {
               fontFamily: 'Fira Code, monospace',
               marginBottom: '12px'
             }}>
+              {/* ========================================================================
+                   STEP ONE - Algorithm Selection
+                   ======================================================================== */}
               Step One
             </div>
             <h2 style={{
@@ -1108,6 +1207,9 @@ function App() {
               fontFamily: 'Fira Code, monospace',
               marginBottom: '12px'
             }}>
+              {/* ========================================================================
+                   STEP TWO - Feature Selection
+                   ======================================================================== */}
               Step Two
             </div>
             <h2 style={{ 
@@ -1340,6 +1442,9 @@ function App() {
                 fontFamily: 'Fira Code, monospace',
                 marginBottom: '12px'
               }}>
+                {/* ========================================================================
+                     STEP THREE - Track Exploration & Slider
+                     ======================================================================== */}
                 Step Three
               </div>
                 <h2 style={{ 
@@ -1589,6 +1694,9 @@ function App() {
                 fontFamily: 'Fira Code, monospace',
                 marginBottom: '12px'
               }}>
+                {/* ========================================================================
+                     STEP FOUR - Algorithmic Recommendations
+                     ======================================================================== */}
                 Step Four
               </div>
                 <h2 style={{ 
