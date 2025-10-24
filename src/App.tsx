@@ -171,7 +171,9 @@ function App() {
     if (sortedTracks.length > 0) {
       const index = Math.floor((value / (tracks.length - 1)) * sortedTracks.length)
       const clampedIndex = Math.min(index, sortedTracks.length - 1)
-      setSelectedSong(sortedTracks[clampedIndex])
+      if (sortedTracks[clampedIndex]) {
+        setSelectedSong(sortedTracks[clampedIndex])
+      }
     }
   }
 
@@ -213,7 +215,9 @@ function App() {
     // Select a track from the sorted recommendations based on slider position
     const index = Math.floor((sliderValue / (tracks.length - 1)) * sortedTracks.length)
     const clampedIndex = Math.min(index, sortedTracks.length - 1)
-    setSelectedSong(sortedTracks[clampedIndex])
+    if (sortedTracks[clampedIndex]) {
+      setSelectedSong(sortedTracks[clampedIndex])
+    }
   }, [selectedFeature, sliderValue, sortedTracks, tracks.length])
 
   const renderFeatureStats = (track: Track) => (
@@ -1495,6 +1499,7 @@ function App() {
                         const featureValue = track[selectedFeature as keyof Track] as number
                         const sliderPos = Math.floor(featureValue * (tracks.length - 1))
                         setSliderValue(sliderPos)
+                        setSelectedSong(track)
                       }
                     }}
                     style={{
