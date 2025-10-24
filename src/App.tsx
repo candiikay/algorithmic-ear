@@ -1649,11 +1649,11 @@ function App() {
               flexDirection: 'column'
             }}>
             <div className="recommendation-grid" style={{
-              display: 'flex',
+              display: 'grid',
+              gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(2, 280px)',
               justifyContent: 'center',
-              gap: '2rem',
-              marginTop: '2rem',
-              flexWrap: 'wrap'
+              gap: window.innerWidth < 768 ? '1rem' : '2rem',
+              marginTop: '2rem'
             }}>
               {/* Selected Song */}
               <div className="recommendation-card" style={{
@@ -1664,8 +1664,8 @@ function App() {
                 justifyContent: 'space-between',
                 background: 'rgba(255, 255, 255, 0.01)',
                 borderRadius: '16px',
-                padding: '24px',
-                width: '280px',
+                padding: window.innerWidth < 768 ? '20px' : '24px',
+                width: window.innerWidth < 768 ? '100%' : '280px',
                 minHeight: '360px',
                 textAlign: 'center',
                 border: '1px solid rgba(255, 255, 255, 0.05)',
@@ -1750,8 +1750,8 @@ function App() {
                   justifyContent: 'space-between',
                   background: 'rgba(255, 255, 255, 0.01)',
                   borderRadius: '16px',
-                  padding: '24px',
-                  width: '280px',
+                  padding: window.innerWidth < 768 ? '20px' : '24px',
+                  width: window.innerWidth < 768 ? '100%' : '280px',
                   minHeight: '360px',
                   textAlign: 'center',
                   border: '1px solid rgba(255, 255, 255, 0.05)',
@@ -1879,8 +1879,8 @@ function App() {
             
             <div style={{
               display: 'grid',
-              gridTemplateColumns: window.innerWidth < 768 ? '1fr' : 'repeat(2, 1fr)',
-              gap: '32px',
+              gridTemplateColumns: window.innerWidth < 768 ? 'repeat(2, 1fr)' : 'repeat(2, 1fr)',
+              gap: window.innerWidth < 768 ? '16px' : '32px',
               marginTop: '48px'
             }}>
               <div style={{
