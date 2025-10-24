@@ -1666,7 +1666,7 @@ function App() {
                 borderRadius: '16px',
                 padding: window.innerWidth < 768 ? '20px' : '24px',
                 width: window.innerWidth < 768 ? '100%' : '280px',
-                minHeight: '360px',
+                minHeight: 'auto',
                 textAlign: 'center',
                 border: '1px solid rgba(255, 255, 255, 0.05)',
                 transition: 'all 0.2s ease'
@@ -1752,7 +1752,7 @@ function App() {
                   borderRadius: '16px',
                   padding: window.innerWidth < 768 ? '20px' : '24px',
                   width: window.innerWidth < 768 ? '100%' : '280px',
-                  minHeight: '360px',
+                  minHeight: 'auto',
                   textAlign: 'center',
                   border: '1px solid rgba(255, 255, 255, 0.05)',
                   transition: 'all 0.2s ease'
@@ -1905,7 +1905,9 @@ function App() {
                   color: 'rgba(255, 255, 255, 0.85)',
                   fontSize: '0.9rem',
                   lineHeight: '1.6',
-                  margin: 0
+                  margin: 0,
+                  wordWrap: 'break-word',
+                  overflowWrap: 'break-word'
                 }}>
                   Modern platforms use ensemble methods, collaborative filtering, content-based filtering, and contextual awareness. Spotify's Discover Weekly combines multiple algorithms with user behavior patterns, while Apple Music emphasizes human curation. The key is balancing algorithmic efficiency with serendipitous discovery—moving beyond simple similarity matching to understand musical context and cultural meaning.
                 </p>
@@ -1933,7 +1935,9 @@ function App() {
                   color: 'rgba(255, 255, 255, 0.85)',
                   fontSize: '0.9rem',
                   lineHeight: '1.6',
-                  margin: 0
+                  margin: 0,
+                  wordWrap: 'break-word',
+                  overflowWrap: 'break-word'
                 }}>
                   True taste development requires human context: cultural knowledge, emotional resonance, and the ability to make unexpected connections. The best recommendation systems don't replace human curators—they amplify their work, using algorithms to surface hidden gems that human experts can then contextualize and present.
                 </p>
